@@ -1,5 +1,8 @@
 package com.anbang.p2p.plan.bean;
 
+/**
+ * 基本贷款
+ */
 public class BaseLoan {
 	private String id;
 	private double baseLimit;// 基本额度

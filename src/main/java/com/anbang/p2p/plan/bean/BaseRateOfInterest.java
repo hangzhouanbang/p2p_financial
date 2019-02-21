@@ -1,5 +1,8 @@
 package com.anbang.p2p.plan.bean;
 
+/**
+ * 基本利率
+ */
 public class BaseRateOfInterest {
 	private String id;
 	private double seven;// 七日利率

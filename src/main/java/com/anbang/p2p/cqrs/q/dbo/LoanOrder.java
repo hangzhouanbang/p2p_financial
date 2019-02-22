@@ -1,39 +1,32 @@
-package com.anbang.p2p.cqrs.c.domain.order;
+package com.anbang.p2p.cqrs.q.dbo;
 
-public class OrderValueObject {
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+
+/**
+ * 贷款订单
+ */
+public class LoanOrder {
 	private String id;// 卡密
 	private String userId;// 用户
-	private String bankCardNo;// 银行卡号
+	private String nickname;// 用户昵称
+	private String headimgurl;// 头像
+	private String realName;// 真实姓名
+	private String phone;// 手机号码
+	private String address;// 地址
 	private double amount;// 贷款金额
+	private String bankCardId;// 银行卡号
 	private double service_charge;// 手续费
-	private long freeOfInterest;// 免息时间
+	private long freeOfInterest;// 免息天数
 	private long maxLimitTime;// 最大还款日期
 	private double rate;// 每日利率
-	private double overdue_rate;// 逾期利率
+	private double overdue;// 逾期利率
 	private OrderState state;// 卡密状态
 	private long createTime;// 创建时间
 	private long refundTime;// 实际还款日期
+	private double refundAmount;// 应还款
 	private double realRefundAmount;// 实际还款
-	private double realAmount;// 实际到账
-	private long deliverTime;// 放款时间
-
-	public OrderValueObject(Order order) {
-		this.id = order.getId();
-		this.userId = order.getUserId();
-		this.bankCardNo = order.getBankCardNo();
-		this.amount = order.getAmount();
-		this.service_charge = order.getService_charge();
-		this.freeOfInterest = order.getFreeOfInterest();
-		this.maxLimitTime = order.getMaxLimitTime();
-		this.rate = order.getRate();
-		this.overdue_rate = order.getOverdue_rate();
-		this.state = order.getState();
-		this.createTime = order.getCreateTime();
-		this.refundTime = order.getRefundTime();
-		this.realRefundAmount = order.getRealRefundAmount();
-		this.realAmount = order.getRealAmount();
-		this.deliverTime = order.getDeliverTime();
-	}
+	private OrderContract contract;// 订单合同
+	private long deliverTime;// 放款日期
 
 	public String getId() {
 		return id;
@@ -51,12 +44,44 @@ public class OrderValueObject {
 		this.userId = userId;
 	}
 
-	public String getBankCardNo() {
-		return bankCardNo;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setBankCardNo(String bankCardNo) {
-		this.bankCardNo = bankCardNo;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getHeadimgurl() {
+		return headimgurl;
+	}
+
+	public void setHeadimgurl(String headimgurl) {
+		this.headimgurl = headimgurl;
+	}
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public double getAmount() {
@@ -65,6 +90,14 @@ public class OrderValueObject {
 
 	public void setAmount(double amount) {
 		this.amount = amount;
+	}
+
+	public String getBankCardId() {
+		return bankCardId;
+	}
+
+	public void setBankCardId(String bankCardId) {
+		this.bankCardId = bankCardId;
 	}
 
 	public double getService_charge() {
@@ -99,12 +132,12 @@ public class OrderValueObject {
 		this.rate = rate;
 	}
 
-	public double getOverdue_rate() {
-		return overdue_rate;
+	public double getOverdue() {
+		return overdue;
 	}
 
-	public void setOverdue_rate(double overdue_rate) {
-		this.overdue_rate = overdue_rate;
+	public void setOverdue(double overdue) {
+		this.overdue = overdue;
 	}
 
 	public OrderState getState() {
@@ -131,6 +164,14 @@ public class OrderValueObject {
 		this.refundTime = refundTime;
 	}
 
+	public double getRefundAmount() {
+		return refundAmount;
+	}
+
+	public void setRefundAmount(double refundAmount) {
+		this.refundAmount = refundAmount;
+	}
+
 	public double getRealRefundAmount() {
 		return realRefundAmount;
 	}
@@ -139,12 +180,12 @@ public class OrderValueObject {
 		this.realRefundAmount = realRefundAmount;
 	}
 
-	public double getRealAmount() {
-		return realAmount;
+	public OrderContract getContract() {
+		return contract;
 	}
 
-	public void setRealAmount(double realAmount) {
-		this.realAmount = realAmount;
+	public void setContract(OrderContract contract) {
+		this.contract = contract;
 	}
 
 	public long getDeliverTime() {

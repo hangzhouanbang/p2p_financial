@@ -16,7 +16,7 @@ public class BaseVerifyService {
 		cardVerifyInfoDao.save(info);
 	}
 
-	public IDCardVerifyInfo findIDCardVerifyInfoByUserId(String userId) {
-		return cardVerifyInfoDao.findById(userId);
+	public IDCardVerifyInfo findIDCardVerifyInfoByBiz_token(String biz_token) {
+		return cardVerifyInfoDao.findByBiz_token(biz_token);
 	}
 }

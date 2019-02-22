@@ -1,18 +1,35 @@
 package com.anbang.p2p.cqrs.q.dbo;
 
+import org.eclipse.jetty.util.StringUtil;
+
 /**
- * 用户基本信息
+ * 用户实名信息
  */
 public class UserBaseInfo {
 	private String id;// 用户id
-	private String nickname;// 用户昵称
-	private String headimgurl;// 头像
-	private String phone;// 手机号码
 	private String IDcard;// 身份证
 	private String realName;// 真实姓名
 	private String faceImgUrl;// 人脸图片
 	private String IDcardImgUrl_front;// 身份证正面
 	private String IDcardImgUrl_reverse;// 身份证反面
+
+	/**
+	 * 是否完成实名认证
+	 */
+	public boolean finishUserVerify() {
+		if (StringUtil.isBlank(IDcard)) {
+			return false;
+		} else if (StringUtil.isBlank(realName)) {
+			return false;
+		} else if (StringUtil.isBlank(faceImgUrl)) {
+			return false;
+		} else if (StringUtil.isBlank(IDcardImgUrl_front)) {
+			return false;
+		} else if (StringUtil.isBlank(IDcardImgUrl_reverse)) {
+			return false;
+		}
+		return true;
+	}
 
 	public String getId() {
 		return id;
@@ -20,30 +37,6 @@ public class UserBaseInfo {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-
-	public String getHeadimgurl() {
-		return headimgurl;
-	}
-
-	public void setHeadimgurl(String headimgurl) {
-		this.headimgurl = headimgurl;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 
 	public String getIDcard() {

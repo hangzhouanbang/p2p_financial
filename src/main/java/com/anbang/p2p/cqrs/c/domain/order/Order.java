@@ -2,16 +2,21 @@ package com.anbang.p2p.cqrs.c.domain.order;
 
 import java.math.BigDecimal;
 
+import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
+
+/**
+ * 卡密
+ */
 public class Order {
 	private String id;// 卡密
 	private String userId;// 用户
-	private String bankCardId;// 银行卡号
+	private String bankCardNo;// 银行卡号
 	private double amount;// 贷款金额
 	private double service_charge;// 手续费
-	private int freeOfInterest;// 免息天数
+	private long freeOfInterest;// 免息时间
 	private long maxLimitTime;// 最大还款日期
 	private double rate;// 每日利率
-	private double overdue;// 逾期利率
+	private double overdue_rate;// 逾期利率
 	private OrderState state;// 卡密状态
 	private long createTime;// 创建时间
 	private long refundTime;// 实际还款日期
@@ -30,6 +35,22 @@ public class Order {
 	}
 
 	/**
+	 * 计算手续费：用户借款金额，实际到账金额是扣除手续费后的金额
+	 */
+	public void calculateServiceCharge(double service_charge_rate) {
+		BigDecimal b_amount = new BigDecimal(Double.toString(amount));
+		BigDecimal b_service_charge_rate = new BigDecimal(Double.toString(service_charge_rate));
+		service_charge = b_amount.multiply(b_service_charge_rate).doubleValue();
+	}
+
+	/**
+	 * 计算最大还款日期
+	 */
+	public void calculateMaxLimitTime(int dayNum) {
+		maxLimitTime = dayNum * 24L * 60 * 60 * 1000 + createTime;
+	}
+
+	/**
 	 * 计算应还款
 	 */
 	public double calculateRefundAmount(long currentTime) throws IllegalOperationException {
@@ -39,7 +60,7 @@ public class Order {
 		// 如果需要精确计算，非要用String来够造BigDecimal不可
 		BigDecimal b_amount = new BigDecimal(Double.toString(amount));
 		BigDecimal b_rate = new BigDecimal(Double.toString(rate));
-		BigDecimal b_freeOfInterest = new BigDecimal(Integer.toString(freeOfInterest));
+		BigDecimal b_freeOfInterest = new BigDecimal(Long.toString(freeOfInterest / 24 / 60 / 60 / 1000));
 		if (currentTime > maxLimitTime) {
 			// 逾期应还:到期应还金额+逾期天数X本金X逾期利率
 			long limitDay = (maxLimitTime - deliverTime) / 1000 / 60 / 60 / 24;
@@ -49,8 +70,8 @@ public class Order {
 
 			long day = (currentTime - maxLimitTime) / 1000 / 60 / 60 / 24;
 			BigDecimal b_day = new BigDecimal(Long.toString(day));
-			BigDecimal b_overdue = new BigDecimal(Double.toString(overdue));
-			return amount.add(b_amount.multiply(b_overdue.multiply(b_day))).doubleValue();
+			BigDecimal b_overdue_rate = new BigDecimal(Double.toString(overdue_rate));
+			return amount.add(b_amount.multiply(b_overdue_rate.multiply(b_day))).doubleValue();
 		} else {
 			// 到期应还:本金X相应借款天数利率X（借款天数-免息天数）+本金
 			long day = (currentTime - deliverTime) / 1000 / 60 / 60 / 24;
@@ -76,12 +97,12 @@ public class Order {
 		this.userId = userId;
 	}
 
-	public String getBankCardId() {
-		return bankCardId;
+	public String getBankCardNo() {
+		return bankCardNo;
 	}
 
-	public void setBankCardId(String bankCardId) {
-		this.bankCardId = bankCardId;
+	public void setBankCardNo(String bankCardNo) {
+		this.bankCardNo = bankCardNo;
 	}
 
 	public double getAmount() {
@@ -100,11 +121,11 @@ public class Order {
 		this.service_charge = service_charge;
 	}
 
-	public int getFreeOfInterest() {
+	public long getFreeOfInterest() {
 		return freeOfInterest;
 	}
 
-	public void setFreeOfInterest(int freeOfInterest) {
+	public void setFreeOfInterest(long freeOfInterest) {
 		this.freeOfInterest = freeOfInterest;
 	}
 
@@ -124,12 +145,12 @@ public class Order {
 		this.rate = rate;
 	}
 
-	public double getOverdue() {
-		return overdue;
+	public double getOverdue_rate() {
+		return overdue_rate;
 	}
 
-	public void setOverdue(double overdue) {
-		this.overdue = overdue;
+	public void setOverdue_rate(double overdue_rate) {
+		this.overdue_rate = overdue_rate;
 	}
 
 	public OrderState getState() {

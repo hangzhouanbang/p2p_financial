@@ -7,4 +7,6 @@ public interface UserBaseInfoDao {
 	void save(UserBaseInfo info);
 
 	UserBaseInfo findByPhone(String phone);
+
+	UserBaseInfo findById(String userId);
 }

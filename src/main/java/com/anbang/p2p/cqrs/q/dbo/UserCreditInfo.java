@@ -8,6 +8,10 @@ public class UserCreditInfo {
 	private String auth_id;// 查询用户信用状态的id
 	private String describe;// 查询结果的描述
 
+	public boolean finishCreditVerify() {
+		return true;
+	}
+
 	public String getId() {
 		return id;
 	}

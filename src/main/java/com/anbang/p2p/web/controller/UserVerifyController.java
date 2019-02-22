@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
+import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.bean.IDCardQueryInfo;
 import com.anbang.p2p.plan.bean.IDCardVerifyInfo;
 import com.anbang.p2p.plan.service.BaseVerifyService;
@@ -32,6 +33,9 @@ public class UserVerifyController {
 
 	@Autowired
 	private BaseVerifyService baseVerifyService;
+
+	@Autowired
+	private UserAuthQueryService userAuthQueryService;
 
 	private Gson gson = new Gson();
 
@@ -105,6 +109,12 @@ public class UserVerifyController {
 	@RequestMapping("/baseinfo_query")
 	public CommonVO queryBaseInfo(String biz_token) {
 		CommonVO vo = new CommonVO();
+		IDCardVerifyInfo verifyInfo = baseVerifyService.findIDCardVerifyInfoByBiz_token(biz_token);
+		if (verifyInfo == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid biz_token");
+			return vo;
+		}
 		String response = get_result(biz_token);
 		if (StringUtil.isBlank(response)) {
 			vo.setSuccess(false);
@@ -113,6 +123,7 @@ public class UserVerifyController {
 		}
 		Map map = gson.fromJson(response, Map.class);
 		IDCardQueryInfo info = new IDCardQueryInfo(map);
+		// TODO 更新用户基本信息
 		return vo;
 	}
 

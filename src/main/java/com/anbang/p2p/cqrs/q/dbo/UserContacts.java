@@ -10,6 +10,10 @@ public class UserContacts {
 	private String contactsPhone;// 联系人手机号码
 	private String contactsName;// 联系人姓名
 
+	public boolean finishContactsVerify() {
+		return true;
+	}
+
 	public String getId() {
 		return id;
 	}

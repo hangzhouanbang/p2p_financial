@@ -5,4 +5,6 @@ import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 public interface UserContactsDao {
 
 	void save(UserContacts contacts);
+
+	UserContacts findById(String userId);
 }

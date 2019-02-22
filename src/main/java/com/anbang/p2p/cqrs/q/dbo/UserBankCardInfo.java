@@ -7,7 +7,7 @@ public class UserBankCardInfo {
 	private String id;
 	private String userId;// 用户id
 	private String bank;// 银行名称
-	private String bankCardId;// 银行卡号
+	private String bankCardNo;// 银行卡号
 
 	public String getId() {
 		return id;
@@ -33,12 +33,12 @@ public class UserBankCardInfo {
 		this.bank = bank;
 	}
 
-	public String getBankCardId() {
-		return bankCardId;
+	public String getBankCardNo() {
+		return bankCardNo;
 	}
 
-	public void setBankCardId(String bankCardId) {
-		this.bankCardId = bankCardId;
+	public void setBankCardNo(String bankCardNo) {
+		this.bankCardNo = bankCardNo;
 	}
 
 }

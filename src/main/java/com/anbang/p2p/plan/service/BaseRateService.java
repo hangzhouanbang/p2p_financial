@@ -5,29 +5,41 @@ import org.springframework.stereotype.Service;
 
 import com.anbang.p2p.plan.bean.BaseLoan;
 import com.anbang.p2p.plan.bean.BaseRateOfInterest;
-import com.anbang.p2p.plan.dao.BaseLoanDao;
-import com.anbang.p2p.plan.dao.BaseRateOfInterestDao;
+import com.anbang.p2p.plan.bean.UserBaseLoan;
+import com.anbang.p2p.plan.bean.UserBaseRateOfInterest;
+import com.anbang.p2p.plan.dao.UserBaseLoanDao;
+import com.anbang.p2p.plan.dao.UserBaseRateOfInterestDao;
 
 @Service
 public class BaseRateService {
 
 	@Autowired
-	private BaseLoanDao baseLoanDao;
+	private UserBaseLoanDao userBaseLoanDao;
 
 	@Autowired
-	private BaseRateOfInterestDao baseRateOfInterestDao;
+	private UserBaseRateOfInterestDao userBaseRateOfInterestDao;
 
-	/**
-	 * 基础设置
-	 */
-	public void setBaseLoan(BaseLoan loan) {
-		baseLoanDao.save(loan);
+	public void changeBaseLoan(double baseLimit, double service_charge, long overdue, long freeOfInterest) {
+		BaseLoan.change(baseLimit, service_charge, overdue, freeOfInterest);
 	}
 
-	/**
-	 * 利率设置
-	 */
-	public void setBaseRateOfInterest(BaseRateOfInterest rate) {
-		baseRateOfInterestDao.save(rate);
+	public void changeBaseRateOfInterest(double seven, double fifteen, double thirty, double overdue) {
+		BaseRateOfInterest.change(seven, fifteen, thirty, overdue);
+	}
+
+	public void saveUserBaseLoan(UserBaseLoan loan) {
+		userBaseLoanDao.save(loan);
+	}
+
+	public UserBaseLoan findUserBaseLoanByUserId(String userId) {
+		return userBaseLoanDao.findByUserId(userId);
+	}
+
+	public void saveUserBaseRateOfInterest(UserBaseRateOfInterest rate) {
+		userBaseRateOfInterestDao.save(rate);
+	}
+
+	public UserBaseRateOfInterest findUserBaseRateOfInterestByUserId(String userId) {
+		return userBaseRateOfInterestDao.findByUserId(userId);
 	}
 }

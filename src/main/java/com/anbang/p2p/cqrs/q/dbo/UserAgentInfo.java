@@ -7,6 +7,13 @@ public class UserAgentInfo {
 	private String id;// 用户id
 	private String agent;// 运营商
 
+	/**
+	 * 是否完成运营商验证
+	 */
+	public boolean finishAgentVerify() {
+		return true;
+	}
+
 	public String getId() {
 		return id;
 	}

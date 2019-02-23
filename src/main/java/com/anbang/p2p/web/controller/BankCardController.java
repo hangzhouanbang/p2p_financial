@@ -37,6 +37,7 @@ public class BankCardController {
 			vo.setMsg("invalid param");
 			return vo;
 		}
+		// TODO 查询银行卡
 		info.setUserId(userId);
 		userAuthQueryService.saveBankCardInfo(info);
 		return vo;

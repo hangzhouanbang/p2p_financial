@@ -4,15 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
 import com.anbang.p2p.cqrs.c.service.OrderCmdService;
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
+import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
+import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.dbo.UserAgentInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserBankCardInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.cqrs.q.dbo.UserCreditInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
+import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.bean.BaseLoan;
 import com.anbang.p2p.plan.bean.BaseRateOfInterest;
@@ -35,13 +39,16 @@ public class OrderController {
 	private OrderCmdService orderCmdService;
 
 	@Autowired
+	private OrderQueryService orderQueryService;
+
+	@Autowired
 	private BaseRateService baseRateService;
 
 	/**
 	 * 申请卡密
 	 */
 	@RequestMapping("/createorder")
-	public CommonVO createOrder(String token, String cardId, int dayNum) {
+	public CommonVO createOrder(String token, String cardId, String contractId, int dayNum) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -65,6 +72,13 @@ public class OrderController {
 			vo.setMsg("invalid cardId");
 			return vo;
 		}
+		// TODO 合同认证
+		OrderContract contract = orderQueryService.findOrderContractById(contractId);
+		if (contract == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid contract");
+			return vo;
+		}
 		double amount = BaseLoan.baseLimit;
 		double service_charge_rate = BaseLoan.service_charge_rate;
 		long freeTimeOfInterest = BaseLoan.freeTimeOfInterest;
@@ -84,9 +98,61 @@ public class OrderController {
 				rate = userBaseRateOfInterest.getRateByDayNum(dayNum);
 				overdue_rate = userBaseRateOfInterest.getOverdue_rate();
 			}
+			// 生成卡密
 			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, cardInfo.getBankCardNo(), amount,
-					service_charge_rate, dayNum, freeTimeOfInterest, overdue_rate, rate, System.currentTimeMillis());
-			// TODO 保存订单
+					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
+					System.currentTimeMillis());
+			orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
+			// TODO 风控审核
+			// TODO 放款/转管理员审核
+		} catch (Exception e) {
+			vo.setSuccess(false);
+			vo.setMsg(e.getClass().getName());
+			return vo;
+		}
+		return vo;
+	}
+
+	/**
+	 * 还款
+	 */
+	@RequestMapping("/refund")
+	public CommonVO refundOrder(String token, String cardId) {
+		CommonVO vo = new CommonVO();
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid token");
+			return vo;
+		}
+		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
+		if (cardInfo == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid cardId");
+			return vo;
+		}
+		LoanOrder loanOrder = orderQueryService.findLoanOrderByUserIdAndState(userId, OrderState.refund);
+		if (loanOrder == null) {
+			vo.setSuccess(false);
+			vo.setMsg("OrderNotFoundException");
+			return vo;
+		}
+		if (!loanOrder.getState().equals(OrderState.refund)) {
+			vo.setSuccess(false);
+			vo.setMsg("IllegalOperationException");
+			return vo;
+		}
+		if (System.currentTimeMillis() < loanOrder.getDeliverTime()) {
+			vo.setSuccess(false);
+			vo.setMsg("IllegalOperationException");
+			return vo;
+		}
+		// TODO 还款
+		try {
+			double amount = orderQueryService.queryRefundAmount(userId, System.currentTimeMillis());
+			// 还款
+			OrderValueObject orderValueObject = orderCmdService.cleanOrder(userId, amount, System.currentTimeMillis());
+			orderQueryService.updateLoanOrder(orderValueObject, cardInfo);
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());

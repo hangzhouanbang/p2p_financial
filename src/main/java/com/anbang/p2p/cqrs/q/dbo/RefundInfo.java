@@ -1,6 +1,6 @@
 package com.anbang.p2p.cqrs.q.dbo;
 
-import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
 
 /**
  * 还款信息
@@ -13,18 +13,25 @@ public class RefundInfo {
 	private String headimgurl;// 头像
 	private String realName;// 真实姓名
 	private String phone;// 手机号码
-	private String address;// 地址
 	private double amount;// 贷款金额
-	private String bankCardId;// 还款银行卡号
-	private long maxLimitTime;// 最大还款日期
-	private double rate;// 每日利率
-	private double overdue;// 逾期利率
-	private OrderState state;// 卡密状态
-	private long createTime;// 创建时间
-	private long refundTime;// 实际还款日期
-	private double refundAmount;// 应还款
-	private double realRefundAmount;// 实际还款
+	private double refundAmount;// 还款金额
+	private String bankCardNo;// 还款银行卡号
 	private OrderContract contract;// 订单合同
+	private long createTime;// 创建时间
+
+	public RefundInfo(OrderValueObject orderValueObject, LoanOrder loanOrder, String bankCardNo) {
+		loanOrderId = orderValueObject.getId();
+		amount = orderValueObject.getAmount();
+		refundAmount = orderValueObject.getRealRefundAmount();
+		createTime = orderValueObject.getRefundTime();
+		this.bankCardNo = bankCardNo;
+		this.contract = loanOrder.getContract();
+		userId = loanOrder.getUserId();
+		nickname = loanOrder.getNickname();
+		headimgurl = loanOrder.getHeadimgurl();
+		phone = loanOrder.getPhone();
+		realName = loanOrder.getRealName();
+	}
 
 	public String getId() {
 		return id;
@@ -82,76 +89,12 @@ public class RefundInfo {
 		this.phone = phone;
 	}
 
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 	public double getAmount() {
 		return amount;
 	}
 
 	public void setAmount(double amount) {
 		this.amount = amount;
-	}
-
-	public String getBankCardId() {
-		return bankCardId;
-	}
-
-	public void setBankCardId(String bankCardId) {
-		this.bankCardId = bankCardId;
-	}
-
-	public long getMaxLimitTime() {
-		return maxLimitTime;
-	}
-
-	public void setMaxLimitTime(long maxLimitTime) {
-		this.maxLimitTime = maxLimitTime;
-	}
-
-	public double getRate() {
-		return rate;
-	}
-
-	public void setRate(double rate) {
-		this.rate = rate;
-	}
-
-	public double getOverdue() {
-		return overdue;
-	}
-
-	public void setOverdue(double overdue) {
-		this.overdue = overdue;
-	}
-
-	public OrderState getState() {
-		return state;
-	}
-
-	public void setState(OrderState state) {
-		this.state = state;
-	}
-
-	public long getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(long createTime) {
-		this.createTime = createTime;
-	}
-
-	public long getRefundTime() {
-		return refundTime;
-	}
-
-	public void setRefundTime(long refundTime) {
-		this.refundTime = refundTime;
 	}
 
 	public double getRefundAmount() {
@@ -162,12 +105,12 @@ public class RefundInfo {
 		this.refundAmount = refundAmount;
 	}
 
-	public double getRealRefundAmount() {
-		return realRefundAmount;
+	public String getBankCardNo() {
+		return bankCardNo;
 	}
 
-	public void setRealRefundAmount(double realRefundAmount) {
-		this.realRefundAmount = realRefundAmount;
+	public void setBankCardNo(String bankCardNo) {
+		this.bankCardNo = bankCardNo;
 	}
 
 	public OrderContract getContract() {
@@ -176,6 +119,14 @@ public class RefundInfo {
 
 	public void setContract(OrderContract contract) {
 		this.contract = contract;
+	}
+
+	public long getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(long createTime) {
+		this.createTime = createTime;
 	}
 
 }

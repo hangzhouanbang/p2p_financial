@@ -1,12 +1,10 @@
-package com.anbang.p2p.cqrs.q.dbo;
+package com.anbang.p2p.web.vo;
 
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
-import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
+import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
+import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 
-/**
- * 贷款订单
- */
-public class LoanOrder {
+public class LoanOrderVO {
 	private String id;// 卡密
 	private String userId;// 用户
 	private String nickname;// 用户昵称
@@ -27,54 +25,28 @@ public class LoanOrder {
 	private double realAmount;// 实际到账
 	private long maxLimitTime;// 最大还款日期
 	private long createTime;// 创建时间
-	private long deliverTime;// 放款时间
-	private double realRefundAmount;// 实际还款
-	private long refundTime;// 实际还款日期
 
-	public LoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract, UserBaseInfo baseInfo) {
-		this.id = orderValueObject.getId();
-		this.userId = orderValueObject.getUserId();
-		this.nickname = user.getNickname();
-		this.headimgurl = user.getHeadimgurl();
-		this.realName = baseInfo.getRealName();
-		this.phone = user.getPhone();
-		this.bankCardNo = orderValueObject.getBankCardNo();
-		this.amount = orderValueObject.getAmount();
-		this.dayNum = orderValueObject.getDayNum();
-		this.service_charge_rate = orderValueObject.getService_charge_rate();
-		this.freeTimeOfInterest = orderValueObject.getFreeTimeOfInterest();
-		this.overdue = orderValueObject.getOverdue();
-		this.rate = orderValueObject.getRate();
-		this.overdue_rate = orderValueObject.getOverdue_rate();
-		this.state = orderValueObject.getState();
-		this.contract = contract;
-		this.service_charge = orderValueObject.getService_charge();
-		this.realAmount = orderValueObject.getRealAmount();
-		this.maxLimitTime = orderValueObject.getMaxLimitTime();
-		this.createTime = orderValueObject.getCreateTime();
-		this.deliverTime = orderValueObject.getDeliverTime();
-		this.realRefundAmount = orderValueObject.getRealRefundAmount();
-		this.refundTime = orderValueObject.getRefundTime();
-	}
-
-	/**
-	 * 是否逾期
-	 */
-	public boolean isOverdue(long currentTime) {
-		if (currentTime > maxLimitTime) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * 是否催收
-	 */
-	public boolean isCuishou(long currentTime) {
-		if (currentTime > maxLimitTime + overdue) {
-			return true;
-		}
-		return false;
+	public LoanOrderVO(LoanOrder loanOrder) {
+		this.id = loanOrder.getId();
+		this.userId = loanOrder.getUserId();
+		this.nickname = loanOrder.getNickname();
+		this.headimgurl = loanOrder.getHeadimgurl();
+		this.realName = loanOrder.getRealName();
+		this.phone = loanOrder.getPhone();
+		this.bankCardNo = loanOrder.getBankCardNo();
+		this.amount = loanOrder.getAmount();
+		this.dayNum = loanOrder.getDayNum();
+		this.service_charge_rate = loanOrder.getService_charge_rate();
+		this.freeTimeOfInterest = loanOrder.getFreeTimeOfInterest();
+		this.overdue = loanOrder.getOverdue();
+		this.rate = loanOrder.getRate();
+		this.overdue_rate = loanOrder.getOverdue_rate();
+		this.state = loanOrder.getState();
+		this.contract = loanOrder.getContract();
+		this.service_charge = loanOrder.getService_charge();
+		this.realAmount = loanOrder.getRealAmount();
+		this.maxLimitTime = loanOrder.getMaxLimitTime();
+		this.createTime = loanOrder.getCreateTime();
 	}
 
 	public String getId() {
@@ -235,30 +207,6 @@ public class LoanOrder {
 
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
-	}
-
-	public long getDeliverTime() {
-		return deliverTime;
-	}
-
-	public void setDeliverTime(long deliverTime) {
-		this.deliverTime = deliverTime;
-	}
-
-	public double getRealRefundAmount() {
-		return realRefundAmount;
-	}
-
-	public void setRealRefundAmount(double realRefundAmount) {
-		this.realRefundAmount = realRefundAmount;
-	}
-
-	public long getRefundTime() {
-		return refundTime;
-	}
-
-	public void setRefundTime(long refundTime) {
-		this.refundTime = refundTime;
 	}
 
 }

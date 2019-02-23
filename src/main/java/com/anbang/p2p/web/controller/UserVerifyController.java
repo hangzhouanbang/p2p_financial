@@ -94,6 +94,51 @@ public class UserVerifyController {
 	}
 
 	/**
+	 * 运营商验证
+	 */
+	@RequestMapping("/agentinfo")
+	public CommonVO agentInfo(String token) {
+		CommonVO vo = new CommonVO();
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid token");
+			return vo;
+		}
+		return vo;
+	}
+
+	/**
+	 * 紧急联系人
+	 */
+	@RequestMapping("/contacts")
+	public CommonVO contacts(String token) {
+		CommonVO vo = new CommonVO();
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid token");
+			return vo;
+		}
+		return vo;
+	}
+
+	/**
+	 * 芝麻认证
+	 */
+	@RequestMapping("/creditinfo")
+	public CommonVO creditInfo(String token) {
+		CommonVO vo = new CommonVO();
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid token");
+			return vo;
+		}
+		return vo;
+	}
+
+	/**
 	 * 处理认证notify
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/baseinfo_notify")

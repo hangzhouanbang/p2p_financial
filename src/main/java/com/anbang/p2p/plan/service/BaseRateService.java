@@ -19,12 +19,13 @@ public class BaseRateService {
 	@Autowired
 	private UserBaseRateOfInterestDao userBaseRateOfInterestDao;
 
-	public void changeBaseLoan(double baseLimit, double service_charge, long overdue, long freeOfInterest) {
-		BaseLoan.change(baseLimit, service_charge, overdue, freeOfInterest);
+	public void changeBaseLoan(double baseLimit, double service_charge, long overdue, long freeTimeOfInterest) {
+		BaseLoan.change(baseLimit, service_charge, overdue, freeTimeOfInterest);
 	}
 
-	public void changeBaseRateOfInterest(double seven, double fifteen, double thirty, double overdue) {
-		BaseRateOfInterest.change(seven, fifteen, thirty, overdue);
+	public void changeBaseRateOfInterest(double seven_rate, double fifteen_rate, double thirty_rate,
+			double overdue_rate) {
+		BaseRateOfInterest.change(seven_rate, fifteen_rate, thirty_rate, overdue_rate);
 	}
 
 	public void saveUserBaseLoan(UserBaseLoan loan) {

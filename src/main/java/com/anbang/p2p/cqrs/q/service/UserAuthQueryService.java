@@ -76,6 +76,12 @@ public class UserAuthQueryService {
 		return userDboDao.findById(userId);
 	}
 
+	public ListPage findUserDbo(int page, int size) {
+		int amount = (int) userDboDao.getAmount();
+		List<UserDbo> userList = userDboDao.find(page, size);
+		return new ListPage(userList, page, size, amount);
+	}
+
 	public UserBaseInfo findUserBaseInfoByUserId(String userId) {
 		return userBaseInfoDao.findById(userId);
 	}

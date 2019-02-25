@@ -1,9 +1,11 @@
 package com.anbang.p2p.web.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -115,5 +117,53 @@ public class OrderManagerController {
 		vo.setData(data);
 		data.put("listPage", listPage);
 		return vo;
+	}
+
+	/**
+	 * 待还款转逾期
+	 */
+	@Scheduled(cron = "0 20 0 * * ?") // 每天凌晨20
+	@RequestMapping("/refund_to_overdue")
+	public void refundTransferToOverdue() {
+		LoanOrderQueryVO query = new LoanOrderQueryVO();
+		query.setState(OrderState.refund);
+		int size = 2000;
+		long amount = orderQueryService.countAmount(query);
+		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
+		for (int page = 1; page <= pageCount; page++) {
+			List<LoanOrder> orderList = orderQueryService.findLoanOrderList(page, size, query);
+			try {
+				for (LoanOrder order : orderList) {
+					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToOverdue(order.getUserId());
+					orderQueryService.updateLoanOrder(orderValueObject, null);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 逾期转催收
+	 */
+	@Scheduled(cron = "0 40 0 * * ?") // 每天凌晨40
+	@RequestMapping("/overdue_to_collection")
+	public void overdueTransferToCollection() {
+		LoanOrderQueryVO query = new LoanOrderQueryVO();
+		query.setState(OrderState.overdue);
+		int size = 2000;
+		long amount = orderQueryService.countAmount(query);
+		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
+		for (int page = 1; page <= pageCount; page++) {
+			List<LoanOrder> orderList = orderQueryService.findLoanOrderList(page, size, query);
+			try {
+				for (LoanOrder order : orderList) {
+					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToCollection(order.getUserId());
+					orderQueryService.updateLoanOrder(orderValueObject, null);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -103,6 +103,14 @@ public class OrderQueryService {
 		return loanOrderDao.findById(orderId);
 	}
 
+	public long countAmount(LoanOrderQueryVO query) {
+		return loanOrderDao.getAmount(query);
+	}
+
+	public List<LoanOrder> findLoanOrderList(int page, int size, LoanOrderQueryVO query) {
+		return loanOrderDao.find(page, size, query);
+	}
+
 	public ListPage findLoanOrder(int page, int size, LoanOrderQueryVO query) {
 		int amount = (int) loanOrderDao.getAmount(query);
 		List<LoanOrder> orderList = loanOrderDao.find(page, size, query);

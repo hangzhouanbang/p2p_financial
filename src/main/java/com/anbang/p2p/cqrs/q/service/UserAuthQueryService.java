@@ -94,6 +94,10 @@ public class UserAuthQueryService {
 		return userContactsDao.findById(userId);
 	}
 
+	public void saveContacts(UserContacts contacts) {
+		userContactsDao.save(contacts);
+	}
+
 	public UserCreditInfo findUserCreditInfoByUserId(String userId) {
 		return userCreditInfoDao.findById(userId);
 	}

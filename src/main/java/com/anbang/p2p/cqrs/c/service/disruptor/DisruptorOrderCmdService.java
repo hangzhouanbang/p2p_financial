@@ -131,10 +131,11 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 	}
 
 	@Override
-	public OrderValueObject overdueOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
-		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "overdueOrder", userId);
+	public OrderValueObject changeOrderStateToOverdue(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateToOverdue", userId);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
-			OrderValueObject orderValueObject = orderCmdServiceImpl.overdueOrder(cmd.getParameter());
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateToOverdue(cmd.getParameter());
 			return orderValueObject;
 		});
 		try {
@@ -151,10 +152,12 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 	}
 
 	@Override
-	public OrderValueObject collectOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
-		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "collectOrder", userId);
+	public OrderValueObject changeOrderStateToCollection(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateToCollection",
+				userId);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
-			OrderValueObject orderValueObject = orderCmdServiceImpl.collectOrder(cmd.getParameter());
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateToCollection(cmd.getParameter());
 			return orderValueObject;
 		});
 		try {

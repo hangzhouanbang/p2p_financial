@@ -21,7 +21,8 @@ public interface OrderCmdService {
 	OrderValueObject cleanOrder(String userId, Double amount, Long currentTime)
 			throws OrderNotFoundException, IllegalOperationException;
 
-	OrderValueObject overdueOrder(String userId) throws OrderNotFoundException, IllegalOperationException;
+	OrderValueObject changeOrderStateToOverdue(String userId) throws OrderNotFoundException, IllegalOperationException;
 
-	OrderValueObject collectOrder(String userId) throws OrderNotFoundException, IllegalOperationException;
+	OrderValueObject changeOrderStateToCollection(String userId)
+			throws OrderNotFoundException, IllegalOperationException;
 }

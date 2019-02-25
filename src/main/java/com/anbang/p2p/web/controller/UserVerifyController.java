@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
+import com.anbang.p2p.cqrs.q.dbo.UserAgentInfo;
+import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
+import com.anbang.p2p.cqrs.q.dbo.UserContacts;
+import com.anbang.p2p.cqrs.q.dbo.UserCreditInfo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.bean.IDCardQueryInfo;
 import com.anbang.p2p.plan.bean.IDCardVerifyInfo;
@@ -51,13 +55,18 @@ public class UserVerifyController {
 			vo.setMsg("invalid token");
 			return vo;
 		}
-		// TODO 验证是否已经认证
+		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		if (baseInfo != null && !baseInfo.finishUserVerify()) {
+			vo.setSuccess(false);
+			vo.setMsg("not finish verify");
+			return vo;
+		}
 		IDCardVerifyInfo verifyInfo = new IDCardVerifyInfo();
 		verifyInfo.setUserId(userId);
 		verifyInfo.setToken(token);
 		String biz_no = UUID.randomUUID().toString().replaceAll("-", "");
 		verifyInfo.setBiz_no(biz_no);
-		String response = get_biz_token(biz_no);
+		String response = getBaseInfo_biz_token(biz_no);
 		if (StringUtil.isBlank(response)) {
 			vo.setSuccess(false);
 			vo.setMsg("get biz token fail");
@@ -105,6 +114,12 @@ public class UserVerifyController {
 			vo.setMsg("invalid token");
 			return vo;
 		}
+		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
+		if (agentInfo == null) {
+			vo.setSuccess(false);
+			vo.setMsg("not finish verify");
+			return vo;
+		}
 		return vo;
 	}
 
@@ -112,7 +127,7 @@ public class UserVerifyController {
 	 * 紧急联系人
 	 */
 	@RequestMapping("/contacts")
-	public CommonVO contacts(String token) {
+	public CommonVO contacts(String token, String contactsPhone, String contactsName) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -120,6 +135,16 @@ public class UserVerifyController {
 			vo.setMsg("invalid token");
 			return vo;
 		}
+		if (StringUtil.isBlank(contactsPhone) || StringUtil.isBlank(contactsName)) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid param");
+			return vo;
+		}
+		UserContacts contacts = new UserContacts();
+		contacts.setContactsName(contactsName);
+		contacts.setContactsPhone(contactsPhone);
+		contacts.setUserId(userId);
+		userAuthQueryService.saveContacts(contacts);
 		return vo;
 	}
 
@@ -133,6 +158,12 @@ public class UserVerifyController {
 		if (userId == null) {
 			vo.setSuccess(false);
 			vo.setMsg("invalid token");
+			return vo;
+		}
+		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
+		if (creditInfo != null && creditInfo.finishCreditVerify()) {
+			vo.setSuccess(false);
+			vo.setMsg("not finish verify");
 			return vo;
 		}
 		return vo;
@@ -160,7 +191,7 @@ public class UserVerifyController {
 			vo.setMsg("invalid biz_token");
 			return vo;
 		}
-		String response = get_result(biz_token);
+		String response = getBaseInfo_result(biz_token);
 		if (StringUtil.isBlank(response)) {
 			vo.setSuccess(false);
 			vo.setMsg("get biz token fail");
@@ -172,7 +203,7 @@ public class UserVerifyController {
 		return vo;
 	}
 
-	private String get_biz_token(String biz_no) {
+	private String getBaseInfo_biz_token(String biz_no) {
 		String result = "";
 		String host = "https://openapi.faceid.com";
 		String path = "/lite_ocr/v1/get_biz_token";
@@ -207,7 +238,7 @@ public class UserVerifyController {
 		return result;
 	}
 
-	private String get_result(String biz_token) {
+	private String getBaseInfo_result(String biz_token) {
 		String result = "";
 		String host = "https://openapi.faceid.com";
 		String path = "/lite_ocr/v1/get_result";

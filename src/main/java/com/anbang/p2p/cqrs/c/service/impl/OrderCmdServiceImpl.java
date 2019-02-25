@@ -49,15 +49,17 @@ public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdServi
 	}
 
 	@Override
-	public OrderValueObject overdueOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
+	public OrderValueObject changeOrderStateToOverdue(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.overdueOrder(userId);
+		return orderManager.changeOrderStateToOverdue(userId);
 	}
 
 	@Override
-	public OrderValueObject collectOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
+	public OrderValueObject changeOrderStateToCollection(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.collectOrder(userId);
+		return orderManager.changeOrderStateToCollection(userId);
 	}
 
 }

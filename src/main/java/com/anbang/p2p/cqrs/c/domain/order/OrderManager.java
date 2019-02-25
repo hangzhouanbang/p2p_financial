@@ -122,7 +122,8 @@ public class OrderManager {
 	/**
 	 * 逾期
 	 */
-	public OrderValueObject overdueOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
+	public OrderValueObject changeOrderStateToOverdue(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
 		if (!userIdOrderMap.containsKey(userId)) {
 			throw new OrderNotFoundException();
 		}
@@ -137,7 +138,8 @@ public class OrderManager {
 	/**
 	 * 催收
 	 */
-	public OrderValueObject collectOrder(String userId) throws OrderNotFoundException, IllegalOperationException {
+	public OrderValueObject changeOrderStateToCollection(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
 		if (!userIdOrderMap.containsKey(userId)) {
 			throw new OrderNotFoundException();
 		}

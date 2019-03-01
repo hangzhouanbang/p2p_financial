@@ -15,6 +15,9 @@ public interface OrderCmdService {
 
 	OrderValueObject changeOrderStateToWait(String userId) throws OrderNotFoundException, IllegalOperationException;
 
+	OrderValueObject changeOrderStateToCheck_by_admin(String userId)
+			throws OrderNotFoundException, IllegalOperationException;
+
 	OrderValueObject changeOrderStateToRefund(String userId, Long currentTime)
 			throws OrderNotFoundException, IllegalOperationException;
 

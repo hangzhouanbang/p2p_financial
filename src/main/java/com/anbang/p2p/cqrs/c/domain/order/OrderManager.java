@@ -67,6 +67,23 @@ public class OrderManager {
 	}
 
 	/**
+	 * 转管理员审核
+	 */
+	public OrderValueObject changeOrderStateToCheck_by_admin(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		if (!userIdOrderMap.containsKey(userId)) {
+			throw new OrderNotFoundException();
+		}
+		Order order = userIdOrderMap.get(userId);
+		if (!order.getState().equals(OrderState.check_by_fengkong)) {
+			throw new IllegalOperationException();
+		}
+		order.setState(OrderState.check_by_admin);
+		userIdOrderMap.remove(userId);
+		return new OrderValueObject(order);
+	}
+
+	/**
 	 * 等待放款
 	 */
 	public OrderValueObject changeOrderStateToWait(String userId)

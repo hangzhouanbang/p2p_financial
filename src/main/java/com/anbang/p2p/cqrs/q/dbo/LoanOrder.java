@@ -31,6 +31,10 @@ public class LoanOrder {
 	private double realRefundAmount;// 实际还款
 	private long refundTime;// 实际还款日期
 
+	public LoanOrder() {
+
+	}
+
 	public LoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract, UserBaseInfo baseInfo) {
 		this.id = orderValueObject.getId();
 		this.userId = orderValueObject.getUserId();

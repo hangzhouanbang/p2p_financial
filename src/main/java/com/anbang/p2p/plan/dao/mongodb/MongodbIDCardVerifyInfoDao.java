@@ -24,8 +24,8 @@ public class MongodbIDCardVerifyInfoDao implements IDCardVerifyInfoDao {
 	}
 
 	@Override
-	public IDCardVerifyInfo findByBiz_token(String biz_token) {
-		return repository.findOneByBiz_token(biz_token);
+	public IDCardVerifyInfo findByBiz_token(String biztoken) {
+		return repository.findOneByBiztoken(biztoken);
 	}
 
 }

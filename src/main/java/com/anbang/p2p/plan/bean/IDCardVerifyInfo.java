@@ -11,7 +11,7 @@ public class IDCardVerifyInfo {
 	private String biz_no;// biz_no,业务流水号
 	private String request_id;// request_id,用于标示本次请求的唯一的字符串
 	private String time_used;// 整个请求所花费的时间
-	private String biz_token;// 可用biz_token拼接对应身份证OCR页面URL
+	private String biztoken;// 可用biz_token拼接对应身份证OCR页面URL
 	private String error;// 错误原因
 
 	public String getId() {
@@ -62,12 +62,12 @@ public class IDCardVerifyInfo {
 		this.time_used = time_used;
 	}
 
-	public String getBiz_token() {
-		return biz_token;
+	public String getBiztoken() {
+		return biztoken;
 	}
 
-	public void setBiz_token(String biz_token) {
-		this.biz_token = biz_token;
+	public void setBiztoken(String biztoken) {
+		this.biztoken = biztoken;
 	}
 
 	public String getError() {

@@ -6,4 +6,5 @@ import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 
 public interface UserContactsRepository extends MongoRepository<UserContacts, String> {
 
+	UserContacts findOneByUserId(String userId);
 }

@@ -19,8 +19,13 @@ public class MongodbUserContactsDao implements UserContactsDao {
 	}
 
 	@Override
-	public UserContacts findById(String userId) {
-		return repository.findOne(userId);
+	public UserContacts findById(String id) {
+		return repository.findOne(id);
+	}
+
+	@Override
+	public UserContacts findByUserId(String userId) {
+		return repository.findOneByUserId(userId);
 	}
 
 }

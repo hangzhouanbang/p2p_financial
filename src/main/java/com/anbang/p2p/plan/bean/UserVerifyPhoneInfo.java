@@ -13,6 +13,7 @@ public class UserVerifyPhoneInfo {
 	private String bizId;
 	private long invalidTime;// 失效时间
 	private long createTime;// 创建时间
+	private boolean used;// 是否被使用
 
 	public String getId() {
 		return id;
@@ -76,6 +77,14 @@ public class UserVerifyPhoneInfo {
 
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
+	}
+
+	public boolean isUsed() {
+		return used;
+	}
+
+	public void setUsed(boolean used) {
+		this.used = used;
 	}
 
 }

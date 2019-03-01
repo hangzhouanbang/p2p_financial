@@ -8,6 +8,8 @@ public interface UserDboDao {
 
 	void save(UserDbo dbo);
 
+	void updateNicknameAndHeadimgurlById(String userId, String nickname, String headimgurl);
+
 	UserDbo findById(String userId);
 
 	UserDbo findByPhone(String phone);

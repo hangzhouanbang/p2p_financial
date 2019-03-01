@@ -10,7 +10,7 @@ import com.dml.users.AuthorizationAlreadyExistsException;
 import com.highto.framework.concurrent.DeferredResult;
 import com.highto.framework.ddd.CommonCommand;
 
-@Component(value = "UserAuthCmdService")
+@Component(value = "userAuthCmdService")
 public class DisruptorUserAuthCmdService extends DisruptorCmdServiceBase implements UserAuthCmdService {
 
 	@Autowired

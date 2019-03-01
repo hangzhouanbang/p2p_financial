@@ -6,5 +6,7 @@ public interface UserContactsDao {
 
 	void save(UserContacts contacts);
 
-	UserContacts findById(String userId);
+	UserContacts findById(String id);
+
+	UserContacts findByUserId(String userId);
 }

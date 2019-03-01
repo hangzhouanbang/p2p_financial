@@ -76,6 +76,10 @@ public class UserAuthQueryService {
 		return userDboDao.findById(userId);
 	}
 
+	public void updateNicknameAndHeadimgurlById(String userId, String nickname, String headimgurl) {
+		userDboDao.updateNicknameAndHeadimgurlById(userId, nickname, headimgurl);
+	}
+
 	public ListPage findUserDbo(int page, int size) {
 		int amount = (int) userDboDao.getAmount();
 		List<UserDbo> userList = userDboDao.find(page, size);
@@ -86,12 +90,20 @@ public class UserAuthQueryService {
 		return userBaseInfoDao.findById(userId);
 	}
 
+	public void saveUserBaseInfo(UserBaseInfo info) {
+		userBaseInfoDao.save(info);
+	}
+
 	public UserAgentInfo findUserAgentInfoByUserId(String userId) {
 		return userAgentInfoDao.findById(userId);
 	}
 
+	public void saveUserAgentInfo(UserAgentInfo info) {
+		userAgentInfoDao.save(info);
+	}
+
 	public UserContacts findUserContactsByUserId(String userId) {
-		return userContactsDao.findById(userId);
+		return userContactsDao.findByUserId(userId);
 	}
 
 	public void saveContacts(UserContacts contacts) {
@@ -100,6 +112,10 @@ public class UserAuthQueryService {
 
 	public UserCreditInfo findUserCreditInfoByUserId(String userId) {
 		return userCreditInfoDao.findById(userId);
+	}
+
+	public void saveUserCreditInfo(UserCreditInfo info) {
+		userCreditInfoDao.save(info);
 	}
 
 	public ListPage findBankCardInfoByUserId(int page, int size, String userId) {

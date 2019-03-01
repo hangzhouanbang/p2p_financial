@@ -12,7 +12,7 @@ import com.anbang.p2p.cqrs.c.service.impl.OrderCmdServiceImpl;
 import com.highto.framework.concurrent.DeferredResult;
 import com.highto.framework.ddd.CommonCommand;
 
-@Component(value = "OrderCmdService")
+@Component(value = "orderCmdService")
 public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements OrderCmdService {
 
 	@Autowired
@@ -158,6 +158,29 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 				userId);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
 			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateToCollection(cmd.getParameter());
+			return orderValueObject;
+		});
+		try {
+			return result.getResult();
+		} catch (Exception e) {
+			if (e instanceof OrderNotFoundException) {
+				throw (OrderNotFoundException) e;
+			} else if (e instanceof IllegalOperationException) {
+				throw (IllegalOperationException) e;
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	@Override
+	public OrderValueObject changeOrderStateToCheck_by_admin(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateToCheck_by_admin",
+				userId);
+		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
+			OrderValueObject orderValueObject = orderCmdServiceImpl
+					.changeOrderStateToCheck_by_admin(cmd.getParameter());
 			return orderValueObject;
 		});
 		try {

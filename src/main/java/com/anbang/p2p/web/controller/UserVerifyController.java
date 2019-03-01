@@ -2,7 +2,6 @@ package com.anbang.p2p.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,49 +55,60 @@ public class UserVerifyController {
 			return vo;
 		}
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
-		if (baseInfo != null && !baseInfo.finishUserVerify()) {
+		if (baseInfo != null && baseInfo.finishUserVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("finish verify");
 			return vo;
 		}
-		IDCardVerifyInfo verifyInfo = new IDCardVerifyInfo();
-		verifyInfo.setUserId(userId);
-		verifyInfo.setToken(token);
-		String biz_no = UUID.randomUUID().toString().replaceAll("-", "");
-		verifyInfo.setBiz_no(biz_no);
-		String response = getBaseInfo_biz_token(biz_no);
-		if (StringUtil.isBlank(response)) {
-			vo.setSuccess(false);
-			vo.setMsg("get biz token fail");
-			return vo;
-		}
-		Map map = gson.fromJson(response, Map.class);
-		String request_id = "";
-		String time_used = "";
-		String biz_token = "";
-		String error = "";
-		if (map.containsKey("request_id")) {
-			request_id = (String) map.get("request_id");
-		}
-		if (map.containsKey("time_used")) {
-			time_used = (String) map.get("time_used");
-		}
-		verifyInfo.setRequest_id(request_id);
-		verifyInfo.setTime_used(time_used);
-		if (map.containsKey("biz_token")) {
-			biz_token = (String) map.get("biz_token");
-			verifyInfo.setBiz_token(biz_token);
-			String verifyUrl = "https://openapi.faceid.com/lite_ocr/v1/do/" + biz_token;
-			Map data = new HashMap<>();
-			vo.setData(data);
-			data.put("url", verifyUrl);
-		} else if (map.containsKey("error")) {
-			error = (String) map.get("error");
-			verifyInfo.setError(error);
-			vo.setSuccess(false);
-			vo.setMsg(error);
-		}
-		baseVerifyService.saveIDCardVerifyInfo(verifyInfo);
+		baseInfo = new UserBaseInfo();
+		baseInfo.setId(userId);
+		baseInfo.setIDcard("33019566695612323");
+		baseInfo.setIDcardImgUrl_front(
+				"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1551161768209&di=109b309590b4d54e40bf6417a697410c&imgtype=0&src=http%3A%2F%2Fimg1.gamersky.com%2Fimage2012%2F03%2F20120313s_5%2F10.jpg");
+		baseInfo.setIDcardImgUrl_reverse(
+				"https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3163144905,873716841&fm=26&gp=0.jpg");
+		baseInfo.setRealName("利鲁姆");
+		baseInfo.setFaceImgUrl(
+				"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1551161725755&di=7ffe5ff12e81d2b764a723c07676f3ea&imgtype=0&src=http%3A%2F%2Fn.sinaimg.cn%2Fsinacn09%2F216%2Fw640h376%2F20181124%2F167c-hmivixn8459064.jpg");
+		userAuthQueryService.saveUserBaseInfo(baseInfo);
+		// IDCardVerifyInfo verifyInfo = new IDCardVerifyInfo();
+		// verifyInfo.setUserId(userId);
+		// verifyInfo.setToken(token);
+		// String biz_no = UUID.randomUUID().toString().replaceAll("-", "");
+		// verifyInfo.setBiz_no(biz_no);
+		// String response = getBaseInfo_biz_token(biz_no);
+		// if (StringUtil.isBlank(response)) {
+		// vo.setSuccess(false);
+		// vo.setMsg("get biz token fail");
+		// return vo;
+		// }
+		// Map map = gson.fromJson(response, Map.class);
+		// String request_id = "";
+		// String time_used = "";
+		// String biz_token = "";
+		// String error = "";
+		// if (map.containsKey("request_id")) {
+		// request_id = (String) map.get("request_id");
+		// }
+		// if (map.containsKey("time_used")) {
+		// time_used = (String) map.get("time_used");
+		// }
+		// verifyInfo.setRequest_id(request_id);
+		// verifyInfo.setTime_used(time_used);
+		// if (map.containsKey("biz_token")) {
+		// biz_token = (String) map.get("biz_token");
+		// verifyInfo.setBiztoken(biz_token);
+		// String verifyUrl = "https://openapi.faceid.com/lite_ocr/v1/do/" + biz_token;
+		// Map data = new HashMap<>();
+		// vo.setData(data);
+		// data.put("url", verifyUrl);
+		// } else if (map.containsKey("error")) {
+		// error = (String) map.get("error");
+		// verifyInfo.setError(error);
+		// vo.setSuccess(false);
+		// vo.setMsg(error);
+		// }
+		// baseVerifyService.saveIDCardVerifyInfo(verifyInfo);
 		return vo;
 	}
 
@@ -115,11 +125,15 @@ public class UserVerifyController {
 			return vo;
 		}
 		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
-		if (agentInfo == null) {
+		if (agentInfo != null) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("finish verify");
 			return vo;
 		}
+		agentInfo = new UserAgentInfo();
+		agentInfo.setId(userId);
+		agentInfo.setAgent("移动");
+		userAuthQueryService.saveUserAgentInfo(agentInfo);
 		return vo;
 	}
 
@@ -163,9 +177,14 @@ public class UserVerifyController {
 		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
 		if (creditInfo != null && creditInfo.finishCreditVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("finish verify");
 			return vo;
 		}
+		creditInfo = new UserCreditInfo();
+		creditInfo.setId(userId);
+		creditInfo.setAuth_id("f5d4g56df");
+		creditInfo.setDescribe("信用良好");
+		userAuthQueryService.saveUserCreditInfo(creditInfo);
 		return vo;
 	}
 

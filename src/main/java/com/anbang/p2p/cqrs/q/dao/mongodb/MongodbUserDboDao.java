@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.anbang.p2p.cqrs.q.dao.UserDboDao;
@@ -46,9 +47,19 @@ public class MongodbUserDboDao implements UserDboDao {
 	@Override
 	public List<UserDbo> find(int page, int size) {
 		Query query = new Query();
-		query.skip((page-1)*size);
+		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, UserDbo.class);
+	}
+
+	@Override
+	public void updateNicknameAndHeadimgurlById(String userId, String nickname, String headimgurl) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(userId));
+		Update update = new Update();
+		update.set("nickname", nickname);
+		update.set("headimgurl", headimgurl);
+		mongoTemplate.updateFirst(query, update, UserDbo.class);
 	}
 
 }

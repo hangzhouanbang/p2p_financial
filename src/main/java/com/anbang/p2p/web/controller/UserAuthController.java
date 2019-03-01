@@ -113,11 +113,14 @@ public class UserAuthController {
 			vo.setMsg("invalid phone");
 			return vo;
 		}
-		if (!verifyInfo.getParam().equals(code) || System.currentTimeMillis() > verifyInfo.getInvalidTime()) {// 验证码错误或者已失效
+		if (verifyInfo.isUsed() || !verifyInfo.getParam().equals(code)
+				|| System.currentTimeMillis() > verifyInfo.getInvalidTime()) {// 验证码错误或者已失效
 			vo.setSuccess(false);
 			vo.setMsg("invalid code");
 			return vo;
 		}
+		verifyInfo.setUsed(true);
+		phoneVerifyService.saveVerifyPhoneCode(verifyInfo);
 		try {
 			AuthorizationDbo authDbo = userAuthQueryService.findAuthorizationDbo("p2p.app.phone", phone);
 			if (authDbo != null) {// 已经手机注册

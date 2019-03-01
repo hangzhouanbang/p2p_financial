@@ -46,6 +46,22 @@ public class UserInfoController {
 	}
 
 	/**
+	 * 修改用户头像和昵称
+	 */
+	@RequestMapping("/update_user")
+	public CommonVO updateUser(String token, String nickname, String headimgurl) {
+		CommonVO vo = new CommonVO();
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid token");
+			return vo;
+		}
+		userAuthQueryService.updateNicknameAndHeadimgurlById(userId, nickname, headimgurl);
+		return vo;
+	}
+
+	/**
 	 * 实名认证信息
 	 */
 	@RequestMapping("/query_baseinfo")

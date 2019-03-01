@@ -8,6 +8,6 @@ public interface AuthorizationDboRepository extends MongoRepository<Authorizatio
 
 	AuthorizationDbo findOneByThirdAuthAndPublisherAndUuid(boolean thirdAuth, String publisher, String uuid);
 
-	AuthorizationDbo findOneByThirdAuthAndPublisherAndMemberId(boolean thirdAuth, String publisher, String memberId);
+	AuthorizationDbo findOneByThirdAuthAndPublisherAndUserId(boolean thirdAuth, String publisher, String userId);
 
 }

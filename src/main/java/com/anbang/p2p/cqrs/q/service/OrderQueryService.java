@@ -34,10 +34,11 @@ public class OrderQueryService {
 	@Autowired
 	private RefundInfoDao refundInfoDao;
 
-	public void saveLoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract,
+	public LoanOrder saveLoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract,
 			UserBaseInfo baseInfo) {
 		LoanOrder loanOrder = new LoanOrder(orderValueObject, user, contract, baseInfo);
 		loanOrderDao.save(loanOrder);
+		return loanOrder;
 	}
 
 	public void updateLoanOrder(OrderValueObject orderValueObject, UserBankCardInfo cardInfo) {

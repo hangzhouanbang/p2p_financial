@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.anbang.p2p.util.CommonVoUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +99,7 @@ public class UserAuthController {
 		userVerifyPhoneInfo.setInvalidTime(System.currentTimeMillis() + 20 * 60 * 1000);// 有效时间二十分钟
 		userVerifyPhoneInfo.setCreateTime(System.currentTimeMillis());
 		phoneVerifyService.saveVerifyPhoneCode(userVerifyPhoneInfo);
-		return vo;
+		return CommonVoUtil.success("success");
 	}
 
 	/**

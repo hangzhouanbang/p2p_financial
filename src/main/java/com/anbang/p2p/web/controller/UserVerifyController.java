@@ -2,9 +2,15 @@ package com.anbang.p2p.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.anbang.p2p.conf.VerifyConfig;
+import com.anbang.p2p.constants.VerifyRecordState;
+import com.anbang.p2p.plan.bean.VerifyRecord;
+import com.anbang.p2p.plan.service.VerifyRecordService;
+import com.anbang.p2p.util.CommonVoUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.StringUtil;
@@ -39,6 +45,9 @@ public class UserVerifyController {
 
 	@Autowired
 	private UserAuthQueryService userAuthQueryService;
+
+	@Autowired
+	private VerifyRecordService verifyRecordService;
 
 	private Gson gson = new Gson();
 
@@ -113,53 +122,54 @@ public class UserVerifyController {
 	}
 
 	/**
-	 * 运营商验证
+	 * 云慧眼加密加签
 	 */
 	@RequestMapping("/agentinfo")
 	public CommonVO agentInfo(String token) {
-		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid token");
-			return vo;
+			return CommonVoUtil.error("invalid token");
 		}
-		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
-		if (agentInfo != null) {
-			vo.setSuccess(false);
-			vo.setMsg("finish verify");
-			return vo;
-		}
-		agentInfo = new UserAgentInfo();
-		agentInfo.setId(userId);
-		agentInfo.setAgent("移动");
-		userAuthQueryService.saveUserAgentInfo(agentInfo);
-		return vo;
+
+		VerifyRecord record = new VerifyRecord();
+		record.setUerId(userId);
+		record.setState(VerifyRecordState.INIT);
+		record.setCauseBy("加密加签");
+		record.setCreateTime(System.currentTimeMillis());
+		verifyRecordService.save(record);
+
+		String partner_order_id = record.getId();
+		String pub_key = VerifyConfig.PUB_KEY;
+		String sign = "";
+		String sign_time = "";
+
+
+
+
+		return CommonVoUtil.success("success");
 	}
 
 	/**
 	 * 紧急联系人
 	 */
 	@RequestMapping("/contacts")
-	public CommonVO contacts(String token, String contactsPhone, String contactsName) {
-		CommonVO vo = new CommonVO();
+	public CommonVO contacts(String token, UserContacts userContacts) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid token");
-			return vo;
+			return CommonVoUtil.error("invalid token");
 		}
-		if (StringUtil.isBlank(contactsPhone) || StringUtil.isBlank(contactsName)) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid param");
-			return vo;
+		if (userContacts == null || UserContacts.isBlank(userContacts)) {
+			return CommonVoUtil.error("invalid param");
 		}
-		UserContacts contacts = new UserContacts();
-		contacts.setContactsName(contactsName);
-		contacts.setContactsPhone(contactsPhone);
-		contacts.setUserId(userId);
-		userAuthQueryService.saveContacts(contacts);
-		return vo;
+		if (!Pattern.matches("[0-9]{11}", userContacts.getCommonContactsPhone()) ||
+				!Pattern.matches("[0-9]{11}", userContacts.getDirectContactsPhone())) {// 检验手机格式
+			return CommonVoUtil.error("invalid phone");
+		}
+
+		userContacts.setId(null);
+		userContacts.setUserId(userId);
+		userAuthQueryService.saveContacts(userContacts);
+		return CommonVoUtil.success("success");
 	}
 
 	/**

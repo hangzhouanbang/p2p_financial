@@ -2,7 +2,7 @@ package com.anbang.p2p.util;
 
 import com.anbang.p2p.web.vo.CommonVO;
 
-public class CommonVoUtil {
+public class CommonVOUtil {
     public static CommonVO success(Object data, String msg) {
         CommonVO commonVO = new CommonVO();
         commonVO.setSuccess(true);

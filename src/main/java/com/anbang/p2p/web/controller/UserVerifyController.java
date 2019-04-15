@@ -1,16 +1,19 @@
 package com.anbang.p2p.web.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.constants.VerifyRecordState;
 import com.anbang.p2p.plan.bean.VerifyRecord;
 import com.anbang.p2p.plan.service.VerifyRecordService;
-import com.anbang.p2p.util.CommonVoUtil;
+import com.anbang.p2p.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.StringUtil;
@@ -20,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
-import com.anbang.p2p.cqrs.q.dbo.UserAgentInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.cqrs.q.dbo.UserCreditInfo;
@@ -28,8 +30,6 @@ import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.bean.IDCardQueryInfo;
 import com.anbang.p2p.plan.bean.IDCardVerifyInfo;
 import com.anbang.p2p.plan.service.BaseVerifyService;
-import com.anbang.p2p.util.HmacSha1Sign;
-import com.anbang.p2p.util.HttpUtil;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.google.gson.Gson;
 
@@ -124,11 +124,15 @@ public class UserVerifyController {
 	/**
 	 * 云慧眼加密加签
 	 */
-	@RequestMapping("/agentinfo")
-	public CommonVO agentInfo(String token) {
+	@RequestMapping("/addSign")
+	public CommonVO addSign(String token, String idName, String idNumber) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
-			return CommonVoUtil.error("invalid token");
+			return CommonVOUtil.error("invalid token");
+		}
+
+		if (StringUtils.isAnyBlank(idName, idNumber)) {
+			return CommonVOUtil.lackParameter();
 		}
 
 		VerifyRecord record = new VerifyRecord();
@@ -140,13 +144,51 @@ public class UserVerifyController {
 
 		String partner_order_id = record.getId();
 		String pub_key = VerifyConfig.PUB_KEY;
-		String sign = "";
-		String sign_time = "";
+		String sign_time = TimeUtils.getStringDate(new Date());
+		String sign = RiskUtil.getMD5Sign(record.getId(), sign_time);
+		String return_url = "";
+		String id_name = idName;
+		String id_number = idNumber;
+		String callback_url = "";
 
+		String params = String.format("partner_order_id=%s|pub_key=%s|sign_time=%s|sign=%s|return_url=%s|id_name=%s|id_number=%s|callback_url=%s|",
+				partner_order_id, pub_key, sign_time, sign, return_url, id_name, id_number, callback_url);
+		try {
+			String url = RiskUtil.getAESSign(params);
+			return CommonVOUtil.success(url,"success");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CommonVOUtil.systemException();
+	}
 
+	/**
+	 * 云慧眼身份认证回调
+	 */
+	@RequestMapping("/verifyCallback")
+	public void verifyCallback(String partner_order_id, String result_auth, String result_status, String errorcode, String message) {
+		if (StringUtils.isAnyBlank(partner_order_id, result_auth)) {
+			return;
+		}
 
+		VerifyRecord record = verifyRecordService.getById(partner_order_id);
+		if (record != null) {
+			// TODO: 2019/4/13
+			// 人脸认证成功
+			if ("T".equals(result_auth)) {
 
-		return CommonVoUtil.success("success");
+                // TODO: 2019/4/13
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("id_no","33032619930822****");
+                try {
+                    JSONObject resp = DataServiceUtil.dataservice(jsonObject, "");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+		}
 	}
 
 	/**
@@ -156,20 +198,20 @@ public class UserVerifyController {
 	public CommonVO contacts(String token, UserContacts userContacts) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
-			return CommonVoUtil.error("invalid token");
+			return CommonVOUtil.error("invalid token");
 		}
 		if (userContacts == null || UserContacts.isBlank(userContacts)) {
-			return CommonVoUtil.error("invalid param");
+			return CommonVOUtil.error("invalid param");
 		}
 		if (!Pattern.matches("[0-9]{11}", userContacts.getCommonContactsPhone()) ||
 				!Pattern.matches("[0-9]{11}", userContacts.getDirectContactsPhone())) {// 检验手机格式
-			return CommonVoUtil.error("invalid phone");
+			return CommonVOUtil.error("invalid phone");
 		}
 
 		userContacts.setId(null);
 		userContacts.setUserId(userId);
 		userAuthQueryService.saveContacts(userContacts);
-		return CommonVoUtil.success("success");
+		return CommonVOUtil.success("success");
 	}
 
 	/**

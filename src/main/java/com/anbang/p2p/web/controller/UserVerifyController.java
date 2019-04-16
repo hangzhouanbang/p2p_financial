@@ -84,7 +84,7 @@ public class UserVerifyController {
 		String return_url = VerifyConfig.RETURN_URL;
 		String callback_url = VerifyConfig.CALLBACK_URL;
 
-		String params = String.format("partner_order_id=%s|pub_key=%s|sign_time=%s|sign=%s|return_url=%s|callback_url=%s|",
+		String params = String.format("partner_order_id=%s&pub_key=%s&sign_time=%s&sign=%s&return_url=%s&callback_url=%s",
 				partner_order_id, pub_key, sign_time, sign, return_url, callback_url);
 		try {
 			String url = RiskUtil.getAESSign(params);
@@ -150,118 +150,82 @@ public class UserVerifyController {
 		return CommonVOUtil.success("success");
 	}
 
-	/**
-	 * 芝麻认证
-	 */
-	@RequestMapping("/creditinfo")
-	public CommonVO creditInfo(String token) {
-		CommonVO vo = new CommonVO();
-		String userId = userAuthService.getUserIdBySessionId(token);
-		if (userId == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid token");
-			return vo;
-		}
-		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
-		if (creditInfo != null && creditInfo.finishCreditVerify()) {
-			vo.setSuccess(false);
-			vo.setMsg("finish VerifyTest");
-			return vo;
-		}
-		creditInfo = new UserCreditInfo();
-		creditInfo.setId(userId);
-		creditInfo.setAuth_id("f5d4g56df");
-		creditInfo.setDescribe("信用良好");
-		userAuthQueryService.saveUserCreditInfo(creditInfo);
-		return vo;
-	}
-
-	/**
-	 * 处理认证notify
-	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/baseinfo_notify")
-	public String toBaseInfoNotify(HttpServletRequest request) {
-		// 获取notify过来的json
-		String data = request.getParameter("data");
-		return String.format("%s", data);
-	}
-
-	/**
-	 * 查询身份证认证详情
-	 */
-	@RequestMapping("/baseinfo_query")
-	public CommonVO queryBaseInfo(String biz_token) {
-		CommonVO vo = new CommonVO();
-		IDCardVerifyInfo verifyInfo = baseVerifyService.findIDCardVerifyInfoByBiz_token(biz_token);
-		if (verifyInfo == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid biz_token");
-			return vo;
-		}
-		String response = getBaseInfo_result(biz_token);
-		if (StringUtil.isBlank(response)) {
-			vo.setSuccess(false);
-			vo.setMsg("get biz token fail");
-			return vo;
-		}
-		Map map = gson.fromJson(response, Map.class);
-		IDCardQueryInfo info = new IDCardQueryInfo(map);
-		// TODO 更新用户基本信息
-		return vo;
-	}
-
-	private String getBaseInfo_biz_token(String biz_no) {
-		String result = "";
-		String host = "https://openapi.faceid.com";
-		String path = "/lite_ocr/v1/get_biz_token";
-		Map<String, String> headers = new HashMap<String, String>();
-		Map<String, String> querys = new HashMap<String, String>();
-		querys.put("sign_version", "hmac_sha1");// 签名算法版本，当前仅支持：hmac_sha1
-		querys.put("capture_image", "0");// 0:双面，1:人像面
-		// 用户完成或取消识别后网页跳转的目标URL（回调方法为get
-		// return_url?biz_token=xxx），URL限定为http或https且非内网地址
-		querys.put("return_url", "");
-		// 用户完成验证、取消验证、或验证超时后，由FaceID服务器请求客户服务器的URL，
-		// 我们将会把比对结果同时完整发送至您的服务器，用于对客户端的结果进行验证（回调方法为Post）， URL限定为http或https且非内网地址
-		querys.put("notify_url", "");
-		// "默认为空"。客户业务流水号，建议设置为您的业务相关的流水串号并且唯一。此字段不超过128字节
-		querys.put("biz_no", biz_no);
-		// 限定真是身份证阀值（推荐值0.8），如存在某一面低于设定值则重新拍摄
-		querys.put("idcard_threshold", "0.8");
-		// 0:身份证必须完整，1:身份证内容区域必须都在图片内，2:不做限定，如某一面不满足要求则重新拍摄
-		querys.put("limit_completeness", "0");
-		// 限定图片质量，取［0，1］区间实数，3位有效数字，一般来说质量分低于0.753则认为存在质量问题，如存在某一面低于设定值则重新拍摄
-		querys.put("limit_quality", "0.800");
-		// 0:进行逻辑判断，1:不进行逻辑判断，如存在某一面低于设定值则重新拍摄
-		querys.put("limit_logic", "1");
-		try {
-			String sign = HmacSha1Sign.genSign("apiKey", "secretKey", 0L);
-			querys.put("sign", sign);// 根据API_KEY和API_SECRET生成的签名
-			HttpResponse response = HttpUtil.doPost(host, path, headers, querys, "");
-			result = EntityUtils.toString(response.getEntity());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	private String getBaseInfo_result(String biz_token) {
-		String result = "";
-		String host = "https://openapi.faceid.com";
-		String path = "/lite_ocr/v1/get_result";
-		Map<String, String> headers = new HashMap<String, String>();
-		Map<String, String> querys = new HashMap<String, String>();
-		querys.put("sign_version", "hmac_sha1");// 签名算法版本，当前仅支持：hmac_sha1
-		querys.put("biz_token", biz_token);// get_biz_token接口返回的biz_token
-		querys.put("need_image", "1");// 是否需要返回身份证正反面照片及头像照片，1:返回、0:不返回
-		try {
-			String sign = HmacSha1Sign.genSign("apiKey", "secretKey", 0L);
-			querys.put("sign", sign);// 根据API_KEY和API_SECRET生成的签名
-			HttpResponse response = HttpUtil.doGet(host, path, headers, querys);
-			result = EntityUtils.toString(response.getEntity());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
+//	/**
+//	 * 查询身份证认证详情
+//	 */
+//	@RequestMapping("/baseinfo_query")
+//	public CommonVO queryBaseInfo(String biz_token) {
+//		CommonVO vo = new CommonVO();
+//		IDCardVerifyInfo verifyInfo = baseVerifyService.findIDCardVerifyInfoByBiz_token(biz_token);
+//		if (verifyInfo == null) {
+//			vo.setSuccess(false);
+//			vo.setMsg("invalid biz_token");
+//			return vo;
+//		}
+//		String response = getBaseInfo_result(biz_token);
+//		if (StringUtil.isBlank(response)) {
+//			vo.setSuccess(false);
+//			vo.setMsg("get biz token fail");
+//			return vo;
+//		}
+//		Map map = gson.fromJson(response, Map.class);
+//		IDCardQueryInfo info = new IDCardQueryInfo(map);
+//		// TODO 更新用户基本信息
+//		return vo;
+//	}
+//
+//	private String getBaseInfo_biz_token(String biz_no) {
+//		String result = "";
+//		String host = "https://openapi.faceid.com";
+//		String path = "/lite_ocr/v1/get_biz_token";
+//		Map<String, String> headers = new HashMap<String, String>();
+//		Map<String, String> querys = new HashMap<String, String>();
+//		querys.put("sign_version", "hmac_sha1");// 签名算法版本，当前仅支持：hmac_sha1
+//		querys.put("capture_image", "0");// 0:双面，1:人像面
+//		// 用户完成或取消识别后网页跳转的目标URL（回调方法为get
+//		// return_url?biz_token=xxx），URL限定为http或https且非内网地址
+//		querys.put("return_url", "");
+//		// 用户完成验证、取消验证、或验证超时后，由FaceID服务器请求客户服务器的URL，
+//		// 我们将会把比对结果同时完整发送至您的服务器，用于对客户端的结果进行验证（回调方法为Post）， URL限定为http或https且非内网地址
+//		querys.put("notify_url", "");
+//		// "默认为空"。客户业务流水号，建议设置为您的业务相关的流水串号并且唯一。此字段不超过128字节
+//		querys.put("biz_no", biz_no);
+//		// 限定真是身份证阀值（推荐值0.8），如存在某一面低于设定值则重新拍摄
+//		querys.put("idcard_threshold", "0.8");
+//		// 0:身份证必须完整，1:身份证内容区域必须都在图片内，2:不做限定，如某一面不满足要求则重新拍摄
+//		querys.put("limit_completeness", "0");
+//		// 限定图片质量，取［0，1］区间实数，3位有效数字，一般来说质量分低于0.753则认为存在质量问题，如存在某一面低于设定值则重新拍摄
+//		querys.put("limit_quality", "0.800");
+//		// 0:进行逻辑判断，1:不进行逻辑判断，如存在某一面低于设定值则重新拍摄
+//		querys.put("limit_logic", "1");
+//		try {
+//			String sign = HmacSha1Sign.genSign("apiKey", "secretKey", 0L);
+//			querys.put("sign", sign);// 根据API_KEY和API_SECRET生成的签名
+//			HttpResponse response = HttpUtil.doPost(host, path, headers, querys, "");
+//			result = EntityUtils.toString(response.getEntity());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return result;
+//	}
+//
+//	private String getBaseInfo_result(String biz_token) {
+//		String result = "";
+//		String host = "https://openapi.faceid.com";
+//		String path = "/lite_ocr/v1/get_result";
+//		Map<String, String> headers = new HashMap<String, String>();
+//		Map<String, String> querys = new HashMap<String, String>();
+//		querys.put("sign_version", "hmac_sha1");// 签名算法版本，当前仅支持：hmac_sha1
+//		querys.put("biz_token", biz_token);// get_biz_token接口返回的biz_token
+//		querys.put("need_image", "1");// 是否需要返回身份证正反面照片及头像照片，1:返回、0:不返回
+//		try {
+//			String sign = HmacSha1Sign.genSign("apiKey", "secretKey", 0L);
+//			querys.put("sign", sign);// 根据API_KEY和API_SECRET生成的签名
+//			HttpResponse response = HttpUtil.doGet(host, path, headers, querys);
+//			result = EntityUtils.toString(response.getEntity());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return result;
+//	}
 }

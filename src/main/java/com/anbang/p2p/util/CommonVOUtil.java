@@ -39,10 +39,17 @@ public class CommonVOUtil {
         return commonVO;
     }
 
-    public static CommonVO lackParameter(){
+    public static CommonVO invalidToken(){
         CommonVO commonVO = new CommonVO();
         commonVO.setSuccess(false);
-        commonVO.setMsg("LACK_OF_PARAMETER");
+        commonVO.setMsg("invalid token");
+        return commonVO;
+    }
+
+    public static CommonVO invalidParam(){
+        CommonVO commonVO = new CommonVO();
+        commonVO.setSuccess(false);
+        commonVO.setMsg("invalid param");
         return commonVO;
     }
 }

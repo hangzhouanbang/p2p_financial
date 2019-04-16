@@ -18,7 +18,6 @@ public class RiskService {
     //订单查询接口地址
     static final String Order_Query = "https://idsafe-auth.udcredit.com/front/4.3/api/order_query/pub_key/" + VerifyConfig.PUB_KEY;
 
-
     @Autowired
     private UserBaseInfoDao userBaseInfoDao;
 

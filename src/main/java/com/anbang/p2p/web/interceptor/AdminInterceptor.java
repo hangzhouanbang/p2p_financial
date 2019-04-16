@@ -3,6 +3,8 @@ package com.anbang.p2p.web.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.anbang.p2p.conf.AdminConfig;
+import com.anbang.p2p.web.controller.AdminController;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,15 +17,16 @@ import org.springframework.web.servlet.ModelAndView;
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 
+	static String token = AdminController.encode(AdminConfig.ACCOUNT +AdminConfig.PASS);
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		String account = request.getParameter("account");
-		String pass = request.getParameter("pass");
-		if (StringUtil.isBlank(account) || StringUtil.isBlank(pass)) {
+		String loginToken = request.getParameter("token");
+		if (StringUtil.isBlank(loginToken)) {
 			return false;
 		}
-		if (account.equals("sddo9&rt") && pass.equals("$^dd&ffg")) {
+		if (token.equals(loginToken)) {
 			return true;
 		}
 		return false;

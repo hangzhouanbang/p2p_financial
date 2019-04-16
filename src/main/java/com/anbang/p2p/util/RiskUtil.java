@@ -30,7 +30,6 @@ public class RiskUtil {
      * aes加密
      */
     public static String getAESSign (String params) throws Exception {
-        String pub_key = VerifyConfig.PUB_KEY;
         String encrypt = EncryptUtils.aesEncrypt(params, "4c43a8be85b64563a32244db9caf8454");
         String url = "https://static.udcredit.com/id/v43/index.html?apiparams=" + encrypt;
         return url;

@@ -8,6 +8,7 @@ public class UserBankCardInfo {
 	private String userId;// 用户id
 	private String bank;// 银行名称
 	private String bankCardNo;// 银行卡号
+	private String phone;	// 银行卡预留手机号
 
 	public String getId() {
 		return id;
@@ -41,4 +42,11 @@ public class UserBankCardInfo {
 		this.bankCardNo = bankCardNo;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }

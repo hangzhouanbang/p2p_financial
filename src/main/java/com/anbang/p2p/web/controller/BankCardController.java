@@ -1,5 +1,6 @@
 package com.anbang.p2p.web.controller;
 
+import com.anbang.p2p.util.CommonVOUtil;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,21 +26,16 @@ public class BankCardController {
 	 */
 	@RequestMapping("/bind")
 	public CommonVO bindBankCard(UserBankCardInfo info, String token) {
-		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid token");
-			return vo;
+			return CommonVOUtil.invalidToken();
 		}
 		if (StringUtil.isBlank(info.getBank()) || StringUtil.isBlank(info.getBankCardNo())) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid param");
-			return vo;
+			return CommonVOUtil.invalidParam();
 		}
 		// TODO 查询银行卡
 		info.setUserId(userId);
 		userAuthQueryService.saveBankCardInfo(info);
-		return vo;
+		return CommonVOUtil.success("success");
 	}
 }

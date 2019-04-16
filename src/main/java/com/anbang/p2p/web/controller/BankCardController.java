@@ -3,6 +3,7 @@ package com.anbang.p2p.web.controller;
 import com.anbang.p2p.util.CommonVOUtil;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,6 +12,7 @@ import com.anbang.p2p.cqrs.q.dbo.UserBankCardInfo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.web.vo.CommonVO;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/bankcard")
 public class BankCardController {

@@ -20,9 +20,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
@@ -35,6 +33,7 @@ import com.anbang.p2p.plan.service.BaseVerifyService;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.google.gson.Gson;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/verify")
 public class UserVerifyController {
@@ -107,7 +106,6 @@ public class UserVerifyController {
 
 		VerifyRecord record = verifyRecordService.getById(partner_order_id);
 		if (record != null) {
-			// TODO: 2019/4/13
 			// 人脸认证成功
 			if ("T".equals(result_auth)) {
 				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.SUCCESS, result_auth, message);
@@ -118,9 +116,6 @@ public class UserVerifyController {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
-				UserBaseInfo baseInfo = new UserBaseInfo();
-				userAuthQueryService.saveUserBaseInfo(baseInfo);
             } else {
 				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.ERROR, result_auth, message);
 			}

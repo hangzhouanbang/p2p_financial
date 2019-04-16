@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import com.anbang.p2p.web.vo.CommonVO;
 import com.anbang.p2p.web.vo.LoanOrderQueryVO;
 import com.highto.framework.web.page.ListPage;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/ordermanager")
 public class OrderManagerController {

@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +29,7 @@ import com.anbang.p2p.plan.bean.UserBaseRateOfInterest;
 import com.anbang.p2p.plan.service.BaseRateService;
 import com.anbang.p2p.web.vo.CommonVO;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/order")
 public class OrderController {
@@ -77,34 +79,30 @@ public class OrderController {
 //			vo.setMsg("not finish VerifyTest agentInfo");
 //			return vo;
 //		}
-//		// TODO 紧急联系人
-//		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
-//		if (contacts == null) {
-//			vo.setSuccess(false);
-//			vo.setMsg("not finish VerifyTest contacts");
-//			return vo;
-//		}
-//		// TODO 芝麻认证
-//		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
-//		if (creditInfo == null) {
-//			vo.setSuccess(false);
-//			vo.setMsg("not finish VerifyTest creditInfo");
-//			return vo;
-//		}
+		// TODO 紧急联系人
+		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
+		if (contacts == null) {
+			vo.setSuccess(false);
+			vo.setMsg("not finish VerifyTest contacts");
+			return vo;
+		}
+
 //		// TODO 绑定银行卡
-//		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
-//		if (cardInfo == null) {
-//			vo.setSuccess(false);
-//			vo.setMsg("invalid cardId");
-//			return vo;
-//		}
+		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
+		if (cardInfo == null) {
+			vo.setSuccess(false);
+			vo.setMsg("invalid cardId");
+			return vo;
+		}
 //		// TODO 合同认证
-//		OrderContract contract = orderQueryService.findOrderContractById(contractId);
-		// if (contract == null) {
-		// vo.setSuccess(false);
-		// vo.setMsg("invalid contract");
-		// return vo;
-		// }
+		OrderContract contract = orderQueryService.findOrderContractById(contractId);
+		contract = new OrderContract();
+		contract.setId("test001");
+		 if (contract == null) {
+		 vo.setSuccess(false);
+		 vo.setMsg("invalid contract");
+		 return vo;
+		 }
 		double amount = BaseLoan.baseLimit;
 		double service_charge_rate = BaseLoan.service_charge_rate;
 		long freeTimeOfInterest = BaseLoan.freeTimeOfInterest;
@@ -125,10 +123,10 @@ public class OrderController {
 				overdue_rate = userBaseRateOfInterest.getOverdue_rate();
 			}
 			// 生成卡密
-			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, "123", amount,
+			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, cardInfo.getBankCardNo(), amount,
 					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
 					System.currentTimeMillis());
-			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, null, baseInfo);
+			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
 			checkOrderByFengkong(loanOrder);
 		} catch (Exception e) {
 			vo.setSuccess(false);

@@ -1,13 +1,19 @@
 package com.anbang.p2p.plan.bean;
 
 
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /**
  * @Description: 第三方api的校验记录
  */
+@Document
 public class VerifyRecord {
     private String id;
+    @Indexed(unique = false)
     private String uerId;   // 用户id
     private String state;   // 校验状态
+    private String result;  // api返回
     private String causeBy; // 当前状态的原因
     private long createTime;    //创建时间
 
@@ -33,6 +39,14 @@ public class VerifyRecord {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     public String getCauseBy() {

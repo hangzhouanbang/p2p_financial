@@ -76,7 +76,7 @@ public class UserInfoController {
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
 		if (baseInfo != null && !baseInfo.finishUserVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("not finish VerifyTest");
 			return vo;
 		}
 		Map data = new HashMap<>();
@@ -100,7 +100,7 @@ public class UserInfoController {
 		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
 		if (agentInfo != null && agentInfo.finishAgentVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("not finish VerifyTest");
 			return vo;
 		}
 		Map data = new HashMap<>();
@@ -124,7 +124,7 @@ public class UserInfoController {
 		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
 		if (contacts != null && contacts.finishContactsVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("not finish VerifyTest");
 			return vo;
 		}
 		Map data = new HashMap<>();
@@ -148,7 +148,7 @@ public class UserInfoController {
 		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
 		if (creditInfo != null && creditInfo.finishCreditVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify");
+			vo.setMsg("not finish VerifyTest");
 			return vo;
 		}
 		Map data = new HashMap<>();

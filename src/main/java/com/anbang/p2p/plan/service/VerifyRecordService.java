@@ -20,4 +20,8 @@ public class VerifyRecordService {
     public VerifyRecord getByUerId(String uerId){
         return verifyRecordDao.getByUerId(uerId);
     }
+
+    public void updateStateAndCause(String id, String state, String result, String causeBy){
+        verifyRecordDao.updateStateAndCause(id, state, result ,causeBy);
+    }
 }

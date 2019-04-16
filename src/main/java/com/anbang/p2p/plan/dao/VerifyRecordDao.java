@@ -8,4 +8,6 @@ public interface VerifyRecordDao {
     VerifyRecord getById(String id);
 
     VerifyRecord getByUerId(String uerId);
+
+    void updateStateAndCause(String id, String state, String result, String causeBy);
 }

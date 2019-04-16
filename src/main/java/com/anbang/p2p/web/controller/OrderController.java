@@ -64,41 +64,42 @@ public class OrderController {
 		UserDbo user = userAuthQueryService.findUserDboByUserId(userId);
 		// TODO 身份认证
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		baseInfo.setRealName("temp test");
 		if (baseInfo == null) {
 			vo.setSuccess(false);
-			vo.setMsg("not finish verify baseInfo");
+			vo.setMsg("not finish VerifyTest baseInfo");
 			return vo;
 		}
-		// TODO 运营商认证
-		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
-		if (agentInfo == null) {
-			vo.setSuccess(false);
-			vo.setMsg("not finish verify agentInfo");
-			return vo;
-		}
-		// TODO 紧急联系人
-		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
-		if (contacts == null) {
-			vo.setSuccess(false);
-			vo.setMsg("not finish verify contacts");
-			return vo;
-		}
-		// TODO 芝麻认证
-		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
-		if (creditInfo == null) {
-			vo.setSuccess(false);
-			vo.setMsg("not finish verify creditInfo");
-			return vo;
-		}
-		// TODO 绑定银行卡
-		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
-		if (cardInfo == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid cardId");
-			return vo;
-		}
-		// TODO 合同认证
-		OrderContract contract = orderQueryService.findOrderContractById(contractId);
+//		// TODO 运营商认证
+//		UserAgentInfo agentInfo = userAuthQueryService.findUserAgentInfoByUserId(userId);
+//		if (agentInfo == null) {
+//			vo.setSuccess(false);
+//			vo.setMsg("not finish VerifyTest agentInfo");
+//			return vo;
+//		}
+//		// TODO 紧急联系人
+//		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
+//		if (contacts == null) {
+//			vo.setSuccess(false);
+//			vo.setMsg("not finish VerifyTest contacts");
+//			return vo;
+//		}
+//		// TODO 芝麻认证
+//		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
+//		if (creditInfo == null) {
+//			vo.setSuccess(false);
+//			vo.setMsg("not finish VerifyTest creditInfo");
+//			return vo;
+//		}
+//		// TODO 绑定银行卡
+//		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
+//		if (cardInfo == null) {
+//			vo.setSuccess(false);
+//			vo.setMsg("invalid cardId");
+//			return vo;
+//		}
+//		// TODO 合同认证
+//		OrderContract contract = orderQueryService.findOrderContractById(contractId);
 		// if (contract == null) {
 		// vo.setSuccess(false);
 		// vo.setMsg("invalid contract");
@@ -124,10 +125,10 @@ public class OrderController {
 				overdue_rate = userBaseRateOfInterest.getOverdue_rate();
 			}
 			// 生成卡密
-			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, cardInfo.getBankCardNo(), amount,
+			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, "123", amount,
 					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
 					System.currentTimeMillis());
-			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
+			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, null, baseInfo);
 			checkOrderByFengkong(loanOrder);
 		} catch (Exception e) {
 			vo.setSuccess(false);

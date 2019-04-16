@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.constants.VerifyRecordState;
 import com.anbang.p2p.plan.bean.VerifyRecord;
+import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -49,90 +51,24 @@ public class UserVerifyController {
 	@Autowired
 	private VerifyRecordService verifyRecordService;
 
-	private Gson gson = new Gson();
+	@Autowired
+	private RiskService riskService;
 
-	/**
-	 * 身份认证
-	 */
-	@RequestMapping("/baseinfo")
-	public CommonVO baseInfo(String token) {
-		CommonVO vo = new CommonVO();
-		String userId = userAuthService.getUserIdBySessionId(token);
-		if (userId == null) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid token");
-			return vo;
-		}
-		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
-		if (baseInfo != null && baseInfo.finishUserVerify()) {
-			vo.setSuccess(false);
-			vo.setMsg("finish verify");
-			return vo;
-		}
-		baseInfo = new UserBaseInfo();
-		baseInfo.setId(userId);
-		baseInfo.setIDcard("33019566695612323");
-		baseInfo.setIDcardImgUrl_front(
-				"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1551161768209&di=109b309590b4d54e40bf6417a697410c&imgtype=0&src=http%3A%2F%2Fimg1.gamersky.com%2Fimage2012%2F03%2F20120313s_5%2F10.jpg");
-		baseInfo.setIDcardImgUrl_reverse(
-				"https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3163144905,873716841&fm=26&gp=0.jpg");
-		baseInfo.setRealName("利鲁姆");
-		baseInfo.setFaceImgUrl(
-				"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1551161725755&di=7ffe5ff12e81d2b764a723c07676f3ea&imgtype=0&src=http%3A%2F%2Fn.sinaimg.cn%2Fsinacn09%2F216%2Fw640h376%2F20181124%2F167c-hmivixn8459064.jpg");
-		userAuthQueryService.saveUserBaseInfo(baseInfo);
-		// IDCardVerifyInfo verifyInfo = new IDCardVerifyInfo();
-		// verifyInfo.setUserId(userId);
-		// verifyInfo.setToken(token);
-		// String biz_no = UUID.randomUUID().toString().replaceAll("-", "");
-		// verifyInfo.setBiz_no(biz_no);
-		// String response = getBaseInfo_biz_token(biz_no);
-		// if (StringUtil.isBlank(response)) {
-		// vo.setSuccess(false);
-		// vo.setMsg("get biz token fail");
-		// return vo;
-		// }
-		// Map map = gson.fromJson(response, Map.class);
-		// String request_id = "";
-		// String time_used = "";
-		// String biz_token = "";
-		// String error = "";
-		// if (map.containsKey("request_id")) {
-		// request_id = (String) map.get("request_id");
-		// }
-		// if (map.containsKey("time_used")) {
-		// time_used = (String) map.get("time_used");
-		// }
-		// verifyInfo.setRequest_id(request_id);
-		// verifyInfo.setTime_used(time_used);
-		// if (map.containsKey("biz_token")) {
-		// biz_token = (String) map.get("biz_token");
-		// verifyInfo.setBiztoken(biz_token);
-		// String verifyUrl = "https://openapi.faceid.com/lite_ocr/v1/do/" + biz_token;
-		// Map data = new HashMap<>();
-		// vo.setData(data);
-		// data.put("url", verifyUrl);
-		// } else if (map.containsKey("error")) {
-		// error = (String) map.get("error");
-		// verifyInfo.setError(error);
-		// vo.setSuccess(false);
-		// vo.setMsg(error);
-		// }
-		// baseVerifyService.saveIDCardVerifyInfo(verifyInfo);
-		return vo;
-	}
+	private Gson gson = new Gson();
 
 	/**
 	 * 云慧眼加密加签
 	 */
 	@RequestMapping("/addSign")
-	public CommonVO addSign(String token, String idName, String idNumber) {
+	public CommonVO addSign(String token) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
 			return CommonVOUtil.error("invalid token");
 		}
 
-		if (StringUtils.isAnyBlank(idName, idNumber)) {
-			return CommonVOUtil.lackParameter();
+		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		if (baseInfo != null && baseInfo.finishUserVerify()) {
+			return CommonVOUtil.error("finish VerifyTest");
 		}
 
 		VerifyRecord record = new VerifyRecord();
@@ -146,13 +82,11 @@ public class UserVerifyController {
 		String pub_key = VerifyConfig.PUB_KEY;
 		String sign_time = TimeUtils.getStringDate(new Date());
 		String sign = RiskUtil.getMD5Sign(record.getId(), sign_time);
-		String return_url = "";
-		String id_name = idName;
-		String id_number = idNumber;
-		String callback_url = "";
+		String return_url = VerifyConfig.RETURN_URL;
+		String callback_url = VerifyConfig.CALLBACK_URL;
 
-		String params = String.format("partner_order_id=%s|pub_key=%s|sign_time=%s|sign=%s|return_url=%s|id_name=%s|id_number=%s|callback_url=%s|",
-				partner_order_id, pub_key, sign_time, sign, return_url, id_name, id_number, callback_url);
+		String params = String.format("partner_order_id=%s|pub_key=%s|sign_time=%s|sign=%s|return_url=%s|callback_url=%s|",
+				partner_order_id, pub_key, sign_time, sign, return_url, callback_url);
 		try {
 			String url = RiskUtil.getAESSign(params);
 			return CommonVOUtil.success(url,"success");
@@ -167,7 +101,7 @@ public class UserVerifyController {
 	 */
 	@RequestMapping("/verifyCallback")
 	public void verifyCallback(String partner_order_id, String result_auth, String result_status, String errorcode, String message) {
-		if (StringUtils.isAnyBlank(partner_order_id, result_auth)) {
+		if (StringUtils.isBlank(partner_order_id)) {
 			return;
 		}
 
@@ -176,19 +110,26 @@ public class UserVerifyController {
 			// TODO: 2019/4/13
 			// 人脸认证成功
 			if ("T".equals(result_auth)) {
+				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.SUCCESS, result_auth, message);
 
-                // TODO: 2019/4/13
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("id_no","33032619930822****");
-                try {
-                    JSONObject resp = DataServiceUtil.dataservice(jsonObject, "");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+				// 查询并保存
+				try {
+					riskService.orderQuery(partner_order_id, record.getUerId());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
-            }
-
+				UserBaseInfo baseInfo = new UserBaseInfo();
+				userAuthQueryService.saveUserBaseInfo(baseInfo);
+            } else {
+				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.ERROR, result_auth, message);
+			}
 		}
+	}
+
+	@RequestMapping("/getImg")
+	public void getImg(String imgName, HttpServletResponse response) {
+		ImgSaveUtil.getImg(imgName, response);
 	}
 
 	/**
@@ -229,7 +170,7 @@ public class UserVerifyController {
 		UserCreditInfo creditInfo = userAuthQueryService.findUserCreditInfoByUserId(userId);
 		if (creditInfo != null && creditInfo.finishCreditVerify()) {
 			vo.setSuccess(false);
-			vo.setMsg("finish verify");
+			vo.setMsg("finish VerifyTest");
 			return vo;
 		}
 		creditInfo = new UserCreditInfo();

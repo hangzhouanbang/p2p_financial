@@ -25,7 +25,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.anbang.p2p.web.interceptor.AdminInterceptor;
 import com.anbang.p2p.web.interceptor.PermissionInterceptor;
 
-@Configuration
+//@Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Bean
@@ -59,7 +59,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(permissionInterceptor()).addPathPatterns("/bankcard/**").addPathPatterns("/order/**")
-				.addPathPatterns("/userinfo/**").addPathPatterns("/verify/**");
+				.addPathPatterns("/userinfo/**").addPathPatterns("/VerifyTest/**");
 
 		registry.addInterceptor(adminInterceptor()).addPathPatterns("/base/**").addPathPatterns("/usermanager/**")
 				.addPathPatterns("/ordermanager/**");

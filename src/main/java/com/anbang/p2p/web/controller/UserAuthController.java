@@ -8,7 +8,9 @@ import com.anbang.p2p.util.CommonVOUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anbang.p2p.conf.PhoneVerifyConfig;
@@ -30,6 +32,7 @@ import com.google.gson.Gson;
  * @author lsc
  *
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 public class UserAuthController {
@@ -52,6 +55,7 @@ public class UserAuthController {
 	 * 获取验证码
 	 */
 	@RequestMapping("/getcode")
+	@ResponseBody
 	public CommonVO getVerifyCode(String phone) {
 		CommonVO vo = new CommonVO();
 		if (!Pattern.matches("[0-9]{11}", phone)) {// 检验手机格式
@@ -106,6 +110,7 @@ public class UserAuthController {
 	 * 验证手机验证码
 	 */
 	@RequestMapping("/verify")
+	@ResponseBody
 	public CommonVO verifyPhone(String phone, String code) {
 		CommonVO vo = new CommonVO();
 		UserVerifyPhoneInfo verifyInfo = phoneVerifyService.findUserVerifyPhoneInfoByPhone(phone);

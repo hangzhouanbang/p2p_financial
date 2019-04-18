@@ -80,7 +80,7 @@ public class UserVerifyController {
 		String partner_order_id = record.getId();
 		String pub_key = VerifyConfig.PUB_KEY;
 		String sign_time = TimeUtils.getStringDate(new Date());
-		String sign = RiskUtil.getMD5Sign(record.getId(), sign_time);
+		String sign = RiskUtil.getMD5Sign(record.getId(), sign_time);	// 获取签名
 		String return_url = VerifyConfig.RETURN_URL;
 		String callback_url = VerifyConfig.CALLBACK_URL;
 

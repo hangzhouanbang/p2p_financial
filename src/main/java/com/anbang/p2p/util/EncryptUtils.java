@@ -19,7 +19,7 @@ public class EncryptUtils {
     /**
      * 密钥
      */
-    private static final String KEY = "password";
+    private static final String KEY = "4c43a8be85b64563a32244db9caf8454";
 
     /**
      * 算法

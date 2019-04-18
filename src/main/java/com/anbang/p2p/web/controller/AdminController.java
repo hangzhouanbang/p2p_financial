@@ -23,7 +23,7 @@ public class AdminController {
 
         if (AdminConfig.ACCOUNT.equals(account) && AdminConfig.PASS.equals(pass)) {
             String token = encode(account + pass);
-            return CommonVOUtil.success("","success");
+            return CommonVOUtil.success(token,"success");
         }
 
         return CommonVOUtil.error("ACCOUNT error");

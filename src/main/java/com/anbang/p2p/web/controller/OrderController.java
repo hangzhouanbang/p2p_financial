@@ -98,8 +98,8 @@ public class OrderController {
 		}
 
 //		// TODO 绑定银行卡
-		UserBankCardInfo cardInfo = userAuthQueryService.findUserBankCardInfoById(cardId);
-		if (cardInfo == null) {
+		long bankCardCount = userAuthQueryService.getAmountByUserId(cardId);
+		if (bankCardCount == 0) {
 			vo.setSuccess(false);
 			vo.setMsg("invalid cardId");
 			return vo;
@@ -146,7 +146,7 @@ public class OrderController {
 					System.currentTimeMillis());
 			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
 			// TODO: 2019/4/19 未接入风控
-//			checkOrderByFengkong(loanOrder);
+			checkOrderByFengkong(loanOrder);
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());

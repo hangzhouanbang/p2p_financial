@@ -40,9 +40,6 @@ public class UserVerifyController {
 	@Autowired
 	private VerifyRecordService verifyRecordService;
 
-	@Autowired
-	private RiskService riskService;
-
 	private Gson gson = new Gson();
 
 	/**
@@ -85,33 +82,6 @@ public class UserVerifyController {
 		return CommonVOUtil.systemException();
 	}
 
-	/**
-	 * 云慧眼身份认证回调
-	 */
-	@RequestMapping("/verifyCallback")
-	public void verifyCallback(String partner_order_id, String result_auth, String result_status, String errorcode, String message) {
-		if (StringUtils.isBlank(partner_order_id)) {
-			return;
-		}
-
-		VerifyRecord record = verifyRecordService.getById(partner_order_id);
-		if (record != null) {
-			// 人脸认证成功
-			if ("T".equals(result_auth)) {
-				verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.SUCCESS, result_auth, message);
-
-				// 查询并保存
-				try {
-					riskService.orderQuery(partner_order_id, record.getUerId());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-            } else {
-				verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.ERROR, result_auth, message);
-			}
-		}
-	}
-
 	@RequestMapping("/getImg")
 	public void getImg(String imgName, HttpServletResponse response) {
 		ImgSaveUtil.getImg(imgName, response);
@@ -134,10 +104,30 @@ public class UserVerifyController {
 			return CommonVOUtil.error("invalid phone");
 		}
 
-		userContacts.setId(null);
+
+
+		userContacts.setId(userId);
 		userContacts.setUserId(userId);
 		userAuthQueryService.saveContacts(userContacts);
 		return CommonVOUtil.success("success");
+	}
+
+	/**
+	 * 紧急联系人
+	 */
+	@RequestMapping("/getContacts")
+	public CommonVO getContacts(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.error("invalid token");
+		}
+
+		UserContacts userContact = userAuthQueryService.findUserContactsByUserId(userId);
+		if (userContact != null) {
+			return CommonVOUtil.success(userContact, "已绑定");
+		}
+
+		return CommonVOUtil.success("未绑定");
 	}
 
 //	/**

@@ -131,4 +131,12 @@ public class UserAuthQueryService {
 	public UserBankCardInfo findUserBankCardInfoById(String cardId) {
 		return userBankCardInfoDao.findById(cardId);
 	}
+
+	public long getAmountByUserId(String userId) {
+		return userBankCardInfoDao.getAmountByUserId(userId);
+	}
+
+	public UserBankCardInfo findById(String userId) {
+		return userBankCardInfoDao.findById(userId);
+	}
 }

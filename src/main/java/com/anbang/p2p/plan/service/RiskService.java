@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.cqrs.q.dao.UserBaseInfoDao;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
+import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.plan.bean.RiskInfo;
 import com.anbang.p2p.plan.dao.RiskInfoDao;
 import com.anbang.p2p.util.ImgSaveUtil;
@@ -26,6 +27,8 @@ public class RiskService {
     @Autowired
     private RiskInfoDao riskInfoDao;
 
+    private UserDbo userDbo;
+
     /**
      * 订单查询
      *
@@ -36,17 +39,16 @@ public class RiskService {
         JSONObject header = new JSONObject();
         String sign_time = TimeUtils.getStringDate(new Date());
         String sign = RiskUtil.getMD5Sign(partner_order_id, sign_time);
-        System.out.println(sign);
+//        System.out.println(sign);
         header.put("partner_order_id", partner_order_id);
         header.put("sign", sign);
         header.put("sign_time", sign_time);
         reqJson.put("header", header);
-        System.out.println("订单查询接口-输入参数：" + JSON.toJSONString(reqJson, true));
+//        System.out.println("订单查询接口-输入参数：" + JSON.toJSONString(reqJson, true));
 
-        JSONObject resJson = RiskUtil.doHttpRequest(Order_Query, reqJson);
-        System.out.println("订单查询接口-输出结果：" + JSON.toJSONString(resJson, true));
+        JSONObject data = RiskUtil.doHttpRequest(Order_Query, reqJson).getJSONObject("data");
+//        System.out.println("订单查询接口-输出结果：" + JSON.toJSONString(resJson, true));
 
-        JSONObject data = reqJson.getJSONObject("data");
         String id_number = data.getString("id_number");
         String id_name = data.getString("id_name");
         String idcard_front_photo = data.getString("idcard_front_photo");
@@ -74,7 +76,7 @@ public class RiskService {
         baseInfo.setIDcardImgUrl_front(front);
         baseInfo.setIDcardImgUrl_reverse(back);
         userBaseInfoDao.save(baseInfo);
-        return resJson;
+        return data;
     }
 
     public void save(RiskInfo riskInfo){

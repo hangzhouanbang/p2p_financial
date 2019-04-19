@@ -42,11 +42,34 @@ public class BankCardController {
 			return CommonVOUtil.invalidParam();
 		}
 
+		UserBankCardInfo bankCardInfo = userAuthQueryService.findById(userId);
+		if (bankCardInfo != null) {
+			return CommonVOUtil.success(bankCardInfo, "已绑定");
+		}
+
 		// todo 只绑定一张卡
 		info.setId(userId);
 		info.setUserId(userId);
 		userAuthQueryService.saveBankCardInfo(info);
 		return CommonVOUtil.success("success");
+	}
+
+	/**
+	 * 查询绑定银行卡
+	 */
+	@RequestMapping("/getBindBankCard")
+	public CommonVO getBindBankCard(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		UserBankCardInfo bankCardInfo = userAuthQueryService.findById(userId);
+		if (bankCardInfo != null) {
+			return CommonVOUtil.success(bankCardInfo, "已绑定");
+		}
+
+		return CommonVOUtil.success("未绑定");
 	}
 
 	/**
@@ -72,6 +95,29 @@ public class BankCardController {
 
 		alipayInfo.setUpdateTime(System.currentTimeMillis());
 		userDbo.setAlipayInfo(alipayInfo);
+		userDboDao.save(userDbo);
 		return CommonVOUtil.success("success");
+	}
+
+	/**
+	 * 查询绑定支付宝
+	 */
+	@RequestMapping("/getBindAlipay")
+	public CommonVO getBindAlipay(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		UserDbo userDbo = userDboDao.findById(userId);
+		if (userDbo == null) {
+			return CommonVOUtil.systemException();
+		}
+
+		if (userDbo.getAlipayInfo() != null) {
+			return CommonVOUtil.success(userDbo.getAlipayInfo(), "已绑定");
+		}
+
+		return CommonVOUtil.success("未绑定");
 	}
 }

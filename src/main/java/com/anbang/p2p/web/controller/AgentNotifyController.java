@@ -9,7 +9,13 @@ import com.anbang.p2p.cqrs.c.service.OrderCmdService;
 import com.anbang.p2p.cqrs.q.dbo.RefundInfo;
 import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
+import com.anbang.p2p.plan.bean.VerifyRecord;
+import com.anbang.p2p.plan.service.RiskService;
+import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.AgentIncome;
+import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.web.vo.CommonVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/agentNotify")
+@RequestMapping("/agentNotifyInfo")
 public class AgentNotifyController {
 
     @Autowired
@@ -31,6 +37,12 @@ public class AgentNotifyController {
 
     @Autowired
     private RefundInfoService refundInfoService;
+
+    @Autowired
+    private VerifyRecordService verifyRecordService;
+
+    @Autowired
+    private RiskService riskService;
 
     @RequestMapping("incomeNotify")
     public String incomeNotify(String merchant, Double amount, String sys_order_no, String out_order_no, String order_time, String sign){
@@ -59,13 +71,41 @@ public class AgentNotifyController {
         return "success";
     }
 
-    @RequestMapping("incomeNotify")
-    public String incomeNotify(String user_order_no){
-        JSONObject object = AgentIncome.queryIncome(user_order_no);
-        String status = object.getString("status");
-        if ("1".equals(status)) {
+    /**
+     * 云慧眼身份认证回调
+     */
+    @RequestMapping("/verifyCallback")
+    public String verifyCallback(String partner_order_id, String result_auth, String result_status, String errorcode, String message) {
+        if (StringUtils.isBlank(partner_order_id)) {
+            return "error";
+        }
 
+        VerifyRecord record = verifyRecordService.getById(partner_order_id);
+        if (record != null) {
+            // 人脸认证成功
+            if ("T".equals(result_auth)) {
+                verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.SUCCESS, result_auth, message);
+
+                // 查询并保存
+                try {
+                    riskService.orderQuery(partner_order_id, record.getUerId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.ERROR, result_auth, message);
+            }
         }
         return "success";
+    }
+
+    @RequestMapping("incomeResult")
+    public CommonVO incomeNotify(String user_order_no){
+        RefundInfo refundInfo = refundInfoService.getById(user_order_no);
+
+        if (refundInfo!= null && CommonRecordState.SUCCESS.equals(refundInfo.getStatus())){
+            return CommonVOUtil.success("success");
+        }
+        return CommonVOUtil.error("waiting");
     }
 }

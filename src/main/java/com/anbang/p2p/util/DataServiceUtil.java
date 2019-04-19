@@ -63,8 +63,8 @@ public class DataServiceUtil {
         String url = String.format(dataservice_url,pub_key,product_code,out_order_id,signature);
         System.out.println("url地址为：" + url);
         JSONObject response = doHttpRequest(url, jsonObject);
-        System.out.println("输出结果：" + JSON.toJSONString(response, true));
-        return null;
+//        System.out.println("输出结果：" + JSON.toJSONString(response, true));
+        return response;
     }
     /**
      * MD5加密

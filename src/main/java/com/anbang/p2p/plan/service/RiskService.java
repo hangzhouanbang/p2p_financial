@@ -3,7 +3,9 @@ package com.anbang.p2p.plan.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
+import com.anbang.p2p.cqrs.q.dao.LoanOrderDao;
 import com.anbang.p2p.cqrs.q.dao.UserBaseInfoDao;
+import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.plan.bean.RiskInfo;
@@ -25,9 +27,12 @@ public class RiskService {
     private UserBaseInfoDao userBaseInfoDao;
 
     @Autowired
+    private LoanOrderDao loanOrderDao;
+
+    @Autowired
     private RiskInfoDao riskInfoDao;
 
-    private UserDbo userDbo;
+    static final String imgUrl = "http://47.96.20.47:2020/admin/getImg?imgName=";
 
     /**
      * 订单查询
@@ -72,10 +77,15 @@ public class RiskService {
         baseInfo.setId(userId);
         baseInfo.setIDcard(id_number);
         baseInfo.setRealName(id_name);
-        baseInfo.setFaceImgUrl(living);
-        baseInfo.setIDcardImgUrl_front(front);
-        baseInfo.setIDcardImgUrl_reverse(back);
+        baseInfo.setFaceImgUrl(imgUrl + living);
+        baseInfo.setIDcardImgUrl_front(imgUrl + front);
+        baseInfo.setIDcardImgUrl_reverse(imgUrl + back);
         userBaseInfoDao.save(baseInfo);
+
+        LoanOrder loanOrder = loanOrderDao.findLastOrderByUserId(userId);
+        loanOrder.setRealName(id_name);
+        loanOrderDao.save(loanOrder);
+
         return data;
     }
 

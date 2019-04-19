@@ -289,4 +289,19 @@ public class LoanOrder {
 	}
 
 
+	public String getRepayType() {
+		return repayType;
+	}
+
+	public void setRepayType(String repayType) {
+		this.repayType = repayType;
+	}
+
+	public String getRepayAccount() {
+		return repayAccount;
+	}
+
+	public void setRepayAccount(String repayAccount) {
+		this.repayAccount = repayAccount;
+	}
 }

@@ -1,7 +1,5 @@
 package com.anbang.p2p.cqrs.q.dbo;
 
-import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
-
 /**
  * 还款信息
  */
@@ -149,4 +147,7 @@ public class RefundInfo {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+
+
 }

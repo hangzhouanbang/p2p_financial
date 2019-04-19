@@ -1,5 +1,6 @@
 package com.anbang.p2p.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
@@ -47,8 +48,10 @@ public class AgentNotifyController {
     @RequestMapping("incomeNotify")
     public String incomeNotify(String merchant, Double amount, String sys_order_no, String out_order_no, String order_time, String sign){
         JSONObject object = AgentIncome.queryIncome(out_order_no);
+        System.out.println("收款回调>>>>>>>>>>>>>>>>>>>>>>>" + JSON.toJSONString(object));
         String status = object.getString("status");
-        if ("1".equals(status)) {
+        String respCode = object.getString("respCode");
+        if ("0000".equals(respCode) && "1".equals(status)) {
 
             RefundInfo refundInfo = refundInfoService.getById(out_order_no);
             refundInfo.setStatus(CommonRecordState.SUCCESS);
@@ -63,11 +66,11 @@ public class AgentNotifyController {
                 e.printStackTrace();
             }
             orderQueryService.updateLoanOrder(orderValueObject);
-        } else {
-            RefundInfo refundInfo = refundInfoService.getById(out_order_no);
-            refundInfo.setStatus(CommonRecordState.ERROR);
-            refundInfoService.save(refundInfo);
+            return "success";
         }
+        RefundInfo refundInfo = refundInfoService.getById(out_order_no);
+        refundInfo.setStatus(CommonRecordState.ERROR);
+        refundInfoService.save(refundInfo);
         return "success";
     }
 
@@ -106,6 +109,10 @@ public class AgentNotifyController {
         if (refundInfo!= null && CommonRecordState.SUCCESS.equals(refundInfo.getStatus())){
             return CommonVOUtil.success("success");
         }
-        return CommonVOUtil.error("waiting");
+
+        if (refundInfo!= null && CommonRecordState.ERROR.equals(refundInfo.getStatus())) {
+            return CommonVOUtil.success("error");
+        }
+        return CommonVOUtil.success("waiting");
     }
 }

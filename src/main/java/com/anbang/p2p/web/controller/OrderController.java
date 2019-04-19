@@ -1,6 +1,7 @@
 package com.anbang.p2p.web.controller;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -8,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.constants.PayType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
@@ -71,7 +73,7 @@ public class OrderController {
 	 * 申请卡密
 	 */
 	@RequestMapping("/createorder")
-	public CommonVO createOrder(String token, String cardId, String contractId, int dayNum) {
+	public CommonVO createOrder(String token, String contractId, int dayNum) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -82,7 +84,6 @@ public class OrderController {
 		UserDbo user = userAuthQueryService.findUserDboByUserId(userId);
 		// TODO 身份认证
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
-		baseInfo.setRealName("temp test");
 		if (baseInfo == null) {
 			vo.setSuccess(false);
 			vo.setMsg("not finish VerifyTest baseInfo");
@@ -98,7 +99,7 @@ public class OrderController {
 		}
 
 //		// TODO 绑定银行卡
-		long bankCardCount = userAuthQueryService.getAmountByUserId(cardId);
+		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
 		if (bankCardCount == 0) {
 			vo.setSuccess(false);
 			vo.setMsg("invalid cardId");
@@ -145,7 +146,8 @@ public class OrderController {
 					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
 					System.currentTimeMillis());
 			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
-			// TODO: 2019/4/19 未接入风控
+
+			//风控
 			checkOrderByFengkong(loanOrder);
 		} catch (Exception e) {
 			vo.setSuccess(false);
@@ -177,6 +179,7 @@ public class OrderController {
 			amount = b.setScale(2, BigDecimal.ROUND_UP).doubleValue();
 
 			RefundInfo refundInfo = new RefundInfo(loanOrder, payType, amount);
+			refundInfo.setStatus(CommonRecordState.INIT);
 			refundInfoService.save(refundInfo);
 			Map data = AgentIncome.income(amount, refundInfo.getId(), payType);
 			return CommonVOUtil.success(data, "success");
@@ -192,10 +195,10 @@ public class OrderController {
 	}
 
 	/**
-	 * 还款
+	 * 查询还款金额
 	 */
-	@RequestMapping("/refund")
-	public CommonVO refundOrder(String token, String payType) {
+	@RequestMapping("/getRefundAmount")
+	public CommonVO getRefundAmount(String token) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -220,23 +223,26 @@ public class OrderController {
 			vo.setMsg("IllegalOperationException");
 			return vo;
 		}
-		// TODO 还款
+
 		try {
+			Map data = new HashMap();
+
+			if (!OrderState.refund.equals(loanOrder.getState()) && !OrderState.overdue.equals(loanOrder.getState()) &&
+					!OrderState.collection.equals(loanOrder.getState())){
+				data.put("amount", 0);
+				data.put("status", loanOrder.getState());
+				return CommonVOUtil.success(data, "不需要还款");
+			}
 
 			double amount = orderQueryService.queryRefundAmount(userId, System.currentTimeMillis());
-//			RefundInfo refundInfo = new RefundInfo(loanOrder, payType, amount);
-
-//			AgentIncome.income(amount, )
-			// 还款
-			OrderValueObject orderValueObject = orderCmdService.cleanOrder(userId, amount, System.currentTimeMillis());
-			/// TODO: 2019/4/18
-			orderQueryService.updateLoanOrder(orderValueObject);
+			data.put("amount", amount);
+			data.put("status", loanOrder.getState());
+			return CommonVOUtil.success(data,"success");
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());
 			return vo;
 		}
-		return vo;
 	}
 
 	/**

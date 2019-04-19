@@ -37,8 +37,7 @@ public class MongodbRefundInfoDao implements RefundInfoDao {
 
 	@Override
 	public RefundInfo getById(String id) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("id").is(id));
+		Query query = new Query(Criteria.where("id").is(id));
 		return mongoTemplate.findOne(query, RefundInfo.class);
 	}
 

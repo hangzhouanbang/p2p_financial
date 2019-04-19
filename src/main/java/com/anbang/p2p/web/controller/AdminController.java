@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/admin")
@@ -27,6 +32,22 @@ public class AdminController {
         }
 
         return CommonVOUtil.error("ACCOUNT error");
+    }
+
+    @RequestMapping("/getImg")
+    public void getImg (String imgName, HttpServletResponse response) {
+        String filePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/imgs/";
+        String imgPath = filePath + imgName;
+        File file = new File(imgPath);
+        try {
+            BufferedImage image = ImageIO.read(new File(imgPath));
+
+            if (file.exists()) {
+                ImageIO.write(image, "jpg", response.getOutputStream());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static String encode(String data) {

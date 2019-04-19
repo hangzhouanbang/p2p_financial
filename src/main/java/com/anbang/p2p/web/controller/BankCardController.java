@@ -1,5 +1,8 @@
 package com.anbang.p2p.web.controller;
 
+import com.anbang.p2p.cqrs.q.dao.UserDboDao;
+import com.anbang.p2p.cqrs.q.dbo.AlipayInfo;
+import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.util.CommonVOUtil;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,9 @@ public class BankCardController {
 	@Autowired
 	private UserAuthQueryService userAuthQueryService;
 
+	@Autowired
+	private UserDboDao userDboDao;
+
 	/**
 	 * 绑定银行卡
 	 */
@@ -32,12 +38,40 @@ public class BankCardController {
 		if (userId == null) {
 			return CommonVOUtil.invalidToken();
 		}
-		if (StringUtil.isBlank(info.getBank()) || StringUtil.isBlank(info.getBankCardNo())) {
+		if (StringUtil.isBlank(info.getPhone()) || StringUtil.isBlank(info.getBankCardNo())) {
 			return CommonVOUtil.invalidParam();
 		}
-		// TODO 查询银行卡
+
+		// todo 只绑定一张卡
+		info.setId(userId);
 		info.setUserId(userId);
 		userAuthQueryService.saveBankCardInfo(info);
+		return CommonVOUtil.success("success");
+	}
+
+	/**
+	 * 绑定支付宝
+	 */
+	@RequestMapping("/bindAlipay")
+	public CommonVO bindAlipay(String token, AlipayInfo alipayInfo) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		alipayInfo.setAccount(alipayInfo.getAccount().trim());
+		alipayInfo.setName(alipayInfo.getName().trim());
+		if (StringUtil.isBlank(alipayInfo.getAccount()) || StringUtil.isBlank(alipayInfo.getName())) {
+			return CommonVOUtil.invalidParam();
+		}
+
+		UserDbo userDbo = userDboDao.findById(userId);
+		if (userDbo == null) {
+			return CommonVOUtil.systemException();
+		}
+
+		alipayInfo.setUpdateTime(System.currentTimeMillis());
+		userDbo.setAlipayInfo(alipayInfo);
 		return CommonVOUtil.success("success");
 	}
 }

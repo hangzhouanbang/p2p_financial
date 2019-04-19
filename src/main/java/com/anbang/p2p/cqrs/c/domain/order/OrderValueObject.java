@@ -3,7 +3,8 @@ package com.anbang.p2p.cqrs.c.domain.order;
 public class OrderValueObject {
 	private String id;// 卡密
 	private String userId;// 用户
-	private String bankCardNo;// 银行卡号
+	private String payType;
+	private String payAccount;
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
 	private double service_charge_rate;// 手续费比例
@@ -24,7 +25,8 @@ public class OrderValueObject {
 	public OrderValueObject(Order order) {
 		this.id = order.getId();
 		this.userId = order.getUserId();
-		this.bankCardNo = order.getBankCardNo();
+		this.payType = order.getPayType();
+		this.payAccount = order.getPayAccount();
 		this.amount = order.getAmount();
 		this.dayNum = order.getDayNum();
 		this.service_charge_rate = order.getService_charge_rate();
@@ -59,12 +61,20 @@ public class OrderValueObject {
 		this.userId = userId;
 	}
 
-	public String getBankCardNo() {
-		return bankCardNo;
+	public String getPayType() {
+		return payType;
 	}
 
-	public void setBankCardNo(String bankCardNo) {
-		this.bankCardNo = bankCardNo;
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getPayAccount() {
+		return payAccount;
+	}
+
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount;
 	}
 
 	public double getAmount() {

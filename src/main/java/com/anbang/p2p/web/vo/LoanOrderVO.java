@@ -11,7 +11,8 @@ public class LoanOrderVO {
 	private String headimgurl;// 头像
 	private String realName;// 真实姓名
 	private String phone;// 手机号码
-	private String bankCardNo;// 银行卡号
+	private String payType;
+	private String payAccount;
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
 	private double service_charge_rate;// 手续费比例
@@ -33,7 +34,8 @@ public class LoanOrderVO {
 		this.headimgurl = loanOrder.getHeadimgurl();
 		this.realName = loanOrder.getRealName();
 		this.phone = loanOrder.getPhone();
-		this.bankCardNo = loanOrder.getBankCardNo();
+		this.payType = loanOrder.getPayType();
+		this.payAccount = loanOrder.getPayAccount();
 		this.amount = loanOrder.getAmount();
 		this.dayNum = loanOrder.getDayNum();
 		this.service_charge_rate = loanOrder.getService_charge_rate();
@@ -97,12 +99,20 @@ public class LoanOrderVO {
 		this.phone = phone;
 	}
 
-	public String getBankCardNo() {
-		return bankCardNo;
+	public String getPayType() {
+		return payType;
 	}
 
-	public void setBankCardNo(String bankCardNo) {
-		this.bankCardNo = bankCardNo;
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getPayAccount() {
+		return payAccount;
+	}
+
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount;
 	}
 
 	public double getAmount() {

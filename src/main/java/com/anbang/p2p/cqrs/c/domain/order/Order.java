@@ -10,7 +10,8 @@ import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 public class Order {
 	private String id;// 卡密
 	private String userId;// 用户
-	private String bankCardNo;// 银行卡号
+	private String payType; //用户收款类型
+	private String payAccount; //用户收款账户
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
 	private double service_charge_rate;// 手续费比例
@@ -101,12 +102,20 @@ public class Order {
 		this.userId = userId;
 	}
 
-	public String getBankCardNo() {
-		return bankCardNo;
+	public String getPayType() {
+		return payType;
 	}
 
-	public void setBankCardNo(String bankCardNo) {
-		this.bankCardNo = bankCardNo;
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getPayAccount() {
+		return payAccount;
+	}
+
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount;
 	}
 
 	public double getAmount() {

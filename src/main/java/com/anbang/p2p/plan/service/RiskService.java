@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.cqrs.q.dao.UserBaseInfoDao;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
+import com.anbang.p2p.plan.bean.RiskInfo;
+import com.anbang.p2p.plan.dao.RiskInfoDao;
 import com.anbang.p2p.util.ImgSaveUtil;
 import com.anbang.p2p.util.RiskUtil;
 import com.anbang.p2p.util.TimeUtils;
@@ -20,6 +22,9 @@ public class RiskService {
 
     @Autowired
     private UserBaseInfoDao userBaseInfoDao;
+
+    @Autowired
+    private RiskInfoDao riskInfoDao;
 
     /**
      * 订单查询
@@ -55,7 +60,13 @@ public class RiskService {
         ImgSaveUtil.generateImage(idcard_back_photo, back);
         ImgSaveUtil.generateImage(living_photo, living);
 
-        UserBaseInfo baseInfo = new UserBaseInfo();
+
+
+        UserBaseInfo baseInfo = userBaseInfoDao.findById(userId);
+        if (baseInfo == null) {
+            baseInfo = new UserBaseInfo();
+        }
+
         baseInfo.setId(userId);
         baseInfo.setIDcard(id_number);
         baseInfo.setRealName(id_name);
@@ -64,5 +75,13 @@ public class RiskService {
         baseInfo.setIDcardImgUrl_reverse(back);
         userBaseInfoDao.save(baseInfo);
         return resJson;
+    }
+
+    public void save(RiskInfo riskInfo){
+        riskInfoDao.save(riskInfo);
+    }
+
+    public RiskInfo getById(String id){
+        return riskInfoDao.getById(id);
     }
 }

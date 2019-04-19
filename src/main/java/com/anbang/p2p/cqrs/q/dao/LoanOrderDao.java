@@ -17,4 +17,6 @@ public interface LoanOrderDao {
 	LoanOrder findByUserIdAndState(String userId, OrderState state);
 
 	LoanOrder findById(String orderId);
+
+	LoanOrder findLastOrderByUserId(String userId);
 }

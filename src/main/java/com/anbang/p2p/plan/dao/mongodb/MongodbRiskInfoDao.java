@@ -24,4 +24,12 @@ public class MongodbRiskInfoDao implements RiskInfoDao {
         query.addCriteria(Criteria.where("id").is(id));
         return mongoTemplate.findOne(query, RiskInfo.class);
     }
+
+    @Override
+    public RiskInfo getByUserId(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId));
+
+        return mongoTemplate.findOne(query, RiskInfo.class);
+    }
 }

@@ -17,7 +17,7 @@ public class OrderManager {
 	/**
 	 * 申请卡密
 	 */
-	public OrderValueObject createOrder(String userId, String bankCardNo, double amount, double service_charge_rate,
+	public OrderValueObject createOrder(String userId, String payType, String payAccount, double amount, double service_charge_rate,
 			long freeTimeOfInterest, long overdue, double overdue_rate, double rate, int dayNum, String contractId,
 			long currentTime) throws UserHasOrderAlreadyException {
 		if (userIdOrderMap.containsKey(userId)) {
@@ -30,7 +30,8 @@ public class OrderManager {
 		Order order = new Order();
 		order.setId(orderId);
 		order.setUserId(userId);
-		order.setBankCardNo(bankCardNo);
+		order.setPayType(payType);
+		order.setPayAccount(payAccount);
 		order.setAmount(amount);
 		order.setDayNum(dayNum);
 		order.setService_charge_rate(service_charge_rate);
@@ -75,11 +76,10 @@ public class OrderManager {
 			throw new OrderNotFoundException();
 		}
 		Order order = userIdOrderMap.get(userId);
-		if (!order.getState().equals(OrderState.check_by_fengkong)) {
+		if (!order.getState().equals(OrderState.check_by_fengkong) && !order.getState().equals(OrderState.wait)) {
 			throw new IllegalOperationException();
 		}
 		order.setState(OrderState.check_by_admin);
-		userIdOrderMap.remove(userId);
 		return new OrderValueObject(order);
 	}
 
@@ -93,7 +93,7 @@ public class OrderManager {
 		}
 		Order order = userIdOrderMap.get(userId);
 		if (!order.getState().equals(OrderState.check_by_fengkong)
-				|| !order.getState().equals(OrderState.check_by_admin)) {
+				&& !order.getState().equals(OrderState.check_by_admin)) {
 			throw new IllegalOperationException();
 		}
 		order.setState(OrderState.wait);

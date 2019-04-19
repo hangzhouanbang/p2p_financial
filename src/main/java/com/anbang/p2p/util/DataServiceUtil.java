@@ -35,11 +35,15 @@ public class DataServiceUtil {
      */
     final static String secretkey = VerifyConfig.SECURITY_KEY;
 
-    /**
-     * 请商户按照实际接入产品传入对应的产品编号 todo
-     */
-    final static String product_code = "产品编号";
-
+//    /**
+//     * 请商户按照实际接入产品传入对应的产品编号
+//     */
+//    final static String product_code = "Y1001005";
+//
+//    /**
+//     * 商户订单号：由商户自定义传入的唯一且不大于32位的字符串
+//     */
+//    String out_order_id = getStringDate(new Date());
 
     /**
      * 加签
@@ -53,8 +57,8 @@ public class DataServiceUtil {
         System.out.println("测试输入签名：" + sign);
         return MD5Encrpytion(sign.getBytes("UTF-8"));
     }
-	
-    public static JSONObject dataservice(JSONObject jsonObject, String out_order_id) throws Exception {
+
+    public static JSONObject dataservice(JSONObject jsonObject, String product_code, String out_order_id) throws Exception {
         String signature = getMd5(jsonObject, secretkey);
         String url = String.format(dataservice_url,pub_key,product_code,out_order_id,signature);
         System.out.println("url地址为：" + url);

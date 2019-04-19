@@ -1,34 +1,24 @@
 package com.anbang.p2p.web.controller;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
-import com.anbang.p2p.constants.VerifyRecordState;
+import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.plan.bean.VerifyRecord;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
-import com.anbang.p2p.cqrs.q.dbo.UserCreditInfo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
-import com.anbang.p2p.plan.bean.IDCardQueryInfo;
-import com.anbang.p2p.plan.bean.IDCardVerifyInfo;
 import com.anbang.p2p.plan.service.BaseVerifyService;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.google.gson.Gson;
@@ -72,7 +62,7 @@ public class UserVerifyController {
 
 		VerifyRecord record = new VerifyRecord();
 		record.setUerId(userId);
-		record.setState(VerifyRecordState.INIT);
+		record.setState(CommonRecordState.INIT);
 		record.setCauseBy("加密加签");
 		record.setCreateTime(System.currentTimeMillis());
 		verifyRecordService.save(record);
@@ -108,7 +98,7 @@ public class UserVerifyController {
 		if (record != null) {
 			// 人脸认证成功
 			if ("T".equals(result_auth)) {
-				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.SUCCESS, result_auth, message);
+				verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.SUCCESS, result_auth, message);
 
 				// 查询并保存
 				try {
@@ -117,7 +107,7 @@ public class UserVerifyController {
 					e.printStackTrace();
 				}
             } else {
-				verifyRecordService.updateStateAndCause(record.getId(), VerifyRecordState.ERROR, result_auth, message);
+				verifyRecordService.updateStateAndCause(record.getId(), CommonRecordState.ERROR, result_auth, message);
 			}
 		}
 	}

@@ -19,17 +19,17 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 	private OrderCmdServiceImpl orderCmdServiceImpl;
 
 	@Override
-	public OrderValueObject createOrder(String userId, String bankCardNo, Double amount, Double service_charge_rate,
+	public OrderValueObject createOrder(String userId, String payType, String payAccount, Double amount, Double service_charge_rate,
 			Long freeTimeOfInterest, Long overdue, Double overdue_rate, Double rate, Integer dayNum, String contractId,
 			Long currentTime) throws UserHasOrderAlreadyException {
-		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "createOrder", userId, bankCardNo,
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "createOrder", userId, payType, payAccount,
 				amount, service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
 				currentTime);
 
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
 			OrderValueObject orderValueObject = orderCmdServiceImpl.createOrder(cmd.getParameter(), cmd.getParameter(),
 					cmd.getParameter(), cmd.getParameter(), cmd.getParameter(), cmd.getParameter(), cmd.getParameter(),
-					cmd.getParameter(), cmd.getParameter(), cmd.getParameter(), cmd.getParameter());
+					cmd.getParameter(), cmd.getParameter(), cmd.getParameter(), cmd.getParameter(), cmd.getParameter());
 			return orderValueObject;
 		});
 		try {

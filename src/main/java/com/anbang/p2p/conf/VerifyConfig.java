@@ -12,7 +12,7 @@ public class VerifyConfig {
     public static final String SECURITY_KEY = "5585ee38-7fc8-43ba-9308-009980d80a19";
 
     // 有盾回显
-    public static final String RETURN_URL = "https://www.baidu.com/";
+    public static final String RETURN_URL = "http://scs.3cscy.com/p2p/#/callback";
 
     // 有盾回调
     public static final String CALLBACK_URL = "http://47.96.20.47:2020/verify/verifyCallback";

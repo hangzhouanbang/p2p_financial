@@ -41,7 +41,7 @@ public class OrderQueryService {
 		return loanOrder;
 	}
 
-	public void updateLoanOrder(OrderValueObject orderValueObject, UserBankCardInfo cardInfo) {
+	public LoanOrder updateLoanOrder(OrderValueObject orderValueObject) {
 		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
 		loanOrder.setState(orderValueObject.getState());
 		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
@@ -49,11 +49,7 @@ public class OrderQueryService {
 		loanOrder.setRefundTime(orderValueObject.getRefundTime());
 		loanOrderDao.save(loanOrder);
 
-		// 还款
-		if (orderValueObject.getState().equals(OrderState.clean)) {
-			RefundInfo info = new RefundInfo(orderValueObject, loanOrder, cardInfo.getBankCardNo());
-			refundInfoDao.save(info);
-		}
+		return loanOrder;
 	}
 
 	/**
@@ -61,11 +57,12 @@ public class OrderQueryService {
 	 */
 	public double queryRefundAmount(String userId, long currentTime)
 			throws OrderNotFoundException, IllegalOperationException {
-		LoanOrder order = loanOrderDao.findByUserIdAndState(userId, OrderState.refund);
+		LoanOrder order = loanOrderDao.findLastOrderByUserId(userId);
 		if (order == null) {
 			throw new OrderNotFoundException();
 		}
-		if (!order.getState().equals(OrderState.refund)) {
+		if (!OrderState.refund.equals(order.getState()) && !OrderState.overdue.equals(order.getState()) &&
+				!OrderState.collection.equals(order.getState())){
 			throw new IllegalOperationException();
 		}
 		if (currentTime < order.getDeliverTime()) {
@@ -104,6 +101,8 @@ public class OrderQueryService {
 		return loanOrderDao.findById(orderId);
 	}
 
+	public LoanOrder findLastOrderByUserId(String userId){ return loanOrderDao.findLastOrderByUserId(userId); }
+
 	public long countAmount(LoanOrderQueryVO query) {
 		return loanOrderDao.getAmount(query);
 	}
@@ -120,5 +119,9 @@ public class OrderQueryService {
 
 	public OrderContract findOrderContractById(String contractId) {
 		return orderContractDao.findById(contractId);
+	}
+
+	public void saveOrderContract(OrderContract contract) {
+		orderContractDao.save(contract);
 	}
 }

@@ -13,7 +13,9 @@ public class LoanOrder {
 	private String headimgurl;// 头像
 	private String realName;// 真实姓名
 	private String phone;// 手机号码
-	private String bankCardNo;// 银行卡号
+	private String payType;
+	private String payAccount;
+	private String IDcard;	//身份证号码
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
 	private double service_charge_rate;// 手续费比例
@@ -31,6 +33,9 @@ public class LoanOrder {
 	private double realRefundAmount;// 实际还款
 	private long refundTime;// 实际还款日期
 
+	private String repayType;
+	private String repayAccount;
+
 	public LoanOrder() {
 
 	}
@@ -42,7 +47,9 @@ public class LoanOrder {
 		this.headimgurl = user.getHeadimgurl();
 		this.realName = baseInfo.getRealName();
 		this.phone = user.getPhone();
-		this.bankCardNo = orderValueObject.getBankCardNo();
+		this.payType = orderValueObject.getPayType();
+		this.payAccount = orderValueObject.getPayAccount();
+		this.IDcard = baseInfo.getIDcard();
 		this.amount = orderValueObject.getAmount();
 		this.dayNum = orderValueObject.getDayNum();
 		this.service_charge_rate = orderValueObject.getService_charge_rate();
@@ -129,12 +136,28 @@ public class LoanOrder {
 		this.phone = phone;
 	}
 
-	public String getBankCardNo() {
-		return bankCardNo;
+	public String getPayType() {
+		return payType;
 	}
 
-	public void setBankCardNo(String bankCardNo) {
-		this.bankCardNo = bankCardNo;
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getPayAccount() {
+		return payAccount;
+	}
+
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount;
+	}
+
+	public String getIDcard() {
+		return IDcard;
+	}
+
+	public void setIDcard(String IDcard) {
+		this.IDcard = IDcard;
 	}
 
 	public double getAmount() {
@@ -264,5 +287,6 @@ public class LoanOrder {
 	public void setRefundTime(long refundTime) {
 		this.refundTime = refundTime;
 	}
+
 
 }

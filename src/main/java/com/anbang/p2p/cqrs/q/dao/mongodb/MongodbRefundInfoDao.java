@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.anbang.p2p.cqrs.q.dao.RefundInfoDao;
@@ -35,6 +36,13 @@ public class MongodbRefundInfoDao implements RefundInfoDao {
 	}
 
 	@Override
+	public RefundInfo getById(String id) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(id));
+		return mongoTemplate.findOne(query, RefundInfo.class);
+	}
+
+	@Override
 	public List<RefundInfo> findByUserId(int page, int size, String userId) {
 		Query query = new Query();
 		if (StringUtil.isBlank(userId)) {
@@ -43,6 +51,14 @@ public class MongodbRefundInfoDao implements RefundInfoDao {
 		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, RefundInfo.class);
+	}
+
+	@Override
+	public void updateStatus(String id, String status) {
+		Query query = new Query(Criteria.where("id").is(id));
+		Update update = new Update();
+		update.set("status", status);
+		mongoTemplate.updateFirst(query, update, RefundInfo.class);
 	}
 
 }

@@ -10,5 +10,9 @@ public interface RefundInfoDao {
 
 	long getAmountByUserId(String userId);
 
+	RefundInfo getById(String id);
+
 	List<RefundInfo> findByUserId(int page, int size, String userId);
+
+	void updateStatus(String id, String status);
 }

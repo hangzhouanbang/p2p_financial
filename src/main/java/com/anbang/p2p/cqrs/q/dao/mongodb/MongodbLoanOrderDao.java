@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -79,6 +80,14 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 	public LoanOrder findById(String orderId) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("id").is(orderId));
+		return mongoTemplate.findOne(query, LoanOrder.class);
+	}
+
+	@Override
+	public LoanOrder findLastOrderByUserId(String userId) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("userId").is(userId));
+		query.with(new Sort(Sort.Direction.DESC, "createTime"));
 		return mongoTemplate.findOne(query, LoanOrder.class);
 	}
 

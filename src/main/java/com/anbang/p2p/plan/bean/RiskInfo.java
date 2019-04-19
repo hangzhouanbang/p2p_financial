@@ -5,10 +5,10 @@ package com.anbang.p2p.plan.bean;
  */
 public class RiskInfo {
 
-    private String id;
+    private String id;      // 风控信息id,也是订单id
     private String userId;
-
-//    private RiskData riskData;
+    private String riskInfo;
+    private long createTime;
 
     public String getId() {
         return id;
@@ -26,11 +26,19 @@ public class RiskInfo {
         this.userId = userId;
     }
 
-//    public RiskData getRiskData() {
-//        return riskData;
-//    }
-//
-//    public void setRiskData(RiskData riskData) {
-//        this.riskData = riskData;
-//    }
+    public String getRiskInfo() {
+        return riskInfo;
+    }
+
+    public void setRiskInfo(String riskInfo) {
+        this.riskInfo = riskInfo;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
 }

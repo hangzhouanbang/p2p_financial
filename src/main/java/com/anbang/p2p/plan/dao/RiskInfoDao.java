@@ -6,4 +6,6 @@ public interface RiskInfoDao {
     void save(RiskInfo riskInfo);
 
     RiskInfo getById(String id);
+
+    RiskInfo getByUserId(String userId);
 }

@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
+import com.anbang.p2p.cqrs.q.dbo.OrderContract;
+import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
+import com.anbang.p2p.util.AgentPay;
+import com.anbang.p2p.util.CommonVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,6 +36,9 @@ public class OrderManagerController {
 
 	@Autowired
 	private OrderQueryService orderQueryService;
+
+	@Autowired
+	private AgentPayRecordService agentPayRecordService;
 
 	/**
 	 * 查询卡密
@@ -74,13 +83,31 @@ public class OrderManagerController {
 		}
 		try {
 			OrderValueObject orderValueObject = orderCmdService.changeOrderStateToWait(order.getUserId());
-			orderQueryService.updateLoanOrder(orderValueObject, null);
+			LoanOrder loanOrder = orderQueryService.updateLoanOrder(orderValueObject);
+
+			//  放款,失败后重新审核
+			AgentPayRecord agentPayRecord = new AgentPayRecord(orderValueObject, loanOrder);
+			agentPayRecord.setStatus(CommonRecordState.INIT);
+			agentPayRecordService.save(agentPayRecord);
+
+			String amount = String.valueOf(loanOrder.getAmount());
+			boolean flag = AgentPay.pay(loanOrder.getPayAccount(), loanOrder.getRealName(), amount, agentPayRecord.getId());
+			if (flag) {
+				OrderValueObject payResult = orderCmdService.changeOrderStateToRefund(order.getUserId(), System.currentTimeMillis());
+				orderQueryService.updateLoanOrder(payResult);
+				agentPayRecordService.updataStatus(agentPayRecord.getId(), CommonRecordState.SUCCESS);
+				return CommonVOUtil.success("success");
+			} else {
+				OrderValueObject payError = orderCmdService.changeOrderStateToCheck_by_admin(order.getUserId());
+				orderQueryService.updateLoanOrder(payError);
+				agentPayRecordService.updataStatus(agentPayRecord.getId(), CommonRecordState.ERROR);
+			}
+			return CommonVOUtil.error("代付失败，请检查代付平台信息");
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());
 			return vo;
 		}
-		return vo;
 	}
 
 	/**
@@ -97,7 +124,7 @@ public class OrderManagerController {
 		}
 		try {
 			OrderValueObject orderValueObject = orderCmdService.refuseOrder(order.getUserId());
-			orderQueryService.updateLoanOrder(orderValueObject, null);
+			orderQueryService.updateLoanOrder(orderValueObject);
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());
@@ -137,7 +164,7 @@ public class OrderManagerController {
 			try {
 				for (LoanOrder order : orderList) {
 					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToOverdue(order.getUserId());
-					orderQueryService.updateLoanOrder(orderValueObject, null);
+					orderQueryService.updateLoanOrder(orderValueObject);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -161,11 +188,23 @@ public class OrderManagerController {
 			try {
 				for (LoanOrder order : orderList) {
 					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToCollection(order.getUserId());
-					orderQueryService.updateLoanOrder(orderValueObject, null);
+					orderQueryService.updateLoanOrder(orderValueObject);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 新增合同号 todo
+	 */
+	@RequestMapping("/addContract")
+	public CommonVO addContract(OrderContract contract) {
+		if (contract == null) {
+			return CommonVOUtil.invalidParam();
+		}
+		orderQueryService.saveOrderContract(contract);
+		return CommonVOUtil.success("success");
 	}
 }

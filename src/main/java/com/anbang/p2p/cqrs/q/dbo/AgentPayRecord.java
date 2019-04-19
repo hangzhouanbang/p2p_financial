@@ -3,9 +3,9 @@ package com.anbang.p2p.cqrs.q.dbo;
 import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
 
 /**
- * 还款信息
+ * 代付流水
  */
-public class RefundInfo {
+public class AgentPayRecord {
 	private String id;
 	private String loanOrderId;// 卡密
 	private String userId;// 用户
@@ -15,20 +15,20 @@ public class RefundInfo {
 	private String phone;// 手机号码
 	private double amount;// 贷款金额
 	private double refundAmount;// 还款金额
-	private String repayType;
-	private String repayAccount;
+	private String payType;
+	private String payAccount;
 	private OrderContract contract;// 订单合同
 	private long createTime;// 创建时间
 
 	private String status;
 
-	public RefundInfo(LoanOrder loanOrder, String repayType, double refundAmount) {
-		loanOrderId = loanOrder.getId();
-		amount = loanOrder.getAmount();
-		this.refundAmount = refundAmount;
-		createTime = System.currentTimeMillis();
-		this.repayType = repayType;
-		this.repayAccount = repayAccount;
+	public AgentPayRecord(OrderValueObject orderValueObject, LoanOrder loanOrder) {
+		loanOrderId = orderValueObject.getId();
+		amount = orderValueObject.getAmount();
+		refundAmount = orderValueObject.getRealRefundAmount();
+		createTime = orderValueObject.getRefundTime();
+		this.payType = loanOrder.getPayType();
+		this.payAccount = loanOrder.getPayAccount();
 		this.contract = loanOrder.getContract();
 		userId = loanOrder.getUserId();
 		nickname = loanOrder.getNickname();
@@ -109,20 +109,20 @@ public class RefundInfo {
 		this.refundAmount = refundAmount;
 	}
 
-	public String getRepayType() {
-		return repayType;
+	public String getPayType() {
+		return payType;
 	}
 
-	public void setRepayType(String repayType) {
-		this.repayType = repayType;
+	public void setPayType(String payType) {
+		this.payType = payType;
 	}
 
-	public String getRepayAccount() {
-		return repayAccount;
+	public String getPayAccount() {
+		return payAccount;
 	}
 
-	public void setRepayAccount(String repayAccount) {
-		this.repayAccount = repayAccount;
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount;
 	}
 
 	public OrderContract getContract() {
@@ -140,7 +140,6 @@ public class RefundInfo {
 	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
 	}
-
 
 	public String getStatus() {
 		return status;

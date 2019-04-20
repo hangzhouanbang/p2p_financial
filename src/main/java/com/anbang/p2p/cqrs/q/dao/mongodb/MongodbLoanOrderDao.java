@@ -45,6 +45,10 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		if (queryVO.getState() != null) {
 			query.addCriteria(Criteria.where("state").is(queryVO.getState()));
 		}
+		if (queryVO.getNowTime() != null) {
+			query.addCriteria(Criteria.where("maxLimitTime").lt(queryVO.getNowTime()));
+		}
+
 		return mongoTemplate.count(query, LoanOrder.class);
 	}
 
@@ -62,6 +66,9 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		}
 		if (queryVO.getState() != null) {
 			query.addCriteria(Criteria.where("state").is(queryVO.getState()));
+		}
+		if (queryVO.getNowTime() != null) {
+			query.addCriteria(Criteria.where("maxLimitTime").lt(queryVO.getNowTime()));
 		}
 		query.skip((page - 1) * size);
 		query.limit(size);

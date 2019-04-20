@@ -82,6 +82,11 @@ public class Order {
 			long day = (currentTime - deliverTime) / 1000 / 60 / 60 / 24;
 			BigDecimal b_day = new BigDecimal(Long.toString(day));
 			BigDecimal num = b_day.subtract(b_freeOfInterest);
+
+			// 小于免息时间，则还本金
+			if (b_day.compareTo(b_freeOfInterest) == -1 ) {
+				return b_amount.doubleValue();
+			}
 			return b_amount.add(b_amount.multiply(b_rate.multiply(num))).doubleValue();
 		}
 	}

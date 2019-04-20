@@ -90,8 +90,8 @@ public class OrderManagerController {
 			agentPayRecord.setStatus(CommonRecordState.INIT);
 			agentPayRecordService.save(agentPayRecord);
 
-			String amount = String.valueOf(loanOrder.getAmount());
-			boolean flag = AgentPay.pay(loanOrder.getPayAccount(), loanOrder.getRealName(), amount, agentPayRecord.getId());
+			String realAmount = String.valueOf(loanOrder.getRealAmount());
+			boolean flag = AgentPay.pay(loanOrder.getPayAccount(), loanOrder.getRealName(), realAmount, agentPayRecord.getId());
 			if (flag) {
 				OrderValueObject payResult = orderCmdService.changeOrderStateToRefund(order.getUserId(), System.currentTimeMillis());
 				orderQueryService.updateLoanOrder(payResult);
@@ -155,6 +155,7 @@ public class OrderManagerController {
 	@RequestMapping("/refund_to_overdue")
 	public void refundTransferToOverdue() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
+		query.setNowTime(System.currentTimeMillis());
 		query.setState(OrderState.refund);
 		int size = 2000;
 		long amount = orderQueryService.countAmount(query);

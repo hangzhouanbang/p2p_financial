@@ -8,6 +8,8 @@ public class LoanOrderQueryVO {
 	private String realName;
 	private OrderState state;
 
+	private Long nowTime;	//用于和应还时间比较maxLimitTime
+
 	public String getUserId() {
 		return userId;
 	}
@@ -40,4 +42,11 @@ public class LoanOrderQueryVO {
 		this.state = state;
 	}
 
+	public Long getNowTime() {
+		return nowTime;
+	}
+
+	public void setNowTime(Long nowTime) {
+		this.nowTime = nowTime;
+	}
 }

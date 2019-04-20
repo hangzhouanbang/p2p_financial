@@ -20,13 +20,15 @@ public class RefundInfo {
 
 	private String status;
 
+	public RefundInfo() {
+	}
+
 	public RefundInfo(LoanOrder loanOrder, String repayType, double refundAmount) {
 		loanOrderId = loanOrder.getId();
 		amount = loanOrder.getAmount();
 		this.refundAmount = refundAmount;
 		createTime = System.currentTimeMillis();
 		this.repayType = repayType;
-		this.repayAccount = repayAccount;
 		this.contract = loanOrder.getContract();
 		userId = loanOrder.getUserId();
 		nickname = loanOrder.getNickname();

@@ -56,6 +56,7 @@ public class UserAuthQueryService {
 		user.setPhone(uuid);
 		user.setLoginIp(loginIp);
 		user.setIpAddress(ipAddress);
+		user.setCreateTime(System.currentTimeMillis());
 		userDboDao.save(user);
 
 		AuthorizationDbo authDbo = new AuthorizationDbo();

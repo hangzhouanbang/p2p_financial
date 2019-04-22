@@ -87,6 +87,10 @@ public class BaseLoanAndRateController {
 	}
 
 	/**
+	 * ----------------- 玩家个人设置
+	 */
+
+	/**
 	 * 玩家基本设置
 	 */
 	@RequestMapping("/user_baseloan_save")

@@ -12,6 +12,8 @@ public class UserDbo {
 	private boolean isVerify;	//实名
 	private String realName;	//真实姓名
 	private long createTime;	//注册日期
+	private int orderCount;		//借款次数
+	private int overdueCount;	// 逾期次数
 
 	private String loginIp;
 	private String ipAddress;
@@ -70,5 +72,45 @@ public class UserDbo {
 
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
+	}
+
+	public boolean isVerify() {
+		return isVerify;
+	}
+
+	public void setVerify(boolean verify) {
+		isVerify = verify;
+	}
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public long getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(long createTime) {
+		this.createTime = createTime;
+	}
+
+	public int getOrderCount() {
+		return orderCount;
+	}
+
+	public void setOrderCount(int orderCount) {
+		this.orderCount = orderCount;
+	}
+
+	public int getOverdueCount() {
+		return overdueCount;
+	}
+
+	public void setOverdueCount(int overdueCount) {
+		this.overdueCount = overdueCount;
 	}
 }

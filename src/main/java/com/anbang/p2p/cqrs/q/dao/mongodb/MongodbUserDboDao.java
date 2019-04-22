@@ -2,6 +2,7 @@ package com.anbang.p2p.cqrs.q.dao.mongodb;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -69,6 +70,36 @@ public class MongodbUserDboDao implements UserDboDao {
 		Update update = new Update();
 		update.set("loginIp", loginIp);
 		update.set("ipAddress", ipAddress);
+		mongoTemplate.updateFirst(query, update, UserDbo.class);
+	}
+
+	@Override
+	public void updataVerify(String userId, Boolean isVerify, String realName) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(userId));
+		Update update = new Update();
+		if (isVerify != null) {
+			update.set("isVerify", isVerify);
+		}
+
+		if (StringUtils.isNotBlank(realName)) {
+			update.set("realName", realName);
+		}
+		mongoTemplate.updateFirst(query, update, UserDbo.class);
+	}
+
+	@Override
+	public void updateCount(String userId, Integer orderCount, Integer overdueCount) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(userId));
+		Update update = new Update();
+		if (orderCount != null) {
+			update.set("orderCount", orderCount);
+		}
+
+		if (overdueCount != null) {
+			update.set("overdueCount", overdueCount);
+		}
 		mongoTemplate.updateFirst(query, update, UserDbo.class);
 	}
 

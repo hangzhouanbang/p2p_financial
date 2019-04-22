@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.cqrs.q.dao.LoanOrderDao;
 import com.anbang.p2p.cqrs.q.dao.UserBaseInfoDao;
+import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
@@ -32,7 +33,10 @@ public class RiskService {
     @Autowired
     private RiskInfoDao riskInfoDao;
 
-    static final String imgUrl = "http://47.96.20.47:2020/admin/getImg?imgName=";
+    @Autowired
+    private UserDboDao userDboDao;
+
+    static final String imgUrl = "http://47.91.219.7:2020/admin/getImg?imgName=";
 
     /**
      * 订单查询
@@ -82,9 +86,12 @@ public class RiskService {
         baseInfo.setIDcardImgUrl_reverse(imgUrl + back);
         userBaseInfoDao.save(baseInfo);
 
-        LoanOrder loanOrder = loanOrderDao.findLastOrderByUserId(userId);
-        loanOrder.setRealName(id_name);
-        loanOrderDao.save(loanOrder);
+//        LoanOrder loanOrder = loanOrderDao.findLastOrderByUserId(userId);
+//        loanOrder.setRealName(id_name);
+//        loanOrderDao.save(loanOrder);
+
+        // 更新用户正式姓名
+        userDboDao.updataVerify(userId, true, id_name);
 
         return data;
     }

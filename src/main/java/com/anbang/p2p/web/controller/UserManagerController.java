@@ -3,6 +3,9 @@ package com.anbang.p2p.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.anbang.p2p.cqrs.q.dbo.UserDbo;
+import com.anbang.p2p.cqrs.q.service.UserService;
+import com.anbang.p2p.util.CommonVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,9 @@ public class UserManagerController {
 	@Autowired
 	private OrderQueryService orderQueryService;
 
+	@Autowired
+	private UserService userService;
+
 	/**
 	 * 查询用户
 	 */
@@ -43,13 +49,21 @@ public class UserManagerController {
 	}
 
 	/**
-	 * 用户身份
+	 * 用户身份证信息
 	 */
 	@RequestMapping("/user_baseinfo")
 	public CommonVO queryUserBaseInfo(String userId) {
-		CommonVO vo = new CommonVO();
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
-		return vo;
+		return CommonVOUtil.success( baseInfo, "success");
+	}
+
+	/**
+	 * 用户基本信息
+	 */
+	@RequestMapping("/queryUserDbo")
+	public CommonVO queryUserDbo(String userId) {
+		UserDbo userDbo = userService.getById(userId);
+		return CommonVOUtil.success( userDbo, "success");
 	}
 
 	/**

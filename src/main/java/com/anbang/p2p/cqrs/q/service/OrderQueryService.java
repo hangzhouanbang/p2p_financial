@@ -3,6 +3,7 @@ package com.anbang.p2p.cqrs.q.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ public class OrderQueryService {
 
 	@Autowired
 	private LoanOrderDao loanOrderDao;
+
+	@Autowired
+	private UserDboDao userDboDao;
 
 	@Autowired
 	private OrderContractDao orderContractDao;

@@ -8,6 +8,7 @@ import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
+import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.util.AgentPay;
 import com.anbang.p2p.util.CommonVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class OrderManagerController {
 
 	@Autowired
 	private AgentPayRecordService agentPayRecordService;
+
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * 查询卡密
@@ -166,6 +170,9 @@ public class OrderManagerController {
 				for (LoanOrder order : orderList) {
 					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToOverdue(order.getUserId());
 					orderQueryService.updateLoanOrder(orderValueObject);
+
+					// 更新用户逾期次数
+					userService.getAndUpdateOverdueCount(order.getUserId());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -208,4 +215,6 @@ public class OrderManagerController {
 		orderQueryService.saveOrderContract(contract);
 		return CommonVOUtil.success("success");
 	}
+
+
 }

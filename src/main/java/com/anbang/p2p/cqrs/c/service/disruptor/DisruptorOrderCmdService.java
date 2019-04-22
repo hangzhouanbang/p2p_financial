@@ -196,4 +196,26 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 		}
 	}
 
+	@Override
+	public OrderValueObject changeOrderStateClean(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateClean",
+				userId);
+		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateClean(cmd.getParameter());
+			return orderValueObject;
+		});
+		try {
+			return result.getResult();
+		} catch (Exception e) {
+			if (e instanceof OrderNotFoundException) {
+				throw (OrderNotFoundException) e;
+			} else if (e instanceof IllegalOperationException) {
+				throw (IllegalOperationException) e;
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 }

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public class UserContacts {
-	private String id;
+	private String id;	//用户id
 	private String userId;// 用户id
 	private String directContactsPhone;// 直接联系人手机号码
 	private String directContactsName;// 直接联系人姓名

@@ -13,6 +13,7 @@ public class LoanOrderVO {
 	private String phone;// 手机号码
 	private String payType;
 	private String payAccount;
+	private String IDcard;	//身份证号码
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
 	private double service_charge_rate;// 手续费比例
@@ -26,6 +27,21 @@ public class LoanOrderVO {
 	private double realAmount;// 实际到账
 	private long maxLimitTime;// 最大还款日期
 	private long createTime;// 创建时间
+	private long deliverTime;// 放款时间
+	private String loginIp;
+	private String ipAddress;
+//	private double realRefundAmount;// 实际还款
+//	private long refundTime;// 实际还款日期
+//	private String repayType; //还款类型
+//	private String repayAccount;  //还款账户
+//	private boolean export;  	// 是否导出
+
+	private double interest;	//利息
+	private long overdueTime;	//逾期时长
+	private double shouldRepayAmount;	//应还金额
+
+	public LoanOrderVO() {
+	}
 
 	public LoanOrderVO(LoanOrder loanOrder) {
 		this.id = loanOrder.getId();
@@ -49,6 +65,12 @@ public class LoanOrderVO {
 		this.realAmount = loanOrder.getRealAmount();
 		this.maxLimitTime = loanOrder.getMaxLimitTime();
 		this.createTime = loanOrder.getCreateTime();
+		this.IDcard = loanOrder.getIDcard();
+		this.deliverTime = loanOrder.getDeliverTime();
+		this.loginIp = loanOrder.getLoginIp();
+		this.ipAddress = loanOrder.getIpAddress();
+
+
 	}
 
 	public String getId() {
@@ -219,4 +241,59 @@ public class LoanOrderVO {
 		this.createTime = createTime;
 	}
 
+	public String getIDcard() {
+		return IDcard;
+	}
+
+	public void setIDcard(String IDcard) {
+		this.IDcard = IDcard;
+	}
+
+	public long getDeliverTime() {
+		return deliverTime;
+	}
+
+	public void setDeliverTime(long deliverTime) {
+		this.deliverTime = deliverTime;
+	}
+
+	public String getLoginIp() {
+		return loginIp;
+	}
+
+	public void setLoginIp(String loginIp) {
+		this.loginIp = loginIp;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+
+	public long getOverdueTime() {
+		return overdueTime;
+	}
+
+	public void setOverdueTime(long overdueTime) {
+		this.overdueTime = overdueTime;
+	}
+
+	public double getShouldRepayAmount() {
+		return shouldRepayAmount;
+	}
+
+	public void setShouldRepayAmount(double shouldRepayAmount) {
+		this.shouldRepayAmount = shouldRepayAmount;
+	}
+
+	public double getInterest() {
+		return interest;
+	}
+
+	public void setInterest(double interest) {
+		this.interest = interest;
+	}
 }

@@ -19,4 +19,8 @@ public interface LoanOrderDao {
 	LoanOrder findById(String orderId);
 
 	LoanOrder findLastOrderByUserId(String userId);
+
+	void updateExportState(String id, boolean export);
+
+	List<LoanOrder> listByIds(String[] ids);
 }

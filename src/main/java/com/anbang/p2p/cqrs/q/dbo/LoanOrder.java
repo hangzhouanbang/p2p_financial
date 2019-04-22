@@ -39,6 +39,8 @@ public class LoanOrder {
 	private String loginIp;
 	private String ipAddress;
 
+	private boolean export;  	// 是否导出
+
 	public LoanOrder() {
 
 	}
@@ -322,5 +324,13 @@ public class LoanOrder {
 
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
+	}
+
+	public boolean isExport() {
+		return export;
+	}
+
+	public void setExport(boolean export) {
+		this.export = export;
 	}
 }

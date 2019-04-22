@@ -168,4 +168,20 @@ public class OrderManager {
 		return new OrderValueObject(order);
 	}
 
+	/**
+	 * 催收核销
+	 */
+	public OrderValueObject changeOrderStateClean(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		if (!userIdOrderMap.containsKey(userId)) {
+			throw new OrderNotFoundException();
+		}
+		Order order = userIdOrderMap.get(userId);
+		if (!order.getState().equals(OrderState.collection)) {
+			throw new IllegalOperationException();
+		}
+		order.setState(OrderState.clean);
+		return new OrderValueObject(order);
+	}
+
 }

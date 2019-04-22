@@ -28,4 +28,7 @@ public interface OrderCmdService {
 
 	OrderValueObject changeOrderStateToCollection(String userId)
 			throws OrderNotFoundException, IllegalOperationException;
+
+	OrderValueObject changeOrderStateClean(String userId)
+			throws OrderNotFoundException, IllegalOperationException;
 }

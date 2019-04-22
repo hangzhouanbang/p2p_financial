@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
@@ -98,4 +99,20 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		return mongoTemplate.findOne(query, LoanOrder.class);
 	}
 
+	@Override
+	public void updateExportState(String id, boolean export) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(id));
+		Update update = new Update();
+		update.set("export", export);
+		mongoTemplate.updateFirst(query, update, LoanOrder.class);
+	}
+
+
+	@Override
+	public List<LoanOrder> listByIds(String[] ids) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").in(ids));
+		return mongoTemplate.find(query, LoanOrder.class);
+	}
 }

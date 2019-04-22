@@ -1,16 +1,28 @@
 package com.anbang.p2p.web.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.cqrs.q.dao.mongodb.MongodbLoanOrderDao;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
+import com.anbang.p2p.cqrs.q.service.LoanOrderExportService;
 import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.util.AgentPay;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.web.vo.RepayImport;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,6 +38,10 @@ import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.anbang.p2p.web.vo.LoanOrderQueryVO;
 import com.highto.framework.web.page.ListPage;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @CrossOrigin
 @RestController
@@ -43,6 +59,9 @@ public class OrderManagerController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private LoanOrderExportService loanOrderExportService;
 
 	/**
 	 * 查询卡密
@@ -215,6 +234,172 @@ public class OrderManagerController {
 		orderQueryService.saveOrderContract(contract);
 		return CommonVOUtil.success("success");
 	}
+
+	/**
+	 * 催收导出
+	 * @param ids 卡密id list
+	 * @param exportType 导出类型 simple/detail
+	 * @return
+	 */
+	@RequestMapping("/collectionExport")
+	public CommonVO collectionExport(@RequestParam(value = "ids") String[] ids, String exportType, HttpServletResponse response) {
+		if (ids == null) {
+			return CommonVOUtil.invalidParam();
+		}
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date date = new Date();
+		OutputStream output = null;
+
+		if ("simple".equals(exportType)) {
+			String fileName = format.format(date) + exportType + "Order.xlsx";
+			response.reset();
+			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+			response.setContentType("application/msexcel");
+
+			try {
+				output = response.getOutputStream();
+				loanOrderExportService.exportSimple(ids, output);
+				output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return CommonVOUtil.success("success");
+		}
+		if ("detail".equals(exportType)) {
+			String fileName = format.format(date) + "催收批量详情文件" + ".zip";
+			response.setContentType("application/octet-stream ");
+			response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
+			response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
+			try {
+				response.setHeader("Content-Disposition",
+						"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
+				response.setCharacterEncoding("UTF-8");
+
+				output = response.getOutputStream();
+				ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+
+				// 业务数据封装
+				loanOrderExportService.exportDetail(ids, zipOutputStream);
+
+				// 关闭输出流
+				zipOutputStream.flush();
+				zipOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+		return CommonVOUtil.systemException();
+	}
+
+	/**
+	 * 催收导出
+	 * @param queryVO 查询条件
+	 * @param exportType 导出类型 simple/detail
+	 * @return
+	 */
+	@RequestMapping("/collectionExportBatch")
+	public CommonVO collectionExportBatch(LoanOrderQueryVO queryVO, String exportType, HttpServletResponse response) {
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date date = new Date();
+
+		if ("simple".equals(exportType)) {
+			String fileName = format.format(date) + exportType + "Order.xlsx";
+			response.reset();
+			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+			response.setContentType("application/msexcel");
+			OutputStream output = null;
+			try {
+				output = response.getOutputStream();
+				loanOrderExportService.exportSimpleBatch(queryVO, output);
+				output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return CommonVOUtil.success("success");
+		}
+		if ("detail".equals(exportType)) {
+
+		}
+		return CommonVOUtil.systemException();
+	}
+
+	/**
+	 * excel 销账导入
+	 */
+	@RequestMapping("/repayImport")
+	public CommonVO repayImport(@RequestParam MultipartFile file, HttpServletRequest request) {
+
+		if(!file.isEmpty()){
+			String filePath = file.getOriginalFilename();
+			//windows
+//			String savePath = request.getSession().getServletContext().getRealPath(filePath);
+
+			//linux
+			String savePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/excel";
+
+			File targetFile = new File(savePath);
+
+			if(!targetFile.exists()){
+				targetFile.mkdirs();
+			}
+
+			try {
+				file.transferTo(targetFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return CommonVOUtil.success("success");
+		}
+
+		return CommonVOUtil.error("");
+	}
+
+	public static List<RepayImport> readExcel(String fileName) throws Exception{
+
+//
+//		InputStream is = new FileInputStream(new File(fileName));
+//		Workbook hssfWorkbook = null;
+//		if (fileName.endsWith("xlsx")){
+//			hssfWorkbook = new XSSFWorkbook(is);//Excel 2007
+//		}else if (fileName.endsWith("xls")){
+//			hssfWorkbook = new HSSFWorkbook(is);//Excel 2003
+//
+//		}
+//		// HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
+//		// XSSFWorkbook hssfWorkbook = new XSSFWorkbook(is);
+//		List<RepayImport> imports = new ArrayList<>();
+//
+//		// 循环工作表Sheet
+//		for (int numSheet = 0; numSheet <hssfWorkbook.getNumberOfSheets(); numSheet++) {
+//			//HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
+//			Sheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
+//			if (hssfSheet == null) {
+//				continue;
+//			}
+//			// 循环行Row
+//			for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
+//				//HSSFRow hssfRow = hssfSheet.getRow(rowNum);
+//				Row hssfRow = hssfSheet.getRow(rowNum);
+//				if (hssfRow != null) {
+//					//HSSFCell name = hssfRow.getCell(0);
+//					//HSSFCell pwd = hssfRow.getCell(1);
+//					Cell orderId = hssfRow.getCell(0);
+//					Cell userId = hssfRow.getCell(1);
+//
+//					// TODO: 2019/4/22
+//					RepayImport repayImport = new RepayImport();
+//					repayImport.setId(orderId.toString());
+//					imports.add(repayImport);
+//
+//				}
+//			}
+//		}
+		return null;
+	}
+
 
 
 }

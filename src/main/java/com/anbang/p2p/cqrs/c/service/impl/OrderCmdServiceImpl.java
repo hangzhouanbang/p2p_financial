@@ -69,4 +69,11 @@ public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdServi
 		return orderManager.changeOrderStateToCheck_by_admin(userId);
 	}
 
+	@Override
+	public OrderValueObject changeOrderStateClean(String userId)
+			throws OrderNotFoundException, IllegalOperationException {
+		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
+		return orderManager.changeOrderStateClean(userId);
+	}
+
 }

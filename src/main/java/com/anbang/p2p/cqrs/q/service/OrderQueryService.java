@@ -31,12 +31,11 @@ public class OrderQueryService {
 	@Autowired
 	private OrderContractDao orderContractDao;
 
-	@Autowired
-	private RefundInfoDao refundInfoDao;
-
 	public LoanOrder saveLoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract,
-			UserBaseInfo baseInfo) {
+			UserBaseInfo baseInfo, String loginIp, String ipAddress) {
 		LoanOrder loanOrder = new LoanOrder(orderValueObject, user, contract, baseInfo);
+		loanOrder.setLoginIp(loginIp);
+		loanOrder.setIpAddress(ipAddress);
 		loanOrderDao.save(loanOrder);
 		return loanOrder;
 	}

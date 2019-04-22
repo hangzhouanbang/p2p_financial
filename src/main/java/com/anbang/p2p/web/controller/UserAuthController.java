@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.anbang.p2p.conf.PhoneVerifyConfig;
+import com.anbang.p2p.conf.AliyunConfig;
 import com.anbang.p2p.cqrs.c.domain.user.CreateUserResult;
 import com.anbang.p2p.cqrs.c.service.UserAuthCmdService;
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
@@ -21,10 +21,10 @@ import com.anbang.p2p.cqrs.q.dbo.AuthorizationDbo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.bean.UserVerifyPhoneInfo;
 import com.anbang.p2p.plan.service.PhoneVerifyService;
-import com.anbang.p2p.util.HttpUtil;
-import com.anbang.p2p.util.VerifyPhoneCodeUtil;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.google.gson.Gson;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 授权验证
@@ -111,7 +111,7 @@ public class UserAuthController {
 	 */
 	@RequestMapping("/verify")
 	@ResponseBody
-	public CommonVO verifyPhone(String phone, String code) {
+	public CommonVO verifyPhone(String phone, String code, HttpServletRequest request) {
 		CommonVO vo = new CommonVO();
 		UserVerifyPhoneInfo verifyInfo = phoneVerifyService.findUserVerifyPhoneInfoByPhone(phone);
 		if (verifyInfo == null) {
@@ -127,9 +127,15 @@ public class UserAuthController {
 		}
 		verifyInfo.setUsed(true);
 		phoneVerifyService.saveVerifyPhoneCode(verifyInfo);
+
+		String loginIp = IPUtil.getRealIp(request);
+		String ipAddress = IPAddressUtil.getIPAddress(loginIp);
+
 		try {
 			AuthorizationDbo authDbo = userAuthQueryService.findAuthorizationDbo("p2p.app.phone", phone);
 			if (authDbo != null) {// 已经手机注册
+				userAuthQueryService.updateIPById(authDbo.getUserId(), loginIp, ipAddress); //更新ip
+
 				String token = userAuthService.thirdAuth("p2p.app.phone", phone);
 				Map data = new HashMap<>();
 				vo.setData(data);
@@ -140,7 +146,7 @@ public class UserAuthController {
 				CreateUserResult createResult = userAuthCmdService.createUserAndAddThirdAuth("p2p.app.phone", phone,
 						System.currentTimeMillis());
 				userAuthQueryService.createUserAndAddThirdAuth(createResult.getUserId(), createResult.getPublisher(),
-						createResult.getUuid());
+						createResult.getUuid(), loginIp, ipAddress);
 				String token = userAuthService.thirdAuth(createResult.getPublisher(), createResult.getUuid());
 				Map data = new HashMap<>();
 				vo.setData(data);
@@ -157,7 +163,7 @@ public class UserAuthController {
 	private String getCode(String phone, String param) {
 		String host = "https://feginesms.market.alicloudapi.com";
 		String path = "/codeNotice";
-		String appcode = PhoneVerifyConfig.APPCODE;
+		String appcode = AliyunConfig.APPCODE;
 		Map<String, String> headers = new HashMap<String, String>();
 		// 最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
 		headers.put("Authorization", "APPCODE " + appcode);
@@ -199,7 +205,7 @@ public class UserAuthController {
 				CreateUserResult createResult = userAuthCmdService.createUserAndAddThirdAuth("p2p.app.phone", phone,
 						System.currentTimeMillis());
 				userAuthQueryService.createUserAndAddThirdAuth(createResult.getUserId(), createResult.getPublisher(),
-						createResult.getUuid());
+						createResult.getUuid(), "","");
 				String token = userAuthService.thirdAuth(createResult.getPublisher(), createResult.getUuid());
 				Map data = new HashMap<>();
 				vo.setData(data);

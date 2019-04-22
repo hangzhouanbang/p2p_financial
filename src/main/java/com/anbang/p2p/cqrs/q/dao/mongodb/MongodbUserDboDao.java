@@ -62,4 +62,14 @@ public class MongodbUserDboDao implements UserDboDao {
 		mongoTemplate.updateFirst(query, update, UserDbo.class);
 	}
 
+	@Override
+	public void updateIPById(String userId, String loginIp, String ipAddress) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(userId));
+		Update update = new Update();
+		update.set("loginIp", loginIp);
+		update.set("ipAddress", ipAddress);
+		mongoTemplate.updateFirst(query, update, UserDbo.class);
+	}
+
 }

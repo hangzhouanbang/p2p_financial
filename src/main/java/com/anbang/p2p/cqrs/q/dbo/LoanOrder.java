@@ -33,8 +33,11 @@ public class LoanOrder {
 	private double realRefundAmount;// 实际还款
 	private long refundTime;// 实际还款日期
 
-	private String repayType;
-	private String repayAccount;
+	private String repayType; //还款类型
+	private String repayAccount;  //还款账户
+
+	private String loginIp;
+	private String ipAddress;
 
 	public LoanOrder() {
 
@@ -303,5 +306,21 @@ public class LoanOrder {
 
 	public void setRepayAccount(String repayAccount) {
 		this.repayAccount = repayAccount;
+	}
+
+	public String getLoginIp() {
+		return loginIp;
+	}
+
+	public void setLoginIp(String loginIp) {
+		this.loginIp = loginIp;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 }

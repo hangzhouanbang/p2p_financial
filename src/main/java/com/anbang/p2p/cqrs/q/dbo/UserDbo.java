@@ -9,6 +9,12 @@ public class UserDbo {
 	private String headimgurl;// 头像
 	private String phone;// 手机号码
 	private AlipayInfo alipayInfo;	//支付宝账号信息
+	private boolean isVerify;	//实名
+	private String realName;	//真实姓名
+	private long createTime;	//注册日期
+
+	private String loginIp;
+	private String ipAddress;
 
 	public String getId() {
 		return id;
@@ -48,5 +54,21 @@ public class UserDbo {
 
 	public void setAlipayInfo(AlipayInfo alipayInfo) {
 		this.alipayInfo = alipayInfo;
+	}
+
+	public String getLoginIp() {
+		return loginIp;
+	}
+
+	public void setLoginIp(String loginIp) {
+		this.loginIp = loginIp;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 }

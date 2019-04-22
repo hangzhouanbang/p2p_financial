@@ -17,4 +17,6 @@ public interface UserDboDao {
 	long getAmount();
 
 	List<UserDbo> find(int page, int size);
+
+	void updateIPById(String userId, String loginIp, String ipAddress);
 }

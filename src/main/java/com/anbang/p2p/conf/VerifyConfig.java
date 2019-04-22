@@ -12,10 +12,10 @@ public class VerifyConfig {
     public static final String SECURITY_KEY = "5585ee38-7fc8-43ba-9308-009980d80a19";
 
     // 有盾回显
-    public static final String RETURN_URL = "http://scs.3cscy.com/p2p/#/callback";
+    public static final String RETURN_URL = "http://47.91.219.7/p2p/#/callback";
 
     // 有盾回调
-    public static final String CALLBACK_URL = "http://47.96.20.47:2020/agentNotifyInfo/verifyCallback";
+    public static final String CALLBACK_URL = "http://47.91.219.7:2020/agentNotifyInfo/verifyCallback";
 
     // 银行卡四要素 appkey
     public static final String BANK_APP_KEY = "cf8046f434dc84614a81eda0a5f6ff9b";

@@ -18,9 +18,7 @@ import com.anbang.p2p.cqrs.q.dbo.*;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
 import com.anbang.p2p.plan.bean.*;
 import com.anbang.p2p.plan.service.RiskService;
-import com.anbang.p2p.util.AgentIncome;
-import com.anbang.p2p.util.CommonVOUtil;
-import com.anbang.p2p.util.RiskUtil;
+import com.anbang.p2p.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +33,8 @@ import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.service.BaseRateService;
 import com.anbang.p2p.web.vo.CommonVO;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static com.anbang.p2p.util.AgentIncome.income;
 
@@ -73,7 +73,7 @@ public class OrderController {
 	 * 申请卡密
 	 */
 	@RequestMapping("/createorder")
-	public CommonVO createOrder(String token, String contractId, int dayNum) {
+	public CommonVO createOrder(String token, String contractId, int dayNum, HttpServletRequest request) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -145,7 +145,11 @@ public class OrderController {
 			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, PayType.alipay, userDbo.getAlipayInfo().getAccount(), amount,
 					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
 					System.currentTimeMillis());
-			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo);
+
+			// IP记录
+			String loginIp = IPUtil.getRealIp(request);
+			String ipAddress = IPAddressUtil.getIPAddress(loginIp);
+			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo, loginIp, ipAddress);
 
 			//风控
 			checkOrderByFengkong(loanOrder);

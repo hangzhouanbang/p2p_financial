@@ -48,12 +48,14 @@ public class UserAuthQueryService {
 	/**
 	 * 创建用户并授权
 	 */
-	public void createUserAndAddThirdAuth(String userId, String publisher, String uuid) {
+	public void createUserAndAddThirdAuth(String userId, String publisher, String uuid, String loginIp, String ipAddress) {
 		UserDbo user = new UserDbo();
 		user.setId(userId);
 		user.setNickname("");
 		user.setHeadimgurl("");
 		user.setPhone(uuid);
+		user.setLoginIp(loginIp);
+		user.setIpAddress(ipAddress);
 		userDboDao.save(user);
 
 		AuthorizationDbo authDbo = new AuthorizationDbo();
@@ -138,5 +140,9 @@ public class UserAuthQueryService {
 
 	public UserBankCardInfo findById(String userId) {
 		return userBankCardInfoDao.findById(userId);
+	}
+
+	public void updateIPById(String userId, String loginIp, String ipAddress){
+		userDboDao.updateIPById(userId, loginIp, ipAddress);
 	}
 }

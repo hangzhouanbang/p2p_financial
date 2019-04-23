@@ -103,4 +103,8 @@ public class RiskService {
     public RiskInfo getById(String id){
         return riskInfoDao.getById(id);
     }
+
+    public RiskInfo getByUserId(String userId){
+        return riskInfoDao.getByUserId(userId);
+    }
 }

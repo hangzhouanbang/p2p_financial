@@ -130,6 +130,15 @@ public class BaseLoanAndRateController {
 	public CommonVO queryUserBaseRateOfInterest(String userId) {
 		CommonVO vo = new CommonVO();
 		UserBaseRateOfInterest userRate = baseRateService.findUserBaseRateOfInterestByUserId(userId);
+
+		if (userRate == null) {
+			userRate = new UserBaseRateOfInterest();
+			userRate.setSeven_rate(BaseRateOfInterest.seven_rate);
+			userRate.setFifteen_rate(BaseRateOfInterest.fifteen_rate);
+			userRate.setThirty_rate(BaseRateOfInterest.thirty_rate);
+			userRate.setOverdue_rate(BaseRateOfInterest.overdue_rate);
+		}
+
 		Map data = new HashMap<>();
 		vo.setData(data);
 		data.put("userRate", userRate);

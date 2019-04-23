@@ -13,6 +13,8 @@ import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
 import com.anbang.p2p.cqrs.q.service.LoanOrderExportService;
 import com.anbang.p2p.cqrs.q.service.UserService;
+import com.anbang.p2p.plan.bean.RiskInfo;
+import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.AgentPay;
 import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.web.vo.RepayImport;
@@ -63,6 +65,9 @@ public class OrderManagerController {
 	@Autowired
 	private LoanOrderExportService loanOrderExportService;
 
+	@Autowired
+	private RiskService riskService;
+
 	/**
 	 * 查询卡密
 	 */
@@ -90,6 +95,15 @@ public class OrderManagerController {
 		vo.setData(data);
 		data.put("listPage", listPage);
 		return vo;
+	}
+
+	/**
+	 * 查询风控信息
+	 */
+	@RequestMapping("/queryRiskInfo")
+	public CommonVO queryRiskInfo(String userId) {
+		RiskInfo riskInfo = riskService.getByUserId(userId);
+		return CommonVOUtil.success(riskInfo, "success");
 	}
 
 	/**

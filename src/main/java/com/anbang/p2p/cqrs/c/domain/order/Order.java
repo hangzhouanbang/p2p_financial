@@ -45,7 +45,7 @@ public class Order {
 		// 如果需要精确计算，非要用String来够造BigDecimal不可
 		BigDecimal b_amount = new BigDecimal(Double.toString(amount));
 		BigDecimal b_service_charge = new BigDecimal(Double.toString(service_charge));
-		realAmount = b_amount.subtract(b_service_charge).doubleValue();
+		realAmount = b_amount.subtract(b_service_charge).setScale(2,BigDecimal.ROUND_DOWN).doubleValue();
 	}
 
 	/**

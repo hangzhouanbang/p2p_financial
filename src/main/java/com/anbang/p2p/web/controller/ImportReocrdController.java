@@ -124,6 +124,7 @@ public class ImportReocrdController {
             Workbook workbook = ImprotExcelUtil.checkExcel(fileEntity);
 
             importRecordService.saveImprotMaterial(workbook, fileEntity.getFileName());
+            return CommonVOUtil.success("success");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -62,6 +62,19 @@ public class MongodbUserDboDao implements UserDboDao {
 	@Override
 	public List<UserDbo> find(int page, int size, UserQuery userQuery) {
 		Query query = new Query();
+		if (StringUtils.isNotBlank(userQuery.getPhone())) {
+			query.addCriteria(Criteria.where("phone").is(userQuery.getPhone()));
+		}
+		if (StringUtils.isNotBlank(userQuery.getRealName())) {
+			query.addCriteria(Criteria.where("realName").regex(userQuery.getRealName()));
+		}
+		if (userQuery.getVerify() != null) {
+			query.addCriteria(Criteria.where("isVerify").is(userQuery.getVerify()));
+		}
+		if (StringUtils.isNotBlank(userQuery.getState())) {
+			query.addCriteria(Criteria.where("state").is(userQuery.getState()));
+		}
+
 		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, UserDbo.class);

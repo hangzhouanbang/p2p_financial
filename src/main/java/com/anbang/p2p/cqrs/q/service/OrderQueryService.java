@@ -59,6 +59,23 @@ public class OrderQueryService {
 		return loanOrder;
 	}
 
+	public LoanOrder updateLoanOrderByImport(OrderValueObject orderValueObject) {
+		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
+		loanOrder.setState(orderValueObject.getState());
+		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
+		loanOrder.setRealRefundAmount(orderValueObject.getRealRefundAmount());
+		loanOrder.setRefundTime(orderValueObject.getRefundTime());
+		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
+
+		// TODO: 2019/4/23
+		loanOrder.setRepayType("催收销账");
+		loanOrderDao.save(loanOrder);
+
+		userDboDao.updateUserState(loanOrder.getUserId(), loanOrder.getState().name());
+
+		return loanOrder;
+	}
+
 	/**
 	 * 查询应还款
 	 */

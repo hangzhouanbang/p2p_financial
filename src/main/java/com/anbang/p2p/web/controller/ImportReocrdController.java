@@ -1,12 +1,23 @@
 package com.anbang.p2p.web.controller;
 
+import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
+import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
+import com.anbang.p2p.cqrs.c.service.OrderCmdService;
+import com.anbang.p2p.cqrs.q.dao.LoanOrderDao;
+import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.plan.bean.ImportRecord;
 import com.anbang.p2p.plan.bean.ImportState;
 import com.anbang.p2p.plan.bean.RepayRecord;
 import com.anbang.p2p.plan.service.ImportRecordService;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.FileUtils;
+import com.anbang.p2p.util.ImprotExcelUtil;
+import com.anbang.p2p.util.bean.FileEntity;
 import com.anbang.p2p.web.vo.CommonVO;
 import com.highto.framework.web.page.ListPage;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +38,13 @@ import java.util.List;
 public class ImportReocrdController {
     @Autowired
     private ImportRecordService importRecordService;
+
+    @Autowired
+    private OrderCmdService orderCmdService;
+
+    @Autowired
+    private OrderQueryService orderQueryService;
+
 
     /**
      * excel 查询导入记录
@@ -75,6 +93,16 @@ public class ImportReocrdController {
             return CommonVOUtil.error("state error");
         }
 
+        for (RepayRecord list : importRecord.getRepayRecords()) {
+            try {
+                OrderValueObject order = orderCmdService.changeOrderStateClean(list.getUserId());
+                orderQueryService.updateLoanOrderByImport(order);
+            } catch (OrderNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalOperationException e) {
+                e.printStackTrace();
+            }
+        }
 
         return CommonVOUtil.success("success");
     }
@@ -85,126 +113,22 @@ public class ImportReocrdController {
      * excel 销账导入
      */
     @RequestMapping("/repayImport")
-    public CommonVO repayImport(MultipartHttpServletRequest request, HttpServletResponse response) {
-//
-//        ReturnStandardDataFormat standardData = new ReturnStandardDataFormat(CustomConstants.CUSTOM_SELECT_EXCEPTION,"导入客户信息失败",null);
-//
-//        MultipartFile file = request.getFile("file");
-//        ExcelReader er = new ExcelReader();
-//        int count =0;
-//        int error =0;
-//        int success = 0;
-//
-//        List<Custom> list_ = new ArrayList<Custom>();
-//        User u = getUser(request.getSession());//SessionUtils.getUser(request.getSession());
-//        Long corpId = Long.valueOf(u.getCorpId());
-//        Date date = new Date();
-//        String returnMsg = "";
-//        int index = 1;
-//
-//        try {
-//
-//            List<Map<Integer,String>> list = er.readExcelContentByList(file.getInputStream()); //读取Excel数据内容
-//            count = list.size();
-//
-//            for(Map<Integer,String> map : list){
-//
-//                if(map.get(0)==null || "".equals(map.get(0))){
-//                    returnMsg += "第"+index+"行：【客户简称(必填)】列不能为空;";
-//                } else if(map.get(1)==null || "".equals(map.get(1))){
-//                    returnMsg += "第"+index+"行：【客户全称(必填)】列不能为空;";
-//                } else {
-//                    int num = 0;
-//                    QueryCustomParam params = new QueryCustomParam();
-//                    params.setShortName(map.get(0));
-//                    params.setCorpId(Long.valueOf(u.getCorpId()));
-//                    num = customService.checkCustom(params); //查询相同客户
-//
-//                    if(num==0){
-//                        Custom custom = new Custom();
-//                        custom.setId(UUIDUtil.getLongUUID());
-//                        custom.setShortName(map.get(0)==null? null : map.get(0));
-//                        custom.setName(map.get(1)==null? null : map.get(1));
-//                        custom.setNumber(map.get(2)==null? null : map.get(2));
-//                        custom.setAddress(map.get(3)==null? null : map.get(3));
-//                        custom.setUrl(map.get(4)==null? null : map.get(4));
-//                        custom.setDescription(map.get(5)==null? null : map.get(5));
-//                        custom.setCustomStatusId(map.get(6)==null? null : basedataService.getLabelId("custom_status", map.get(6), corpId) );
-//                        custom.setCustomLevelId(map.get(7)==null? null : basedataService.getLabelId("custom_level", map.get(7), corpId) );
-//                        custom.setCreaterId(Long.valueOf(u.getUserId()));
-//                        custom.setCreateDate(date);
-//                        custom.setUpdaterId(Long.valueOf(u.getUserId()));
-//                        custom.setUpdateDate(date);
-//                        custom.setCorpId(Long.valueOf(u.getCorpId()));
-//
-//                        list_.add(custom);
-//
-//                    } else {
-//                        returnMsg += "第"+index+"行：【客户简称(必填)】列："+ map.get(0)+"已存在;";
-//                    }
-//                    index++;
-//                }
-//            }
-//
-//            int cuccess = customService.batchInsert(list_); //批量导入客户信息
-//
-//            standardData.setReturnCode(0);
-//            standardData.setReturnData(null);
-//
-//            error = count - success;
-//            standardData.setReturnMessage(returnMsg);
-//
-//        } catch (Exception e) {
-//            log.error("批量导入客户信息异常：" + e.getMessage());
-//            standardData.setReturnMessage(e.getMessage());
-//        }
-//
-//        return JsonHelper.encodeObject2Json(standardData, "yyyy-MM-dd HH:mm:ss");
-        return null;
+    public CommonVO repayImport(MultipartHttpServletRequest request) {
+
+        try {
+            List<FileEntity> list = FileUtils.getFilesFromRequest(request);
+            if (list == null || list.size() == 0) {
+                return CommonVOUtil.error("文件错误");
+            }
+            FileEntity fileEntity = list.get(0);
+            Workbook workbook = ImprotExcelUtil.checkExcel(fileEntity);
+
+            importRecordService.saveImprotMaterial(workbook, fileEntity.getFileName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return CommonVOUtil.error("上传错误，请检查文件格式是否正确");
     }
 
 
-
-    public static List<RepayRecord> readExcel(String fileName) throws Exception{
-
-//
-//		InputStream is = new FileInputStream(new File(fileName));
-//		Workbook hssfWorkbook = null;
-//		if (fileName.endsWith("xlsx")){
-//			hssfWorkbook = new XSSFWorkbook(is);//Excel 2007
-//		}else if (fileName.endsWith("xls")){
-//			hssfWorkbook = new HSSFWorkbook(is);//Excel 2003
-//
-//		}
-//		// HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
-//		// XSSFWorkbook hssfWorkbook = new XSSFWorkbook(is);
-//		List<RepayRecord> imports = new ArrayList<>();
-//
-//		// 循环工作表Sheet
-//		for (int numSheet = 0; numSheet <hssfWorkbook.getNumberOfSheets(); numSheet++) {
-//			//HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
-//			Sheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
-//			if (hssfSheet == null) {
-//				continue;
-//			}
-//			// 循环行Row
-//			for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
-//				//HSSFRow hssfRow = hssfSheet.getRow(rowNum);
-//				Row hssfRow = hssfSheet.getRow(rowNum);
-//				if (hssfRow != null) {
-//					//HSSFCell name = hssfRow.getCell(0);
-//					//HSSFCell pwd = hssfRow.getCell(1);
-//					Cell orderId = hssfRow.getCell(0);
-//					Cell userId = hssfRow.getCell(1);
-//
-//					// TODO: 2019/4/22
-//					RepayRecord repayImport = new RepayRecord();
-//					repayImport.setId(orderId.toString());
-//					imports.add(repayImport);
-//
-//				}
-//			}
-//		}
-        return null;
-    }
 }

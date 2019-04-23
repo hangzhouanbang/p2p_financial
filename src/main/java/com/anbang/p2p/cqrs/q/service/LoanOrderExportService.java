@@ -38,8 +38,8 @@ public class LoanOrderExportService {
     @Autowired
     private UserContactsDao userContactsDao;
 
-    @Autowired
-    private OrderCmdService orderCmdService;
+//    @Autowired
+//    private OrderCmdService orderCmdService;
 
 
     // 导出单页
@@ -118,30 +118,6 @@ public class LoanOrderExportService {
             zipOutputStream.putNextEntry(entry);
             workbook.write(zipOutputStream);
         }
-    }
-
-    public void repay(List<RepayRecord> imports) {
-        for (RepayRecord list : imports) {
-            LoanOrder order = mongodbLoanOrderDao.findById(list.getId());
-            if (order != null) {
-
-                try {
-                    orderCmdService.changeOrderStateClean(list.getUserId());
-
-                    order.setState(OrderState.clean);
-                    order.setRealRefundAmount(list.getRepayAmount());
-                    order.setRefundTime(System.currentTimeMillis());
-                    // TODO: 2019/4/22
-                    order.setRepayType("催收销账");
-                    mongodbLoanOrderDao.save(order);
-                } catch (OrderNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalOperationException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
     }
 
 }

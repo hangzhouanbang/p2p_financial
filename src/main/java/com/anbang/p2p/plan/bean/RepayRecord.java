@@ -1,9 +1,9 @@
-package com.anbang.p2p.web.vo;
+package com.anbang.p2p.plan.bean;
 
 /**
  * 销账导入
  */
-public class RepayImport {
+public class RepayRecord {
     private String id;
     private String userId;
     private String realName;

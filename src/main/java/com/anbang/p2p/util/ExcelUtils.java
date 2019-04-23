@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.web.vo.LoanOrderVO;
@@ -14,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelUtils {
 
-	public static void baseInfoExcel(Integer rowid, Integer sheetNum, List<LoanOrderVO> list,
+	public static void baseInfoExcel(Integer rowid, Integer sheetNum, List<LoanOrder> list,
 										   XSSFWorkbook workbook) {
 		XSSFSheet spreadsheet = null;
 		if (rowid > 20000) {
@@ -35,7 +36,7 @@ public class ExcelUtils {
 			row.createCell(8).setCellValue("当前应还");
 			rowid++;
 		}
-		for (LoanOrderVO vo : list) {
+		for (LoanOrder vo : list) {
 			XSSFRow row = spreadsheet.createRow(rowid);
 			row.createCell(0).setCellValue(vo.getId());
 			row.createCell(1).setCellValue(vo.getRealName());
@@ -69,7 +70,7 @@ public class ExcelUtils {
 		row1.createCell(5).setCellValue(userBaseInfo.getIDcardImgUrl_reverse());
 	}
 
-	public static void detailLoanOrderVO(XSSFWorkbook workbook, LoanOrderVO vo) {
+	public static void detailLoanOrderVO(XSSFWorkbook workbook, LoanOrder vo) {
 		XSSFSheet spreadsheet = workbook.createSheet("idCardInfo");
 		XSSFRow row = spreadsheet.createRow(0);
 		row.createCell(0).setCellValue("卡密编号");

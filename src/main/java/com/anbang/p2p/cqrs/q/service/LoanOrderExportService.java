@@ -10,22 +10,16 @@ import com.anbang.p2p.cqrs.q.dao.mongodb.MongodbLoanOrderDao;
 import com.anbang.p2p.cqrs.q.dbo.LoanOrder;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
+import com.anbang.p2p.plan.bean.RepayRecord;
 import com.anbang.p2p.util.ExcelUtils;
 import com.anbang.p2p.web.vo.LoanOrderQueryVO;
-import com.anbang.p2p.web.vo.LoanOrderVO;
-import com.anbang.p2p.web.vo.RepayImport;
-import javafx.util.Pair;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -59,20 +53,7 @@ public class LoanOrderExportService {
         for (int page = 1; page <= pageNum; page++) {
             List<LoanOrder> orderList = mongodbLoanOrderDao.listByIds(ids);
 
-            // 结果转换
-            List<LoanOrderVO> vos = new ArrayList<>();
-            for (LoanOrder list : orderList) {
-                LoanOrderVO vo = new LoanOrderVO(list);
-                try {
-                    shouldRepayAmount(list, System.currentTimeMillis(), vo);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    continue;
-                }
-                vos.add(vo);
-            }
-
-            ExcelUtils.baseInfoExcel(rowid, sheetNum, vos, workbook);
+            ExcelUtils.baseInfoExcel(rowid, sheetNum, orderList, workbook);
             sheetNum++;
         }
         workbook.write(output);
@@ -87,12 +68,10 @@ public class LoanOrderExportService {
 
             // 四页：身份证信息、卡密详情、紧急联系人、通讯录
             UserBaseInfo baseInfo = userBaseInfoDao.findById(list.getUserId());
-            LoanOrderVO vo = new LoanOrderVO(list);
-            shouldRepayAmount(list, System.currentTimeMillis(), vo);
             UserContacts contacts = userContactsDao.findById(list.getUserId());
 
             ExcelUtils.detailBaseInfo(workbook, baseInfo);
-            ExcelUtils.detailLoanOrderVO(workbook, vo);
+            ExcelUtils.detailLoanOrderVO(workbook, list);
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
@@ -113,20 +92,7 @@ public class LoanOrderExportService {
         for (int page = 1; page <= pageNum; page++) {
             List<LoanOrder> orderList = mongodbLoanOrderDao.find(page, size, queryVO);
 
-            // 结果转换
-            List<LoanOrderVO> vos = new ArrayList<>();
-            for (LoanOrder list : orderList) {
-                LoanOrderVO vo = new LoanOrderVO(list);
-                try {
-                    shouldRepayAmount(list, System.currentTimeMillis(), vo);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    continue;
-                }
-                vos.add(vo);
-            }
-
-            ExcelUtils.baseInfoExcel(rowid, sheetNum, vos, workbook);
+            ExcelUtils.baseInfoExcel(rowid, sheetNum, orderList, workbook);
             sheetNum++;
         }
         workbook.write(output);
@@ -141,12 +107,10 @@ public class LoanOrderExportService {
 
             // 四页：身份证信息、卡密详情、紧急联系人、通讯录
             UserBaseInfo baseInfo = userBaseInfoDao.findById(list.getUserId());
-            LoanOrderVO vo = new LoanOrderVO(list);
-            shouldRepayAmount(list, System.currentTimeMillis(), vo);
             UserContacts contacts = userContactsDao.findById(list.getUserId());
 
             ExcelUtils.detailBaseInfo(workbook, baseInfo);
-            ExcelUtils.detailLoanOrderVO(workbook, vo);
+            ExcelUtils.detailLoanOrderVO(workbook, list);
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
@@ -156,8 +120,8 @@ public class LoanOrderExportService {
         }
     }
 
-    public void repay(List<RepayImport> imports) {
-        for (RepayImport list : imports) {
+    public void repay(List<RepayRecord> imports) {
+        for (RepayRecord list : imports) {
             LoanOrder order = mongodbLoanOrderDao.findById(list.getId());
             if (order != null) {
 
@@ -180,42 +144,4 @@ public class LoanOrderExportService {
 
     }
 
-    /**
-     * ----------------计算应还款
-     */
-    public void shouldRepayAmount(LoanOrder order, long currentTime, LoanOrderVO vo) {
-        Map map = new HashMap();
-
-        if (!OrderState.overdue.equals(order.getState()) && !OrderState.collection.equals(order.getState())){
-            return ;
-        }
-        if (currentTime < order.getDeliverTime()) {
-            return;
-        }
-        // 如果需要精确计算，非要用String来够造BigDecimal不可
-        BigDecimal b_amount = new BigDecimal(Double.toString(order.getAmount()));
-        BigDecimal b_rate = new BigDecimal(Double.toString(order.getRate()));
-        BigDecimal b_freeOfInterest = new BigDecimal(
-                Long.toString(order.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000));
-        if (currentTime > order.getMaxLimitTime()) {
-            // 逾期应还:到期应还金额+逾期天数X本金X逾期利率
-            long limitDay = (order.getMaxLimitTime() - order.getDeliverTime()) / 1000 / 60 / 60 / 24;
-            BigDecimal b_limitDay = new BigDecimal(Long.toString(limitDay));
-            BigDecimal limit_num = b_limitDay.subtract(b_freeOfInterest);
-            BigDecimal amount = b_amount.add(b_amount.multiply(b_rate.multiply(limit_num)));
-
-            long day = (currentTime - order.getMaxLimitTime()) / 1000 / 60 / 60 / 24;
-            BigDecimal b_day = new BigDecimal(Long.toString(day));
-            BigDecimal b_overdue_rate = new BigDecimal(Double.toString(order.getOverdue_rate()));
-
-            BigDecimal interest = b_amount.multiply(b_overdue_rate.multiply(b_day));
-
-            vo.setOverdueTime(day);
-            vo.setInterest(interest.doubleValue());
-            vo.setInterest(amount.add(interest).doubleValue());
-            return ;
-        } else {
-            return;
-        }
-    }
 }

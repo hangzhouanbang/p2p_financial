@@ -10,6 +10,11 @@ public class LoanOrderQueryVO {
 
 	private Long nowTime;	//用于和应还时间比较maxLimitTime
 
+	private String id;	//卡密id
+	private Boolean export; //是否导出
+	private Long startTime; //逾期范围
+	private Long endTime; //逾期范围
+
 	public String getUserId() {
 		return userId;
 	}
@@ -48,5 +53,37 @@ public class LoanOrderQueryVO {
 
 	public void setNowTime(Long nowTime) {
 		this.nowTime = nowTime;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Boolean getExport() {
+		return export;
+	}
+
+	public void setExport(Boolean export) {
+		this.export = export;
+	}
+
+	public Long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Long startTime) {
+		this.startTime = startTime;
+	}
+
+	public Long getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Long endTime) {
+		this.endTime = endTime;
 	}
 }

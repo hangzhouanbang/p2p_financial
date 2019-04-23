@@ -3,28 +3,21 @@ package com.anbang.p2p.web.controller;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.anbang.p2p.constants.CommonRecordState;
-import com.anbang.p2p.cqrs.q.dao.mongodb.MongodbLoanOrderDao;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
 import com.anbang.p2p.cqrs.q.service.LoanOrderExportService;
 import com.anbang.p2p.cqrs.q.service.UserService;
+import com.anbang.p2p.plan.bean.ImportRecord;
+import com.anbang.p2p.plan.bean.RepayRecord;
 import com.anbang.p2p.plan.bean.RiskInfo;
+import com.anbang.p2p.plan.service.ImportRecordService;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.AgentPay;
 import com.anbang.p2p.util.CommonVOUtil;
-import com.anbang.p2p.web.vo.RepayImport;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -80,6 +73,15 @@ public class OrderManagerController {
 		vo.setData(data);
 		data.put("listPage", listPage);
 		return vo;
+	}
+
+	/**
+	 * 查询卡密详情
+	 */
+	@RequestMapping("/order_detail_query")
+	public CommonVO queryOrderDetail(String id) {
+		LoanOrder loanOrder = orderQueryService.findLoanOrderById(id);
+		return CommonVOUtil.success(loanOrder, "success");
 	}
 
 	/**
@@ -359,81 +361,5 @@ public class OrderManagerController {
 		}
 		return CommonVOUtil.systemException();
 	}
-
-	/**
-	 * excel 销账导入
-	 */
-	@RequestMapping("/repayImport")
-	public CommonVO repayImport(@RequestParam MultipartFile file, HttpServletRequest request) {
-
-		if(!file.isEmpty()){
-			String filePath = file.getOriginalFilename();
-			//windows
-//			String savePath = request.getSession().getServletContext().getRealPath(filePath);
-
-			//linux
-			String savePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/excel";
-
-			File targetFile = new File(savePath);
-
-			if(!targetFile.exists()){
-				targetFile.mkdirs();
-			}
-
-			try {
-				file.transferTo(targetFile);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return CommonVOUtil.success("success");
-		}
-
-		return CommonVOUtil.error("");
-	}
-
-	public static List<RepayImport> readExcel(String fileName) throws Exception{
-
-//
-//		InputStream is = new FileInputStream(new File(fileName));
-//		Workbook hssfWorkbook = null;
-//		if (fileName.endsWith("xlsx")){
-//			hssfWorkbook = new XSSFWorkbook(is);//Excel 2007
-//		}else if (fileName.endsWith("xls")){
-//			hssfWorkbook = new HSSFWorkbook(is);//Excel 2003
-//
-//		}
-//		// HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
-//		// XSSFWorkbook hssfWorkbook = new XSSFWorkbook(is);
-//		List<RepayImport> imports = new ArrayList<>();
-//
-//		// 循环工作表Sheet
-//		for (int numSheet = 0; numSheet <hssfWorkbook.getNumberOfSheets(); numSheet++) {
-//			//HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
-//			Sheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
-//			if (hssfSheet == null) {
-//				continue;
-//			}
-//			// 循环行Row
-//			for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
-//				//HSSFRow hssfRow = hssfSheet.getRow(rowNum);
-//				Row hssfRow = hssfSheet.getRow(rowNum);
-//				if (hssfRow != null) {
-//					//HSSFCell name = hssfRow.getCell(0);
-//					//HSSFCell pwd = hssfRow.getCell(1);
-//					Cell orderId = hssfRow.getCell(0);
-//					Cell userId = hssfRow.getCell(1);
-//
-//					// TODO: 2019/4/22
-//					RepayImport repayImport = new RepayImport();
-//					repayImport.setId(orderId.toString());
-//					imports.add(repayImport);
-//
-//				}
-//			}
-//		}
-		return null;
-	}
-
-
 
 }

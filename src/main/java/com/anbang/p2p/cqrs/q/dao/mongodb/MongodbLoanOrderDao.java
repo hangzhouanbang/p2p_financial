@@ -2,6 +2,7 @@ package com.anbang.p2p.cqrs.q.dao.mongodb;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -50,6 +51,23 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 			query.addCriteria(Criteria.where("maxLimitTime").lt(queryVO.getNowTime()));
 		}
 
+		if (StringUtils.isNotBlank(queryVO.getId())) {
+			query.addCriteria(Criteria.where("id").is(queryVO.getId()));
+		}
+		if (queryVO.getExport() != null) {
+			query.addCriteria(Criteria.where("export").is(queryVO.getExport()));
+		}
+		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
+			Criteria criteria = Criteria.where("overdueTime");
+			if (queryVO.getStartTime() != null) {
+				criteria = criteria.gte(queryVO.getStartTime());
+			}
+			if (queryVO.getEndTime() != null) {
+				criteria = criteria.lte(queryVO.getEndTime());
+			}
+			query.addCriteria(criteria);
+		}
+
 		return mongoTemplate.count(query, LoanOrder.class);
 	}
 
@@ -71,6 +89,24 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		if (queryVO.getNowTime() != null) {
 			query.addCriteria(Criteria.where("maxLimitTime").lt(queryVO.getNowTime()));
 		}
+
+		if (StringUtils.isNotBlank(queryVO.getId())) {
+			query.addCriteria(Criteria.where("id").is(queryVO.getId()));
+		}
+		if (queryVO.getExport() != null) {
+			query.addCriteria(Criteria.where("export").is(queryVO.getExport()));
+		}
+		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
+			Criteria criteria = Criteria.where("overdueTime");
+			if (queryVO.getStartTime() != null) {
+				criteria = criteria.gte(queryVO.getStartTime());
+			}
+			if (queryVO.getEndTime() != null) {
+				criteria = criteria.lte(queryVO.getEndTime());
+			}
+			query.addCriteria(criteria);
+		}
+
 		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, LoanOrder.class);

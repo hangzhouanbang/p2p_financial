@@ -62,7 +62,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.addPathPatterns("/userinfo/**").addPathPatterns("/verify/**");
 
 		registry.addInterceptor(adminInterceptor()).addPathPatterns("/base/**").addPathPatterns("/usermanager/**")
-				.addPathPatterns("/ordermanager/**");
+				.addPathPatterns("/ordermanager/**").addPathPatterns("/importReocrd/**");
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.anbang.p2p.cqrs.q.dao.UserDboDao;
+import com.anbang.p2p.util.CalAmountUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,7 @@ public class OrderQueryService {
 		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
 		loanOrder.setRealRefundAmount(orderValueObject.getRealRefundAmount());
 		loanOrder.setRefundTime(orderValueObject.getRefundTime());
+		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
 		loanOrderDao.save(loanOrder);
 
 		userDboDao.updateUserState(loanOrder.getUserId(), loanOrder.getState().name());

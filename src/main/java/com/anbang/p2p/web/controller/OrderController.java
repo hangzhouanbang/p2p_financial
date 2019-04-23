@@ -153,7 +153,7 @@ public class OrderController {
 
 			//风控
 			checkOrderByFengkong(loanOrder);
-			userDboDao.updateCount(userId, user.getOrderCount() + 1, null);
+			userDboDao.updateCountAndState(userId, user.getOrderCount() + 1, null, OrderState.wait.name());
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());

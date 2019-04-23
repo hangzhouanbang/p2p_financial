@@ -9,11 +9,12 @@ public class UserDbo {
 	private String headimgurl;// 头像
 	private String phone;// 手机号码
 	private AlipayInfo alipayInfo;	//支付宝账号信息
-	private boolean isVerify;	//实名
+	private Boolean isVerify;	//实名
 	private String realName;	//真实姓名
 	private long createTime;	//注册日期
 	private int orderCount;		//借款次数
 	private int overdueCount;	// 逾期次数
+	private String state;
 
 	private String loginIp;
 	private String ipAddress;
@@ -74,11 +75,11 @@ public class UserDbo {
 		this.ipAddress = ipAddress;
 	}
 
-	public boolean isVerify() {
+	public Boolean getVerify() {
 		return isVerify;
 	}
 
-	public void setVerify(boolean verify) {
+	public void setVerify(Boolean verify) {
 		isVerify = verify;
 	}
 
@@ -112,5 +113,13 @@ public class UserDbo {
 
 	public void setOverdueCount(int overdueCount) {
 		this.overdueCount = overdueCount;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 }

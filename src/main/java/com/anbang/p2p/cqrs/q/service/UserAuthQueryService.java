@@ -2,6 +2,8 @@ package com.anbang.p2p.cqrs.q.service;
 
 import java.util.List;
 
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +59,8 @@ public class UserAuthQueryService {
 		user.setLoginIp(loginIp);
 		user.setIpAddress(ipAddress);
 		user.setCreateTime(System.currentTimeMillis());
+		user.setState(OrderState.init.name());
+		user.setVerify(false);
 		userDboDao.save(user);
 
 		AuthorizationDbo authDbo = new AuthorizationDbo();
@@ -83,9 +87,9 @@ public class UserAuthQueryService {
 		userDboDao.updateNicknameAndHeadimgurlById(userId, nickname, headimgurl);
 	}
 
-	public ListPage findUserDbo(int page, int size) {
-		int amount = (int) userDboDao.getAmount();
-		List<UserDbo> userList = userDboDao.find(page, size);
+	public ListPage findUserDbo(int page, int size, UserQuery userQuery) {
+		int amount = (int) userDboDao.getAmount(userQuery);
+		List<UserDbo> userList = userDboDao.find(page, size, userQuery);
 		return new ListPage(userList, page, size, amount);
 	}
 

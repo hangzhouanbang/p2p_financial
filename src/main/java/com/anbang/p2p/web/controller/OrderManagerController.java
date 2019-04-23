@@ -267,7 +267,7 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
-			String fileName = format.format(date) + "催收批量详情文件" + ".zip";
+			String fileName = format.format(date) + "催收详情文件" + ".zip";
 			response.setContentType("application/octet-stream ");
 			response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
 			response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
@@ -304,13 +304,13 @@ public class OrderManagerController {
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date date = new Date();
+		OutputStream output = null;
 
 		if ("simple".equals(exportType)) {
 			String fileName = format.format(date) + exportType + "Order.xlsx";
 			response.reset();
 			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
 			response.setContentType("application/msexcel");
-			OutputStream output = null;
 			try {
 				output = response.getOutputStream();
 				loanOrderExportService.exportSimpleBatch(queryVO, output);
@@ -321,7 +321,27 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
+			String fileName = format.format(date) + "催收批量文件" + ".zip";
+			response.setContentType("application/octet-stream ");
+			response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
+			response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
+			try {
+				response.setHeader("Content-Disposition",
+						"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
+				response.setCharacterEncoding("UTF-8");
 
+				output = response.getOutputStream();
+				ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+
+				// 业务数据封装
+				loanOrderExportService.exportDetailBatch(queryVO, zipOutputStream);
+
+				// 关闭输出流
+				zipOutputStream.flush();
+				zipOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return CommonVOUtil.systemException();
 	}

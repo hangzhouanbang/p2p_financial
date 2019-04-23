@@ -6,6 +6,7 @@ import java.util.Map;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +40,10 @@ public class UserManagerController {
 	 */
 	@RequestMapping("/user_query")
 	public CommonVO queryUser(@RequestParam(required = true, defaultValue = "1") int page,
-			@RequestParam(required = true, defaultValue = "20") int size) {
+							  @RequestParam(required = true, defaultValue = "20") int size,
+							  UserQuery userQuery) {
 		CommonVO vo = new CommonVO();
-		ListPage listPage = userAuthQueryService.findUserDbo(page, size);
+		ListPage listPage = userAuthQueryService.findUserDbo(page, size, userQuery);
 		Map data = new HashMap<>();
 		vo.setData(data);
 		data.put("listPage", listPage);

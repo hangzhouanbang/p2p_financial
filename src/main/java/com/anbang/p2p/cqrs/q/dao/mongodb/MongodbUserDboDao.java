@@ -2,6 +2,7 @@ package com.anbang.p2p.cqrs.q.dao.mongodb;
 
 import java.util.List;
 
+import com.anbang.p2p.web.vo.UserQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -41,12 +42,25 @@ public class MongodbUserDboDao implements UserDboDao {
 	}
 
 	@Override
-	public long getAmount() {
+	public long getAmount(UserQuery userQuery) {
+		Query query = new Query();
+		if (StringUtils.isNotBlank(userQuery.getPhone())) {
+			query.addCriteria(Criteria.where("phone").is(userQuery.getPhone()));
+		}
+		if (StringUtils.isNotBlank(userQuery.getRealName())) {
+			query.addCriteria(Criteria.where("realName").regex(userQuery.getRealName()));
+		}
+		if (userQuery.getVerify() != null) {
+			query.addCriteria(Criteria.where("isVerify").is(userQuery.getVerify()));
+		}
+		if (StringUtils.isNotBlank(userQuery.getState())) {
+			query.addCriteria(Criteria.where("state").is(userQuery.getState()));
+		}
 		return repository.count();
 	}
 
 	@Override
-	public List<UserDbo> find(int page, int size) {
+	public List<UserDbo> find(int page, int size, UserQuery userQuery) {
 		Query query = new Query();
 		query.skip((page - 1) * size);
 		query.limit(size);
@@ -89,7 +103,7 @@ public class MongodbUserDboDao implements UserDboDao {
 	}
 
 	@Override
-	public void updateCount(String userId, Integer orderCount, Integer overdueCount) {
+	public void updateCountAndState(String userId, Integer orderCount, Integer overdueCount, String state) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("id").is(userId));
 		Update update = new Update();
@@ -100,7 +114,19 @@ public class MongodbUserDboDao implements UserDboDao {
 		if (overdueCount != null) {
 			update.set("overdueCount", overdueCount);
 		}
+
+		if (StringUtils.isNotBlank(state)) {
+			update.set("state", state);
+		}
 		mongoTemplate.updateFirst(query, update, UserDbo.class);
 	}
 
+	@Override
+	public void updateUserState(String userId, String state) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(userId));
+		Update update = new Update();
+		update.set("state", state);
+		mongoTemplate.updateFirst(query, update, UserDbo.class);
+	}
 }

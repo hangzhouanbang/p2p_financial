@@ -133,6 +133,29 @@ public class LoanOrderExportService {
         workbook.close();
     }
 
+    // 批量导出
+    public void exportDetailBatch(LoanOrderQueryVO queryVO, ZipOutputStream zipOutputStream) throws IOException {
+        List<LoanOrder> orderList = mongodbLoanOrderDao.find(1, 10000, queryVO);
+        for (LoanOrder list : orderList) {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+
+            // 四页：身份证信息、卡密详情、紧急联系人、通讯录
+            UserBaseInfo baseInfo = userBaseInfoDao.findById(list.getUserId());
+            LoanOrderVO vo = new LoanOrderVO(list);
+            shouldRepayAmount(list, System.currentTimeMillis(), vo);
+            UserContacts contacts = userContactsDao.findById(list.getUserId());
+
+            ExcelUtils.detailBaseInfo(workbook, baseInfo);
+            ExcelUtils.detailLoanOrderVO(workbook, vo);
+            ExcelUtils.detailContacts(workbook, contacts);
+            ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
+
+            ZipEntry entry = new ZipEntry(list.getRealName() + list.getIDcard() + ".xls");
+            zipOutputStream.putNextEntry(entry);
+            workbook.write(zipOutputStream);
+        }
+    }
+
     public void repay(List<RepayImport> imports) {
         for (RepayImport list : imports) {
             LoanOrder order = mongodbLoanOrderDao.findById(list.getId());

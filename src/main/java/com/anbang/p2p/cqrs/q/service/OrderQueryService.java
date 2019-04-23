@@ -52,6 +52,8 @@ public class OrderQueryService {
 		loanOrder.setRefundTime(orderValueObject.getRefundTime());
 		loanOrderDao.save(loanOrder);
 
+		userDboDao.updateUserState(loanOrder.getUserId(), loanOrder.getState().name());
+
 		return loanOrder;
 	}
 

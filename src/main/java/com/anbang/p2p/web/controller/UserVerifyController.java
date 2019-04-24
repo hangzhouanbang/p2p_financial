@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.plan.bean.MobileVerify;
 import com.anbang.p2p.plan.bean.VerifyRecord;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.plan.service.VerifyRecordService;
@@ -40,7 +41,8 @@ public class UserVerifyController {
 	@Autowired
 	private VerifyRecordService verifyRecordService;
 
-	private Gson gson = new Gson();
+	@Autowired
+	private MobileDemo mobileDemo;
 
 	/**
 	 * 云慧眼加密加签
@@ -99,8 +101,6 @@ public class UserVerifyController {
 			return CommonVOUtil.error("invalid phone");
 		}
 
-
-
 		userContacts.setId(userId);
 		userContacts.setUserId(userId);
 		userAuthQueryService.saveContacts(userContacts);
@@ -122,8 +122,87 @@ public class UserVerifyController {
 			return CommonVOUtil.success(userContact, "已绑定");
 		}
 
-		return CommonVOUtil.success("未绑定");
+		return CommonVOUtil.error("未绑定");
 	}
 
+	/**
+	 * 运营商验证,获取验证码
+	 */
+	@RequestMapping("/mobileVerify")
+	public CommonVO mobileVerify (String token, String username, String password) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.error("invalid token");
+		}
 
+		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		if (baseInfo == null) {
+			return CommonVOUtil.error("请先进行身份认证");
+		}
+
+		MobileVerify mobileVerify = new MobileVerify();
+		mobileVerify.setId(userId);
+		mobileVerify.setIDcard(baseInfo.getIDcard());
+		mobileVerify.setRealName(baseInfo.getRealName());
+		mobileVerify.setUsername(username);
+		mobileVerify.setPassword(password);
+		mobileVerify.setState(CommonRecordState.INIT);
+		mobileVerify.setCreateTime(System.currentTimeMillis());
+
+		try {
+			String key =  mobileDemo.startTask(userId, baseInfo.getIDcard(), baseInfo.getRealName(), username, password);
+			mobileVerify.setToken(key);
+			userAuthQueryService.saveMobileVerify(mobileVerify);
+			return CommonVOUtil.success(key,"success");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CommonVOUtil.error("运营商认证失败");
+		}
+	}
+
+	/**
+	 * 运营商验证码输入
+	 */
+	@RequestMapping("/mobileCode")
+	public CommonVO mobileCode (String token, String input) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.error("invalid token");
+		}
+
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null) {
+			return CommonVOUtil.error("认证异常");
+		}
+
+		try {
+			String query_token = mobileDemo.input(mobileVerify.getToken(), input);
+			return CommonVOUtil.success(query_token,"success");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return CommonVOUtil.error("运营商认证失败");
+		}
+	}
+
+	/**
+	 * 运营商认证情况查询
+	 */
+	@RequestMapping("/checkMobile")
+	public CommonVO checkMobile (String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.error("invalid token");
+		}
+
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null) {
+			return CommonVOUtil.error("未绑定");
+		}
+
+		if (CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+			return CommonVOUtil.success(mobileVerify, "success");
+		}
+
+		return CommonVOUtil.error("等待中");
+	}
 }

@@ -45,7 +45,7 @@ public class AgentNotifyController {
     @Autowired
     private RiskService riskService;
 
-    @RequestMapping("incomeNotify")
+    @RequestMapping("/incomeNotify")
     public String incomeNotify(String merchant, Double amount, String sys_order_no, String out_order_no, String order_time, String sign){
         JSONObject object = AgentIncome.queryIncome(out_order_no);
         System.out.println("收款回调>>>>>>>>>>>>>>>>>>>>>>>" + JSON.toJSONString(object));
@@ -102,7 +102,7 @@ public class AgentNotifyController {
         return "success";
     }
 
-    @RequestMapping("incomeResult")
+    @RequestMapping("/incomeResult")
     public CommonVO incomeNotify(String user_order_no){
         RefundInfo refundInfo = refundInfoService.getById(user_order_no);
 
@@ -114,5 +114,12 @@ public class AgentNotifyController {
             return CommonVOUtil.success("error");
         }
         return CommonVOUtil.success("waiting");
+    }
+
+
+    @RequestMapping("/contactNotify")
+    public String contactNotify(String uid, String bizType, String code, String msg, String token){
+        System.out.println("运营商验证回调>>>>>>>>>>" + String.format("%s|%s|%s|%s|%s",uid,bizType,code,msg,token));
+        return "success";
     }
 }

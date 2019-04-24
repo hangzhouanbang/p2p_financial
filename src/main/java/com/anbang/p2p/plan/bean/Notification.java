@@ -23,4 +23,8 @@ public class Notification {
     public static void update(Map<String, String> map){
         notification = map;
     }
+    public static Map getMap(){
+        return new HashMap(notification);
+    }
+
 }

@@ -9,6 +9,7 @@ public class UserBaseLoan {
 	private double service_charge_rate;// 手续费比例
 	private long overdue;// 逾期转催收时间
 	private long freeTimeOfInterest;// 免息时间
+	private double overdue_rate;	//逾期利率
 
 	public String getId() {
 		return id;
@@ -50,4 +51,11 @@ public class UserBaseLoan {
 		this.freeTimeOfInterest = freeTimeOfInterest;
 	}
 
+	public double getOverdue_rate() {
+		return overdue_rate;
+	}
+
+	public void setOverdue_rate(double overdue_rate) {
+		this.overdue_rate = overdue_rate;
+	}
 }

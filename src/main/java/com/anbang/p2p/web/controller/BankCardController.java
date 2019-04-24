@@ -69,7 +69,7 @@ public class BankCardController {
 			return CommonVOUtil.success(bankCardInfo, "已绑定");
 		}
 
-		return CommonVOUtil.success("未绑定");
+		return CommonVOUtil.error("未绑定");
 	}
 
 	/**
@@ -118,6 +118,6 @@ public class BankCardController {
 			return CommonVOUtil.success(userDbo.getAlipayInfo(), "已绑定");
 		}
 
-		return CommonVOUtil.success("未绑定");
+		return CommonVOUtil.error("未绑定");
 	}
 }

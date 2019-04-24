@@ -17,10 +17,11 @@ import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import com.anbang.p2p.cqrs.q.dbo.*;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
 import com.anbang.p2p.plan.bean.*;
+import com.anbang.p2p.plan.dao.LeaveWordDao;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,6 @@ import com.anbang.p2p.plan.service.BaseRateService;
 import com.anbang.p2p.web.vo.CommonVO;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static com.anbang.p2p.util.AgentIncome.income;
 
 @CrossOrigin
 @RestController
@@ -67,7 +66,56 @@ public class OrderController {
 	@Autowired
 	private RefundInfoService refundInfoService;
 
+	@Autowired
+	private LeaveWordDao leaveWordDao;
+
 	private ExecutorService executorService = Executors.newCachedThreadPool();
+
+	/**
+	 * 查询提示
+	 */
+	@RequestMapping("/queryOrderTip")
+	public CommonVO queryOrderTip(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+		LoanOrder loanOrder = orderQueryService.findLastOrderByUserId(userId);
+		if (loanOrder == null) {
+			return CommonVOUtil.success("init");
+		}
+
+		if (OrderState.refund.equals(loanOrder.getState())) {
+			long maxLimitTime = loanOrder.getMaxLimitTime();
+			long nowTIme = System.currentTimeMillis();
+			double flag = TimeUtils.repayTime(maxLimitTime, nowTIme);
+			if (flag > 1 && flag < 2) {
+				return CommonVOUtil.success(Notification.getMap().get("repayDay").toString());
+			}
+			if (flag > 0 && flag < 1) {
+				return CommonVOUtil.success(Notification.getMap().get("repayFront").toString());
+			}
+		}
+		if (OrderState.clean.equals(loanOrder.getState())) {
+			return CommonVOUtil.success(Notification.getMap().get("repaySuccess").toString());
+		}
+		if (OrderState.overdue.equals(loanOrder.getState())) {
+			double flag = TimeUtils.repayTime(System.currentTimeMillis(), loanOrder.getMaxLimitTime());
+			if (flag > 15) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond15").toString());
+			}
+			if (flag > 7) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond7").toString());
+			}
+			if (flag > 3) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond3").toString());
+			}
+			if (flag > 1) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond1").toString());
+			}
+		}
+		return CommonVOUtil.success("init");
+	}
 
 	/**
 	 * 申请卡密
@@ -126,16 +174,18 @@ public class OrderController {
 		double service_charge_rate = BaseLoan.service_charge_rate;
 		long freeTimeOfInterest = BaseLoan.freeTimeOfInterest;
 		long overdue = BaseLoan.overdue;
+		double overdue_rate = BaseLoan.overdue_rate;
 		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
 		if (loan != null) {
 			amount = loan.getBaseLimit();
 			service_charge_rate = loan.getService_charge_rate();
 			freeTimeOfInterest = loan.getFreeTimeOfInterest();
 			overdue = loan.getOverdue();
+//			overdue_rate = loan.get
 		}
 		try {
 			double rate = BaseRateOfInterest.getRateByDayNum(dayNum);
-			double overdue_rate = BaseRateOfInterest.overdue_rate;
+//			double overdue_rate = BaseRateOfInterest.overdue_rate;
 			UserBaseRateOfInterest userBaseRateOfInterest = baseRateService.findUserBaseRateOfInterestByUserId(userId);
 			if (userBaseRateOfInterest != null) {
 				rate = userBaseRateOfInterest.getRateByDayNum(dayNum);
@@ -248,6 +298,26 @@ public class OrderController {
 			vo.setMsg(e.getClass().getName());
 			return vo;
 		}
+	}
+
+	/**
+	 * 新增留言
+	 */
+	@RequestMapping("/addLeaveWord")
+	public CommonVO addLeaveWord(String token, LeaveWord leaveWord) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.error("invalid token");
+		}
+
+		if (StringUtils.isNotBlank(leaveWord.getMsg())) {
+			return CommonVOUtil.invalidParam();
+		}
+
+		leaveWord.setUserId(userId);
+		leaveWord.setCreateTime(System.currentTimeMillis());
+		leaveWordDao.save(leaveWord);
+		return CommonVOUtil.success("success");
 	}
 
 	/**

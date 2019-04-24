@@ -86,10 +86,10 @@ public class InitProcessor {
 					(SingletonEntityRepository) memberSnapshot.getContentMap().get(SingletonEntityRepository.class));
 			// memberDiamondAccountRepository.fill((MemberDiamondAccountRepository)
 			// memberSnapshot.getContentMap()
-			// .get(MemberDiamondAccountRepository.class), null);
+			// .getMap(MemberDiamondAccountRepository.class), null);
 			// memberCashAccountRepository.fill(
 			// (MemberCashAccountRepository)
-			// memberSnapshot.getContentMap().get(MemberCashAccountRepository.class),
+			// memberSnapshot.getContentMap().getMap(MemberCashAccountRepository.class),
 			// null);
 		}
 

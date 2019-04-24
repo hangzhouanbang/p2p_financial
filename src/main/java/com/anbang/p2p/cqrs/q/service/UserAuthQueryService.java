@@ -3,6 +3,8 @@ package com.anbang.p2p.cqrs.q.service;
 import java.util.List;
 
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import com.anbang.p2p.plan.bean.MobileVerify;
+import com.anbang.p2p.plan.dao.MobileVerifyDao;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,9 @@ public class UserAuthQueryService {
 
 	@Autowired
 	private UserBankCardInfoDao userBankCardInfoDao;
+
+	@Autowired
+	private MobileVerifyDao mobileVerifyDao;
 
 	/**
 	 * 创建用户并授权
@@ -149,5 +154,13 @@ public class UserAuthQueryService {
 
 	public void updateIPById(String userId, String loginIp, String ipAddress){
 		userDboDao.updateIPById(userId, loginIp, ipAddress);
+	}
+
+	public void saveMobileVerify(MobileVerify mobileVerify) {
+		mobileVerifyDao.save(mobileVerify);
+	}
+
+	public MobileVerify getMobileVerify(String id) {
+		return mobileVerifyDao.getById(id);
 	}
 }

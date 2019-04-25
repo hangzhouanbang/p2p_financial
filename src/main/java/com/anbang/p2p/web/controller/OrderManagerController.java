@@ -17,6 +17,7 @@ import com.anbang.p2p.plan.bean.RiskInfo;
 import com.anbang.p2p.plan.service.ImportRecordService;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.AgentPay;
+import com.anbang.p2p.util.CalAmountUtil;
 import com.anbang.p2p.util.CommonVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -204,7 +205,7 @@ public class OrderManagerController {
 			try {
 				for (LoanOrder order : orderList) {
 					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToOverdue(order.getUserId());
-					orderQueryService.updateLoanOrder(orderValueObject);
+					orderQueryService.updateLoanOrderPlus(orderValueObject);
 
 					// 更新用户逾期次数
 					userService.getAndUpdateOverdueCount(order.getUserId());
@@ -218,7 +219,7 @@ public class OrderManagerController {
 	/**
 	 * 逾期转催收
 	 */
-	@Scheduled(cron = "0 40 0 * * ?") // 每天凌晨40
+	@Scheduled(cron = "0 30 0 * * ?") // 每天凌晨30
 	@RequestMapping("/overdue_to_collection")
 	public void overdueTransferToCollection() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
@@ -230,8 +231,42 @@ public class OrderManagerController {
 			List<LoanOrder> orderList = orderQueryService.findLoanOrderList(page, size, query);
 			try {
 				for (LoanOrder order : orderList) {
+
+					// 不需要转催收,只计算应还钱
+					if (System.currentTimeMillis() < order.getMaxLimitTime() + order.getOverdue()) {
+						CalAmountUtil.shouldRepayAmount(order, System.currentTimeMillis());
+						orderQueryService.updateLoanOrderAmount(order.getId(), order.getOverdueDay(), order.getInterest(),
+								order.getShouldRepayAmount());
+						continue;
+					}
+
 					OrderValueObject orderValueObject = orderCmdService.changeOrderStateToCollection(order.getUserId());
-					orderQueryService.updateLoanOrder(orderValueObject);
+					orderQueryService.updateLoanOrderPlus(orderValueObject);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 催收更新应还款
+	 */
+	@Scheduled(cron = "0 40 0 * * ?") // 每天凌晨40
+	@RequestMapping("/collection_cal")
+	public void collectionCal() {
+		LoanOrderQueryVO query = new LoanOrderQueryVO();
+		query.setState(OrderState.collection);
+		int size = 2000;
+		long amount = orderQueryService.countAmount(query);
+		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
+		for (int page = 1; page <= pageCount; page++) {
+			List<LoanOrder> orderList = orderQueryService.findLoanOrderList(page, size, query);
+			try {
+				for (LoanOrder order : orderList) {
+					CalAmountUtil.shouldRepayAmount(order, System.currentTimeMillis());
+					orderQueryService.updateLoanOrderAmount(order.getId(), order.getOverdueDay(), order.getInterest(),
+							order.getShouldRepayAmount());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

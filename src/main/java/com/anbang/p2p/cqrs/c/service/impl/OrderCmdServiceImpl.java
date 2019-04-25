@@ -1,12 +1,9 @@
 package com.anbang.p2p.cqrs.c.service.impl;
 
+import com.anbang.p2p.cqrs.c.domain.order.*;
 import org.springframework.stereotype.Component;
 
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
-import com.anbang.p2p.cqrs.c.domain.order.OrderManager;
-import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
-import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
-import com.anbang.p2p.cqrs.c.domain.order.UserHasOrderAlreadyException;
 import com.anbang.p2p.cqrs.c.service.OrderCmdService;
 
 @Component
@@ -75,5 +72,14 @@ public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdServi
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
 		return orderManager.changeOrderStateClean(userId);
 	}
+
+	@Override
+	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+			throws OrderNotFoundException {
+		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
+		return orderManager.changeOrderStateByAdmin(userId, orderState);
+	}
+
+
 
 }

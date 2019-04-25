@@ -32,12 +32,12 @@ public class CalAmountUtil {
             // 逾期费用
             BigDecimal interest = b_amount.multiply(b_overdue_rate.multiply(b_day));
 
-            order.setOverdueTime(day);
+            order.setOverdueDay((int)day);
             order.setInterest(interest.doubleValue());
             order.setShouldRepayAmount(b_amount.add(interest).doubleValue());
             return ;
         } else {
-            order.setOverdueTime(0);
+            order.setOverdueDay(0);
             order.setInterest(0);
             order.setShouldRepayAmount(order.getAmount());
             return;

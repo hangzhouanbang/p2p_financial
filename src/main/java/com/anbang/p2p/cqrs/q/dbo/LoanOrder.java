@@ -39,7 +39,7 @@ public class LoanOrder {
 	private String ipAddress;
 
 	private double interest;	//利息
-	private long overdueTime;	//逾期时长
+	private int overdueDay;	//逾期时长
 	private double shouldRepayAmount;	//应还金额
 
 	private boolean export;  	// 是否导出
@@ -343,12 +343,12 @@ public class LoanOrder {
 		this.interest = interest;
 	}
 
-	public long getOverdueTime() {
-		return overdueTime;
+	public int getOverdueDay() {
+		return overdueDay;
 	}
 
-	public void setOverdueTime(long overdueTime) {
-		this.overdueTime = overdueTime;
+	public void setOverdueDay(int overdueDay) {
+		this.overdueDay = overdueDay;
 	}
 
 	public double getShouldRepayAmount() {

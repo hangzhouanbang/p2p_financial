@@ -23,4 +23,6 @@ public interface LoanOrderDao {
 	void updateExportState(String id, boolean export);
 
 	List<LoanOrder> listByIds(String[] ids);
+
+	void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount);
 }

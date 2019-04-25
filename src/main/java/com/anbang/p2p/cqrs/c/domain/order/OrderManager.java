@@ -186,4 +186,17 @@ public class OrderManager {
 		return new OrderValueObject(order);
 	}
 
+	/**
+	 * 管理员变更状态
+	 */
+	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+			throws OrderNotFoundException {
+		if (!userIdOrderMap.containsKey(userId)) {
+			throw new OrderNotFoundException();
+		}
+		Order order = userIdOrderMap.get(userId);
+		order.setState(orderState);
+		return new OrderValueObject(order);
+	}
+
 }

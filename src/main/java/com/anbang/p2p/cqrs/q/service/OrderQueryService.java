@@ -36,6 +36,10 @@ public class OrderQueryService {
 	@Autowired
 	private OrderContractDao orderContractDao;
 
+	public void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount) {
+		loanOrderDao.updateLoanOrderAmount(id, overdueDay, interest, shouldRepayAmount);
+	}
+
 	public LoanOrder saveLoanOrder(OrderValueObject orderValueObject, UserDbo user, OrderContract contract,
 			UserBaseInfo baseInfo, String loginIp, String ipAddress) {
 		LoanOrder loanOrder = new LoanOrder(orderValueObject, user, contract, baseInfo);

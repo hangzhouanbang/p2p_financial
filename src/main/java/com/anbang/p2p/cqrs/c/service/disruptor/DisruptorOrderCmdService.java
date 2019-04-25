@@ -1,5 +1,6 @@
 package com.anbang.p2p.cqrs.c.service.disruptor;
 
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -212,6 +213,26 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 				throw (OrderNotFoundException) e;
 			} else if (e instanceof IllegalOperationException) {
 				throw (IllegalOperationException) e;
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	@Override
+	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+			throws OrderNotFoundException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateByAdmin",
+				userId, orderState);
+		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateByAdmin(cmd.getParameter(), cmd.getParameter());
+			return orderValueObject;
+		});
+		try {
+			return result.getResult();
+		} catch (Exception e) {
+			if (e instanceof OrderNotFoundException) {
+				throw (OrderNotFoundException) e;
 			} else {
 				throw new RuntimeException(e);
 			}

@@ -151,4 +151,15 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		query.addCriteria(Criteria.where("id").in(ids));
 		return mongoTemplate.find(query, LoanOrder.class);
 	}
+
+	@Override
+	public void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(id));
+		Update update = new Update();
+		update.set("overdueDay", overdueDay);
+		update.set("interest", interest);
+		update.set("shouldRepayAmount", shouldRepayAmount);
+		mongoTemplate.updateFirst(query, update, LoanOrder.class);
+	}
 }

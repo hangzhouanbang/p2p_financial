@@ -2,6 +2,7 @@ package com.anbang.p2p.cqrs.c.service;
 
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
 import com.anbang.p2p.cqrs.c.domain.order.UserHasOrderAlreadyException;
 
@@ -31,4 +32,7 @@ public interface OrderCmdService {
 
 	OrderValueObject changeOrderStateClean(String userId)
 			throws OrderNotFoundException, IllegalOperationException;
+
+	OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+			throws OrderNotFoundException;
 }

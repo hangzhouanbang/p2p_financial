@@ -43,7 +43,7 @@ public class ExcelUtils {
 			row.createCell(2).setCellValue(vo.getIDcard());
 			row.createCell(3).setCellValue(vo.getPhone());
 			row.createCell(4).setCellValue(vo.getAmount());
-			row.createCell(5).setCellValue(vo.getOverdueTime() + "天");
+			row.createCell(5).setCellValue(vo.getOverdueDay() + "天");
 			row.createCell(6).setCellValue(vo.getInterest());
 			row.createCell(7).setCellValue(vo.getOverdue_rate());
 			row.createCell(8).setCellValue(vo.getShouldRepayAmount());
@@ -91,7 +91,7 @@ public class ExcelUtils {
 		row.createCell(2).setCellValue(vo.getIDcard());
 		row.createCell(3).setCellValue(vo.getPhone());
 		row.createCell(4).setCellValue(vo.getAmount());
-		row.createCell(5).setCellValue(vo.getOverdueTime() + "天");
+		row.createCell(5).setCellValue(vo.getOverdueDay() + "天");
 		row.createCell(6).setCellValue(vo.getInterest());
 		row.createCell(7).setCellValue(vo.getOverdue_rate());
 		row.createCell(8).setCellValue(vo.getShouldRepayAmount());

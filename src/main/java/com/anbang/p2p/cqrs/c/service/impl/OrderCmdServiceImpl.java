@@ -13,12 +13,12 @@ import com.anbang.p2p.cqrs.c.service.OrderCmdService;
 public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdService {
 
 	@Override
-	public OrderValueObject createOrder(String userId, String payType, String payAccount, Double amount, Double service_charge_rate,
-			Long freeTimeOfInterest, Long overdue, Double overdue_rate, Double rate, Integer dayNum, String contractId,
+	public OrderValueObject createOrder(String userId, String payType, String payAccount, Double amount, Double service_charge,
+			Long freeTimeOfInterest, Long overdue, Double overdue_rate, Integer dayNum, String contractId, Double expand_charge,
 			Long currentTime) throws UserHasOrderAlreadyException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.createOrder(userId, payType, payAccount, amount, service_charge_rate, freeTimeOfInterest, overdue,
-				overdue_rate, rate, dayNum, contractId, currentTime);
+		return orderManager.createOrder(userId, payType, payAccount, amount, service_charge, freeTimeOfInterest, overdue,
+				overdue_rate, dayNum, contractId, expand_charge, currentTime);
 	}
 
 	@Override

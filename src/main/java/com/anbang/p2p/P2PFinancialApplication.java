@@ -5,6 +5,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,6 +18,8 @@ import com.anbang.p2p.cqrs.c.service.disruptor.SnapshotJsonUtil;
 import com.anbang.p2p.init.InitProcessor;
 import com.dml.users.UserSessionsManager;
 import com.highto.framework.ddd.SingletonEntityRepository;
+
+import javax.servlet.MultipartConfigElement;
 
 @SpringBootApplication
 @EnableScheduling
@@ -81,6 +84,17 @@ public class P2PFinancialApplication {
 				processCoreCommandEventHandler(), singletonEntityRepository(), applicationContext);
 		initProcessor.init();
 		return initProcessor;
+	}
+
+	/**
+	 * 配置文件上传大小
+	 */
+	@Bean
+	public MultipartConfigElement getMultiConfig() {
+		MultipartConfigFactory factory = new MultipartConfigFactory();
+		factory.setMaxFileSize("50MB");
+		factory.setMaxRequestSize("50MB");
+		return factory.createMultipartConfig();
 	}
 
 	public static void main(String[] args) {

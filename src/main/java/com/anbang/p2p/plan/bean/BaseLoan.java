@@ -5,16 +5,19 @@ package com.anbang.p2p.plan.bean;
  */
 public class BaseLoan {
 	public static double baseLimit = 0.2;// 基本额度
-	public static double service_charge_rate = 0.02;// 手续费比例
+	public static double service_charge = 200;// 借款手续费
+	public static double expand_charge = 100;	//延期手续费
 	public static long overdue = 24L * 60 * 60 * 1000 * 7;// 逾期转催收时间
 	public static long freeTimeOfInterest = 24L * 60 * 60 * 1000 * 3;// 免息时间
 	public static double overdue_rate = 0.002;// 逾期利率
 
-	public static void change(double baseLimit, double service_charge_rate, long overdue, long freeTimeOfInterest) {
+	public static void change(double baseLimit, double service_charge, double expand_charge, long overdue,
+							  long freeTimeOfInterest, double overdue_rate) {
 		BaseLoan.baseLimit = baseLimit;
-		BaseLoan.service_charge_rate = service_charge_rate;
+		BaseLoan.service_charge = service_charge;
+		BaseLoan.expand_charge = expand_charge;
 		BaseLoan.overdue = overdue;
 		BaseLoan.freeTimeOfInterest = freeTimeOfInterest;
-//		BaseLoan.overdue_rate = overdue_rate;
+		BaseLoan.overdue_rate = overdue_rate;
 	}
 }

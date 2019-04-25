@@ -8,4 +8,6 @@ public interface MobileVerifyDao {
 
     MobileVerify getById(String id);
 
+    void updateStateAndData(String id, String state, String report);
+
 }

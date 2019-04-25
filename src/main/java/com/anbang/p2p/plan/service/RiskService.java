@@ -91,7 +91,7 @@ public class RiskService {
 //        loanOrderDao.save(loanOrder);
 
         // 更新用户正式姓名
-        userDboDao.updataVerify(userId, true, id_name);
+        userDboDao.updataVerify(userId, true, id_name, id_number);
 
         return data;
     }

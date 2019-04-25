@@ -7,10 +7,8 @@ public class OrderValueObject {
 	private String payAccount;
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
-	private double service_charge_rate;// 手续费比例
 	private long freeTimeOfInterest;// 免息时间
 	private long overdue;// 逾期转催收时间
-	private double rate;// 每日利率
 	private double overdue_rate;// 逾期利率
 	private OrderState state;// 卡密状态
 	private String contractId;// 订单合同
@@ -22,6 +20,10 @@ public class OrderValueObject {
 	private double realRefundAmount;// 实际还款
 	private long refundTime;// 实际还款日期
 
+	private double expand_charge; // 延期手续费
+	private double expandTotal;	  // 延期总费用
+	private int expandTimes;	  // 延期次数
+
 	public OrderValueObject(Order order) {
 		this.id = order.getId();
 		this.userId = order.getUserId();
@@ -29,10 +31,8 @@ public class OrderValueObject {
 		this.payAccount = order.getPayAccount();
 		this.amount = order.getAmount();
 		this.dayNum = order.getDayNum();
-		this.service_charge_rate = order.getService_charge_rate();
 		this.freeTimeOfInterest = order.getFreeTimeOfInterest();
 		this.overdue = order.getOverdue();
-		this.rate = order.getRate();
 		this.overdue_rate = order.getOverdue_rate();
 		this.state = order.getState();
 		this.contractId = order.getContractId();
@@ -43,6 +43,9 @@ public class OrderValueObject {
 		this.deliverTime = order.getDeliverTime();
 		this.realRefundAmount = order.getRealRefundAmount();
 		this.refundTime = order.getRefundTime();
+		this.expand_charge = order.getExpand_charge();
+		this.expandTotal = order.getExpandTotal();
+		this.expandTimes = order.getExpandTimes();
 	}
 
 	public String getId() {
@@ -93,14 +96,6 @@ public class OrderValueObject {
 		this.dayNum = dayNum;
 	}
 
-	public double getService_charge_rate() {
-		return service_charge_rate;
-	}
-
-	public void setService_charge_rate(double service_charge_rate) {
-		this.service_charge_rate = service_charge_rate;
-	}
-
 	public long getFreeTimeOfInterest() {
 		return freeTimeOfInterest;
 	}
@@ -115,14 +110,6 @@ public class OrderValueObject {
 
 	public void setOverdue(long overdue) {
 		this.overdue = overdue;
-	}
-
-	public double getRate() {
-		return rate;
-	}
-
-	public void setRate(double rate) {
-		this.rate = rate;
 	}
 
 	public double getOverdue_rate() {
@@ -205,4 +192,27 @@ public class OrderValueObject {
 		this.refundTime = refundTime;
 	}
 
+	public double getExpand_charge() {
+		return expand_charge;
+	}
+
+	public void setExpand_charge(double expand_charge) {
+		this.expand_charge = expand_charge;
+	}
+
+	public double getExpandTotal() {
+		return expandTotal;
+	}
+
+	public void setExpandTotal(double expandTotal) {
+		this.expandTotal = expandTotal;
+	}
+
+	public int getExpandTimes() {
+		return expandTimes;
+	}
+
+	public void setExpandTimes(int expandTimes) {
+		this.expandTimes = expandTimes;
+	}
 }

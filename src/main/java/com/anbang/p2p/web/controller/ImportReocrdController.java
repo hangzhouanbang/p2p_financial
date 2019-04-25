@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.List;
 
 @CrossOrigin
@@ -113,16 +115,30 @@ public class ImportReocrdController {
      * excel 销账导入
      */
     @RequestMapping("/repayImport")
-    public CommonVO repayImport(MultipartHttpServletRequest request) {
-
+    public CommonVO repayImport(@RequestParam(value="filename") MultipartFile file) {
         try {
-            List<FileEntity> list = FileUtils.getFilesFromRequest(request);
-            if (list == null || list.size() == 0) {
-                return CommonVOUtil.error("文件错误");
-            }
-            FileEntity fileEntity = list.get(0);
-            Workbook workbook = ImprotExcelUtil.checkExcel(fileEntity);
 
+            InputStream inputstream = file.getInputStream();
+            if (!(inputstream.markSupported())) {
+                inputstream = new PushbackInputStream(inputstream, 8);
+            }
+
+            String fileName = file.getOriginalFilename();
+            String prefix =
+                    fileName.lastIndexOf(".") >= 1 ? fileName.substring(fileName.lastIndexOf(".") + 1)
+                            : null;
+            FileEntity fileEntity = new FileEntity();
+            fileEntity.setInputStream(inputstream);
+            fileEntity.setFileType(prefix);
+            fileEntity.setFileName(fileName);
+
+//            List<FileEntity> list = FileUtils.getFilesFromRequest(request);
+//            if (list == null || list.size() == 0) {
+//                return CommonVOUtil.error("文件错误");
+//            }
+//            FileEntity fileEntity = list.get(0);
+
+            Workbook workbook = ImprotExcelUtil.checkExcel(fileEntity);
             importRecordService.saveImprotMaterial(workbook, fileEntity.getFileName());
             return CommonVOUtil.success("success");
         } catch (Exception e) {

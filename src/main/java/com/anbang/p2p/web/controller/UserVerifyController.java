@@ -3,16 +3,13 @@ package com.anbang.p2p.web.controller;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletResponse;
-
 import com.anbang.p2p.conf.VerifyConfig;
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.plan.bean.MobileVerify;
 import com.anbang.p2p.plan.bean.VerifyRecord;
-import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.*;
-import org.apache.commons.lang3.StringUtils;
+import com.anbang.p2p.util.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +19,6 @@ import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.plan.service.BaseVerifyService;
 import com.anbang.p2p.web.vo.CommonVO;
-import com.google.gson.Gson;
 
 @CrossOrigin
 @RestController
@@ -33,16 +29,13 @@ public class UserVerifyController {
 	private UserAuthService userAuthService;
 
 	@Autowired
-	private BaseVerifyService baseVerifyService;
-
-	@Autowired
 	private UserAuthQueryService userAuthQueryService;
 
 	@Autowired
 	private VerifyRecordService verifyRecordService;
 
 	@Autowired
-	private MobileDemo mobileDemo;
+	private MobileServiceUtil mobileServiceUtil;
 
 	/**
 	 * 云慧眼加密加签
@@ -150,7 +143,7 @@ public class UserVerifyController {
 		mobileVerify.setCreateTime(System.currentTimeMillis());
 
 		try {
-			String key =  mobileDemo.startTask(userId, baseInfo.getIDcard(), baseInfo.getRealName(), username, password);
+			String key =  mobileServiceUtil.startTask(userId, baseInfo.getIDcard(), baseInfo.getRealName(), username, password);
 			mobileVerify.setToken(key);
 			userAuthQueryService.saveMobileVerify(mobileVerify);
 			return CommonVOUtil.success(key,"success");
@@ -170,13 +163,17 @@ public class UserVerifyController {
 			return CommonVOUtil.error("invalid token");
 		}
 
+		if (StringUtils.isBlank(input)) {
+			return CommonVOUtil.invalidParam();
+		}
+
 		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
 		if (mobileVerify == null) {
 			return CommonVOUtil.error("认证异常");
 		}
 
 		try {
-			String query_token = mobileDemo.input(mobileVerify.getToken(), input);
+			String query_token = mobileServiceUtil.input(mobileVerify.getToken(), input);
 			return CommonVOUtil.success(query_token,"success");
 		} catch (Exception e) {
 			e.printStackTrace();

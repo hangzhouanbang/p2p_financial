@@ -17,8 +17,7 @@ public class LoanOrder {
 	private String payAccount;
 	private String IDcard;	//身份证号码
 	private double amount;// 贷款金额
-	private int dayNum;// 贷款天数
-	private double service_charge_rate;// 手续费比例
+	private int dayNum;// 贷款天数discard
 	private long freeTimeOfInterest;// 免息时间
 	private long overdue;// 逾期转催收时间
 	private double rate;// 每日利率
@@ -45,6 +44,10 @@ public class LoanOrder {
 
 	private boolean export;  	// 是否导出
 
+	private double expand_charge; // 延期手续费
+	private double expandTotal;	  // 延期总费用
+	private int expandTimes;	  // 延期次数
+
 	public LoanOrder() {
 
 	}
@@ -61,10 +64,8 @@ public class LoanOrder {
 		this.IDcard = baseInfo.getIDcard();
 		this.amount = orderValueObject.getAmount();
 		this.dayNum = orderValueObject.getDayNum();
-		this.service_charge_rate = orderValueObject.getService_charge_rate();
 		this.freeTimeOfInterest = orderValueObject.getFreeTimeOfInterest();
 		this.overdue = orderValueObject.getOverdue();
-		this.rate = orderValueObject.getRate();
 		this.overdue_rate = orderValueObject.getOverdue_rate();
 		this.state = orderValueObject.getState();
 		this.contract = contract;
@@ -75,6 +76,10 @@ public class LoanOrder {
 		this.deliverTime = orderValueObject.getDeliverTime();
 		this.realRefundAmount = orderValueObject.getRealRefundAmount();
 		this.refundTime = orderValueObject.getRefundTime();
+
+		this.expand_charge = orderValueObject.getExpand_charge();
+		this.expandTotal = orderValueObject.getExpandTotal();
+		this.expandTimes = orderValueObject.getExpandTimes();
 	}
 
 	/**
@@ -183,14 +188,6 @@ public class LoanOrder {
 
 	public void setDayNum(int dayNum) {
 		this.dayNum = dayNum;
-	}
-
-	public double getService_charge_rate() {
-		return service_charge_rate;
-	}
-
-	public void setService_charge_rate(double service_charge_rate) {
-		this.service_charge_rate = service_charge_rate;
 	}
 
 	public long getFreeTimeOfInterest() {
@@ -360,5 +357,29 @@ public class LoanOrder {
 
 	public void setShouldRepayAmount(double shouldRepayAmount) {
 		this.shouldRepayAmount = shouldRepayAmount;
+	}
+
+	public double getExpand_charge() {
+		return expand_charge;
+	}
+
+	public void setExpand_charge(double expand_charge) {
+		this.expand_charge = expand_charge;
+	}
+
+	public double getExpandTotal() {
+		return expandTotal;
+	}
+
+	public void setExpandTotal(double expandTotal) {
+		this.expandTotal = expandTotal;
+	}
+
+	public int getExpandTimes() {
+		return expandTimes;
+	}
+
+	public void setExpandTimes(int expandTimes) {
+		this.expandTimes = expandTimes;
 	}
 }

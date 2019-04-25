@@ -21,7 +21,7 @@ public interface UserDboDao {
 
 	void updateIPById(String userId, String loginIp, String ipAddress);
 
-	void updataVerify(String userId, Boolean isVerify, String realName);
+	void updataVerify(String userId, Boolean isVerify, String realName, String IDcard);
 
 	// 更新借款、逾期次数
 	void updateCountAndState(String userId, Integer orderCount, Integer overdueCount, String state);

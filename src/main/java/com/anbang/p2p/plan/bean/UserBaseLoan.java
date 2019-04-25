@@ -6,10 +6,12 @@ package com.anbang.p2p.plan.bean;
 public class UserBaseLoan {
 	private String id;// userId
 	private double baseLimit;// 基本额度
-	private double service_charge_rate;// 手续费比例
-	private long overdue;// 逾期转催收时间
-	private long freeTimeOfInterest;// 免息时间
-	private double overdue_rate;	//逾期利率
+	public double service_charge;// 借款手续费
+	public double expand_charge ;	//延期手续费
+	private long overdue;// 逾期转催收时间 -
+	private long freeTimeOfInterest;// 免息时间-
+	private double overdue_rate;	//逾期利率-
+
 
 	public String getId() {
 		return id;
@@ -27,12 +29,20 @@ public class UserBaseLoan {
 		this.baseLimit = baseLimit;
 	}
 
-	public double getService_charge_rate() {
-		return service_charge_rate;
+	public double getService_charge() {
+		return service_charge;
 	}
 
-	public void setService_charge_rate(double service_charge_rate) {
-		this.service_charge_rate = service_charge_rate;
+	public void setService_charge(double service_charge) {
+		this.service_charge = service_charge;
+	}
+
+	public double getExpand_charge() {
+		return expand_charge;
+	}
+
+	public void setExpand_charge(double expand_charge) {
+		this.expand_charge = expand_charge;
 	}
 
 	public long getOverdue() {

@@ -3,6 +3,12 @@ package com.anbang.p2p.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.anbang.p2p.conf.OrgInfoConfig;
+import com.anbang.p2p.plan.bean.BaseLoan;
+import com.anbang.p2p.plan.bean.UserBaseLoan;
+import com.anbang.p2p.plan.dao.OrgInfoDao;
+import com.anbang.p2p.plan.service.BaseRateService;
+import com.anbang.p2p.util.CommonVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +33,9 @@ public class UserInfoController {
 
 	@Autowired
 	private UserAuthQueryService userAuthQueryService;
+
+	@Autowired
+	private BaseRateService baseRateService;
 
 	/**
 	 * 用户信息
@@ -157,5 +166,83 @@ public class UserInfoController {
 		vo.setData(data);
 		data.put("creditInfo", creditInfo);
 		return vo;
+	}
+
+	/**
+	 * 查询玩家基本设置
+	 */
+	@RequestMapping("/user_baseloan_query")
+	public CommonVO queryUserBaseLoan(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
+		Map data = new HashMap();
+		if (loan == null) {
+			data.put("id", userId);
+			data.put("baseLimit", BaseLoan.baseLimit);
+			data.put("service_charge", BaseLoan.service_charge);
+			data.put("expand_charge", BaseLoan.expand_charge);
+			data.put("overdue", BaseLoan.overdue / 24 / 60 / 60 / 1000);
+			data.put("freeTimeOfInterest", BaseLoan.freeTimeOfInterest / 24 / 60 / 60 / 1000);
+			data.put("overdue_rate", BaseLoan.overdue_rate * 1000);
+			return CommonVOUtil.success(data, "success");
+		} else {
+			data.put("id", userId);
+			data.put("baseLimit", loan.getBaseLimit());
+			data.put("service_charge", loan.getService_charge());
+			data.put("expand_charge", loan.getExpand_charge());
+			data.put("overdue", loan.getOverdue() / 24 / 60 / 60 / 1000);
+			data.put("freeTimeOfInterest", loan.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000);
+			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
+			return CommonVOUtil.success(data, "success");
+		}
+	}
+
+	/**
+	 * 查询玩家合同信息
+	 */
+	@RequestMapping("/queryContract")
+	public CommonVO queryContract(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		UserDbo userDbo = userAuthQueryService.findUserDboByUserId(userId);
+		if (userDbo == null) {
+			return CommonVOUtil.error("未进行身份认证");
+		}
+
+		Map data = new HashMap();
+		data.put("id_card", userDbo.getIDcard());
+		data.put("realName", userDbo.getRealName());
+
+		// TODO: 2019/4/25
+		data.put("org_name", OrgInfoConfig.org_name);
+		data.put("org_phone", OrgInfoConfig.org_phone);
+
+		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
+		if (loan == null) {
+			data.put("id", userId);
+			data.put("baseLimit", BaseLoan.baseLimit);
+			data.put("service_charge", BaseLoan.service_charge);
+			data.put("expand_charge", BaseLoan.expand_charge);
+			data.put("overdue", BaseLoan.overdue / 24 / 60 / 60 / 1000);
+			data.put("freeTimeOfInterest", BaseLoan.freeTimeOfInterest / 24 / 60 / 60 / 1000);
+			data.put("overdue_rate", BaseLoan.overdue_rate * 1000);
+			return CommonVOUtil.success(data, "success");
+		} else {
+			data.put("id", userId);
+			data.put("baseLimit", loan.getBaseLimit());
+			data.put("service_charge", loan.getService_charge());
+			data.put("expand_charge", loan.getExpand_charge());
+			data.put("overdue", loan.getOverdue() / 24 / 60 / 60 / 1000);
+			data.put("freeTimeOfInterest", loan.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000);
+			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
+			return CommonVOUtil.success(data, "success");
+		}
 	}
 }

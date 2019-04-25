@@ -121,7 +121,7 @@ public class OrderController {
 	 * 申请卡密
 	 */
 	@RequestMapping("/createorder")
-	public CommonVO createOrder(String token, String contractId, int dayNum, HttpServletRequest request) {
+	public CommonVO createOrder(String token, String contractId, HttpServletRequest request) {
 		CommonVO vo = new CommonVO();
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
@@ -162,6 +162,13 @@ public class OrderController {
 			return vo;
 		}
 
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+			vo.setSuccess(false);
+			vo.setMsg("lack mobile verify");
+			return vo;
+		}
+
 //		// TODO 合同认证
 		OrderContract contract = orderQueryService.findOrderContractById(contractId);
 		if (contract == null) {
@@ -170,30 +177,26 @@ public class OrderController {
 			return vo;
 		}
 
+
 		double amount = BaseLoan.baseLimit;
-		double service_charge_rate = BaseLoan.service_charge_rate;
+		double service_charge = BaseLoan.service_charge;
 		long freeTimeOfInterest = BaseLoan.freeTimeOfInterest;
 		long overdue = BaseLoan.overdue;
 		double overdue_rate = BaseLoan.overdue_rate;
+		double expand_charge = BaseLoan.expand_charge;
 		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
 		if (loan != null) {
 			amount = loan.getBaseLimit();
-			service_charge_rate = loan.getService_charge_rate();
+			service_charge = loan.getService_charge();
 			freeTimeOfInterest = loan.getFreeTimeOfInterest();
 			overdue = loan.getOverdue();
-//			overdue_rate = loan.get
+			overdue_rate = loan.getOverdue_rate();
 		}
 		try {
-			double rate = BaseRateOfInterest.getRateByDayNum(dayNum);
-//			double overdue_rate = BaseRateOfInterest.overdue_rate;
-			UserBaseRateOfInterest userBaseRateOfInterest = baseRateService.findUserBaseRateOfInterestByUserId(userId);
-			if (userBaseRateOfInterest != null) {
-				rate = userBaseRateOfInterest.getRateByDayNum(dayNum);
-				overdue_rate = userBaseRateOfInterest.getOverdue_rate();
-			}
 			// 生成卡密
+			int dayNum = (int) freeTimeOfInterest  / 1000 / 60 / 60 / 24;	// 借款天数
 			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, PayType.alipay, userDbo.getAlipayInfo().getAccount(), amount,
-					service_charge_rate, freeTimeOfInterest, overdue, overdue_rate, rate, dayNum, contractId,
+					service_charge, freeTimeOfInterest, overdue, overdue_rate, dayNum, contractId, expand_charge,
 					System.currentTimeMillis());
 
 			// IP记录
@@ -289,7 +292,7 @@ public class OrderController {
 				return CommonVOUtil.success(data, "不需要还款");
 			}
 
-			double amount = orderQueryService.queryRefundAmount(userId, System.currentTimeMillis());
+			double amount = loanOrder.getShouldRepayAmount();
 			data.put("amount", amount);
 			data.put("status", loanOrder.getState());
 			return CommonVOUtil.success(data,"success");

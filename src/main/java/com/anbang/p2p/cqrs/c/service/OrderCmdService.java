@@ -7,9 +7,9 @@ import com.anbang.p2p.cqrs.c.domain.order.UserHasOrderAlreadyException;
 
 public interface OrderCmdService {
 
-	OrderValueObject createOrder(String userId, String payType, String payAccount, Double amount, Double service_charge_rate,
-			Long freeTimeOfInterest, Long overdue, Double overdue_rate, Double rate, Integer dayNum, String contractId,
-			Long currentTime) throws UserHasOrderAlreadyException;
+	OrderValueObject createOrder(String userId, String payType, String payAccount, Double amount, Double service_charge,
+			Long freeTimeOfInterest, Long overdue, Double overdue_rate, Integer dayNum, String contractId,
+			Double expand_charge, Long currentTime) throws UserHasOrderAlreadyException;
 
 	OrderValueObject refuseOrder(String userId) throws OrderNotFoundException, IllegalOperationException;
 

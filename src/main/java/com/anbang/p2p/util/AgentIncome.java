@@ -88,10 +88,10 @@ public class AgentIncome {
         System.out.println("payerror-------->" + json);
 
         return json;
-    }
+}
 
     public static void main(String[] args) {
-//        System.out.println(JSON.toJSONString(income(0.01, "0013", "alipay")));
+        System.out.println(JSON.toJSONString(income(0.15, "0025", "alipay")));
 
 //        System.out.println(queryIncome("5cb9d1b8bf89a21bfe8b45c6"));
         System.out.println("5cb9dc7abf89a2283ad3b3a0".length());

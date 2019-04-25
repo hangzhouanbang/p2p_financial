@@ -17,8 +17,8 @@ public class OrderManager {
 	/**
 	 * 申请卡密
 	 */
-	public OrderValueObject createOrder(String userId, String payType, String payAccount, double amount, double service_charge_rate,
-			long freeTimeOfInterest, long overdue, double overdue_rate, double rate, int dayNum, String contractId,
+	public OrderValueObject createOrder(String userId, String payType, String payAccount, double amount, double service_charge,
+			long freeTimeOfInterest, long overdue, double overdue_rate, int dayNum, String contractId, double expand_charge,
 			long currentTime) throws UserHasOrderAlreadyException {
 		if (userIdOrderMap.containsKey(userId)) {
 			throw new UserHasOrderAlreadyException();
@@ -34,15 +34,17 @@ public class OrderManager {
 		order.setPayAccount(payAccount);
 		order.setAmount(amount);
 		order.setDayNum(dayNum);
-		order.setService_charge_rate(service_charge_rate);
 		order.setFreeTimeOfInterest(freeTimeOfInterest);
 		order.setContractId(contractId);
-		order.setRate(rate);
+
+		order.setService_charge(service_charge);
+		order.setExpand_charge(expand_charge);
+		order.setOverdue(overdue);
+
 		order.setOverdue_rate(overdue_rate);
 		order.setState(OrderState.check_by_fengkong);
 		order.setCreateTime(currentTime);
-		// 计算手续费
-		order.calculateServiceCharge();
+
 		// 计算实际到账金额
 		order.calculateRealAmount();
 		// 计算最大还款日期

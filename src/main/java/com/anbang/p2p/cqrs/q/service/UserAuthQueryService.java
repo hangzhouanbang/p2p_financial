@@ -163,4 +163,8 @@ public class UserAuthQueryService {
 	public MobileVerify getMobileVerify(String id) {
 		return mobileVerifyDao.getById(id);
 	}
+
+	public void updateStateAndData(String id, String state, String report) {
+		mobileVerifyDao.updateStateAndData(id, state, report);
+	}
 }

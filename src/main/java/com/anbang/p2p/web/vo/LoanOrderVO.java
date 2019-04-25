@@ -16,7 +16,6 @@ public class LoanOrderVO {
 	private String IDcard;	//身份证号码
 	private double amount;// 贷款金额
 	private int dayNum;// 贷款天数
-	private double service_charge_rate;// 手续费比例
 	private long freeTimeOfInterest;// 免息时间
 	private long overdue;// 逾期转催收时间
 	private double rate;// 每日利率
@@ -54,7 +53,6 @@ public class LoanOrderVO {
 		this.payAccount = loanOrder.getPayAccount();
 		this.amount = loanOrder.getAmount();
 		this.dayNum = loanOrder.getDayNum();
-		this.service_charge_rate = loanOrder.getService_charge_rate();
 		this.freeTimeOfInterest = loanOrder.getFreeTimeOfInterest();
 		this.overdue = loanOrder.getOverdue();
 		this.rate = loanOrder.getRate();
@@ -151,14 +149,6 @@ public class LoanOrderVO {
 
 	public void setDayNum(int dayNum) {
 		this.dayNum = dayNum;
-	}
-
-	public double getService_charge_rate() {
-		return service_charge_rate;
-	}
-
-	public void setService_charge_rate(double service_charge_rate) {
-		this.service_charge_rate = service_charge_rate;
 	}
 
 	public long getFreeTimeOfInterest() {

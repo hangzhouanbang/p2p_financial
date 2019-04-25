@@ -101,7 +101,7 @@ public class MongodbUserDboDao implements UserDboDao {
 	}
 
 	@Override
-	public void updataVerify(String userId, Boolean isVerify, String realName) {
+	public void updataVerify(String userId, Boolean isVerify, String realName, String IDcard) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("id").is(userId));
 		Update update = new Update();
@@ -112,6 +112,11 @@ public class MongodbUserDboDao implements UserDboDao {
 		if (StringUtils.isNotBlank(realName)) {
 			update.set("realName", realName);
 		}
+
+		if (StringUtils.isNotBlank(IDcard)) {
+			update.set("IDcard", IDcard);
+		}
+
 		mongoTemplate.updateFirst(query, update, UserDbo.class);
 	}
 

@@ -41,11 +41,27 @@ public class OrderQueryService {
 		LoanOrder loanOrder = new LoanOrder(orderValueObject, user, contract, baseInfo);
 		loanOrder.setLoginIp(loginIp);
 		loanOrder.setIpAddress(ipAddress);
+
+		loanOrder.setShouldRepayAmount(loanOrder.getAmount());
 		loanOrderDao.save(loanOrder);
 		return loanOrder;
 	}
 
 	public LoanOrder updateLoanOrder(OrderValueObject orderValueObject) {
+		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
+		loanOrder.setState(orderValueObject.getState());
+		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
+		loanOrder.setRealRefundAmount(orderValueObject.getRealRefundAmount());
+		loanOrder.setRefundTime(orderValueObject.getRefundTime());
+		loanOrderDao.save(loanOrder);
+
+		userDboDao.updateUserState(loanOrder.getUserId(), loanOrder.getState().name());
+
+		return loanOrder;
+	}
+
+	// 需要更新还款金额的更新
+	public LoanOrder updateLoanOrderPlus(OrderValueObject orderValueObject) {
 		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
 		loanOrder.setState(orderValueObject.getState());
 		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
@@ -92,34 +108,7 @@ public class OrderQueryService {
 		if (currentTime < order.getDeliverTime()) {
 			throw new IllegalOperationException();
 		}
-		// 如果需要精确计算，非要用String来够造BigDecimal不可
-		BigDecimal b_amount = new BigDecimal(Double.toString(order.getAmount()));
-		BigDecimal b_rate = new BigDecimal(Double.toString(order.getRate()));
-		BigDecimal b_freeOfInterest = new BigDecimal(
-				Long.toString(order.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000));
-		if (currentTime > order.getMaxLimitTime()) {
-			// 逾期应还:到期应还金额+逾期天数X本金X逾期利率
-			long limitDay = (order.getMaxLimitTime() - order.getDeliverTime()) / 1000 / 60 / 60 / 24;
-			BigDecimal b_limitDay = new BigDecimal(Long.toString(limitDay));
-			BigDecimal limit_num = b_limitDay.subtract(b_freeOfInterest);
-			BigDecimal amount = b_amount.add(b_amount.multiply(b_rate.multiply(limit_num)));
-
-			long day = (currentTime - order.getMaxLimitTime()) / 1000 / 60 / 60 / 24;
-			BigDecimal b_day = new BigDecimal(Long.toString(day));
-			BigDecimal b_overdue_rate = new BigDecimal(Double.toString(order.getOverdue_rate()));
-			return amount.add(b_amount.multiply(b_overdue_rate.multiply(b_day))).doubleValue();
-		} else {
-			// 到期应还:本金X相应借款天数利率X（借款天数-免息天数）+本金
-			long day = (currentTime - order.getDeliverTime()) / 1000 / 60 / 60 / 24;
-			BigDecimal b_day = new BigDecimal(Long.toString(day));
-			BigDecimal num = b_day.subtract(b_freeOfInterest);
-
-			// 小于免息时间，则还本金
-			if (b_day.compareTo(b_freeOfInterest) == -1 ) {
-				return b_amount.doubleValue();
-			}
-			return b_amount.add(b_amount.multiply(b_rate.multiply(num))).doubleValue();
-		}
+		return order.getShouldRepayAmount();
 	}
 
 	public LoanOrder findLoanOrderByUserIdAndState(String userId, OrderState state) {

@@ -2,7 +2,6 @@ package com.anbang.p2p.util;
 
 import com.anbang.p2p.exception.CheckAPIException;
 import com.anbang.p2p.util.common.AbstractCredit;
-import com.anbang.p2p.util.common.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -18,7 +17,7 @@ import java.util.List;
  * @version v1.2.0
  */
 @Service
-public class MobileDemo extends AbstractCredit {
+public class MobileServiceUtil extends AbstractCredit {
 
     //业务参数
     public static final String method = "api.mobile.get";//请求接口
@@ -32,7 +31,7 @@ public class MobileDemo extends AbstractCredit {
     public static void main(String[] args) throws Exception {
 
         //启动信服务
-        MobileDemo service  = new MobileDemo();
+//        MobileServiceUtil service  = new MobileServiceUtil();
 //        service.startTask("123458678","230804199610160531","张正阳","15645181047","303823");
 
 //        service.input("c0f04adc8cb04293863c94994a817a9f","498637");
@@ -120,8 +119,8 @@ public class MobileDemo extends AbstractCredit {
         String code = rootNode.get("code").textValue();
 
         if("0000".equals(code)) {//受理成功
-            String query_token = rootNode.get("token").textValue();
-            return query_token;
+            String data = rootNode.get("data").textValue();
+            return data;
         } else {
             System.out.println("查询失败");
             throw new CheckAPIException(json);

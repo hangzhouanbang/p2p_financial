@@ -11,6 +11,7 @@ public class UserDbo {
 	private AlipayInfo alipayInfo;	//支付宝账号信息
 	private Boolean isVerify;	//实名
 	private String realName;	//真实姓名
+	private String IDcard;
 	private long createTime;	//注册日期
 	private int orderCount;		//借款次数
 	private int overdueCount;	// 逾期次数
@@ -121,5 +122,13 @@ public class UserDbo {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	public String getIDcard() {
+		return IDcard;
+	}
+
+	public void setIDcard(String IDcard) {
+		this.IDcard = IDcard;
 	}
 }

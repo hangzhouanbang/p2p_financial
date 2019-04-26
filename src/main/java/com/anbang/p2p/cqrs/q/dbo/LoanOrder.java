@@ -47,6 +47,7 @@ public class LoanOrder {
 	private double expand_charge; // 延期手续费
 	private double expandTotal;	  // 延期总费用
 	private int expandTimes;	  // 延期次数
+	private String contractPath;
 
 	public LoanOrder() {
 
@@ -80,6 +81,7 @@ public class LoanOrder {
 		this.expand_charge = orderValueObject.getExpand_charge();
 		this.expandTotal = orderValueObject.getExpandTotal();
 		this.expandTimes = orderValueObject.getExpandTimes();
+		this.contractPath = "http://47.91.219.7/p2p/docs/orders/" + id + ".docx";		//temp
 	}
 
 	/**
@@ -399,5 +401,13 @@ public class LoanOrder {
 
 	public void setExpandTimes(int expandTimes) {
 		this.expandTimes = expandTimes;
+	}
+
+	public String getContractPath() {
+		return contractPath;
+	}
+
+	public void setContractPath(String contractPath) {
+		this.contractPath = contractPath;
 	}
 }

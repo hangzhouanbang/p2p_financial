@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.constants.PayType;
+import com.anbang.p2p.constants.PaymentType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.q.dao.UserDboDao;
@@ -18,6 +19,7 @@ import com.anbang.p2p.cqrs.q.dbo.*;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
 import com.anbang.p2p.plan.bean.*;
 import com.anbang.p2p.plan.dao.LeaveWordDao;
+import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -70,52 +72,6 @@ public class OrderController {
 	private LeaveWordDao leaveWordDao;
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
-
-	/**
-	 * 查询提示
-	 */
-	@RequestMapping("/queryOrderTip")
-	public CommonVO queryOrderTip(String token) {
-		String userId = userAuthService.getUserIdBySessionId(token);
-		if (userId == null) {
-			return CommonVOUtil.invalidToken();
-		}
-		LoanOrder loanOrder = orderQueryService.findLastOrderByUserId(userId);
-		if (loanOrder == null) {
-			return CommonVOUtil.success("init");
-		}
-
-		if (OrderState.refund.equals(loanOrder.getState())) {
-			long maxLimitTime = loanOrder.getMaxLimitTime();
-			long nowTIme = System.currentTimeMillis();
-			double flag = TimeUtils.repayTime(maxLimitTime, nowTIme);
-			if (flag > 1 && flag < 2) {
-				return CommonVOUtil.success(Notification.getMap().get("repayDay").toString());
-			}
-			if (flag > 0 && flag < 1) {
-				return CommonVOUtil.success(Notification.getMap().get("repayFront").toString());
-			}
-		}
-		if (OrderState.clean.equals(loanOrder.getState())) {
-			return CommonVOUtil.success(Notification.getMap().get("repaySuccess").toString());
-		}
-		if (OrderState.overdue.equals(loanOrder.getState())) {
-			double flag = TimeUtils.repayTime(System.currentTimeMillis(), loanOrder.getMaxLimitTime());
-			if (flag > 15) {
-				return CommonVOUtil.success(Notification.getMap().get("beyond15").toString());
-			}
-			if (flag > 7) {
-				return CommonVOUtil.success(Notification.getMap().get("beyond7").toString());
-			}
-			if (flag > 3) {
-				return CommonVOUtil.success(Notification.getMap().get("beyond3").toString());
-			}
-			if (flag > 1) {
-				return CommonVOUtil.success(Notification.getMap().get("beyond1").toString());
-			}
-		}
-		return CommonVOUtil.success("init");
-	}
 
 	/**
 	 * 申请卡密
@@ -204,8 +160,8 @@ public class OrderController {
 			String ipAddress = IPAddressUtil.getIPAddress(loginIp);
 			LoanOrder loanOrder = orderQueryService.saveLoanOrder(orderValueObject, user, contract, baseInfo, loginIp, ipAddress);
 
-			//风控
-			checkOrderByFengkong(loanOrder);
+			//获取风控，保存合同
+			riskAndContract(loanOrder);
 			userDboDao.updateCountAndState(userId, user.getOrderCount() + 1, null, OrderState.wait.name());
 		} catch (Exception e) {
 			vo.setSuccess(false);
@@ -237,6 +193,7 @@ public class OrderController {
 			amount = b.setScale(2, BigDecimal.ROUND_UP).doubleValue();
 
 			RefundInfo refundInfo = new RefundInfo(loanOrder, payType, amount);
+			refundInfo.setPaymentType(PaymentType.repay);
 			refundInfo.setStatus(CommonRecordState.INIT);
 			refundInfoService.save(refundInfo);
 			Map data = AgentIncome.income(amount, refundInfo.getId(), payType);
@@ -249,7 +206,6 @@ public class OrderController {
 			e.printStackTrace();
 		}
 		return CommonVOUtil.systemException();
-
 	}
 
 	/**
@@ -306,6 +262,45 @@ public class OrderController {
 		}
 	}
 
+	@RequestMapping("/getExpandUrl")
+	public CommonVO getExpandUrl(String token, String payType) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		if (!"alipay".equals(payType) && !"wechat".equals(payType)) {
+			return CommonVOUtil.error("payTypeError");
+		}
+
+		LoanOrder order = orderQueryService.findLastOrderByUserId(userId);
+		if (order == null) {
+			return CommonVOUtil.error("OrderNotFoundException");
+		}
+
+		try {
+			if (OrderState.refund.equals(order.getState()) || OrderState.overdue.equals(order.getState()) ||
+					OrderState.collection.equals(order.getState())) {
+				double amount = order.getExpand_charge();
+				BigDecimal b = new BigDecimal(amount);
+				amount = b.setScale(2, BigDecimal.ROUND_UP).doubleValue();
+
+				RefundInfo refundInfo = new RefundInfo(order, payType, amount);
+				refundInfo.setPaymentType(PaymentType.expand);
+				refundInfo.setStatus(CommonRecordState.INIT);
+				refundInfoService.save(refundInfo);
+				Map data = AgentIncome.income(amount, refundInfo.getId(), payType);
+				return CommonVOUtil.success(data, "success");
+			}
+
+			return CommonVOUtil.error("orderStateError");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CommonVOUtil.systemException();
+
+	}
+
 	/**
 	 * 新增留言
 	 */
@@ -327,9 +322,9 @@ public class OrderController {
 	}
 
 	/**
-	 * 风控审核
+	 * 风控、合同保存
 	 */
-	private void checkOrderByFengkong(LoanOrder loanOrder) {
+	private void riskAndContract(LoanOrder loanOrder) {
 		executorService.submit(() -> {
 			try {
 				RiskInfo riskInfo = new RiskInfo();
@@ -349,6 +344,33 @@ public class OrderController {
 				OrderValueObject orderValueObject = orderCmdService
 						.changeOrderStateToCheck_by_admin(loanOrder.getUserId());
 				orderQueryService.updateLoanOrder(orderValueObject);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		// 保存合同
+		executorService.submit(() -> {
+			try {
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("${realName}", loanOrder.getRealName());
+				map.put("${card}", loanOrder.getIDcard());
+
+				OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
+				if (orgInfo != null) {
+					map.put("${org}", orgInfo.getOrgName());
+					map.put("${phone}", orgInfo.getPhone());
+				}
+
+				map.put("${amount}", String.valueOf(loanOrder.getAmount()));
+				map.put("${capital}", AmountToUpper.number2CNMontrayUnit(loanOrder.getAmount()));
+				map.put("${rate}", String.valueOf(loanOrder.getOverdue_rate() * 100));
+				map.put("${day}", String.valueOf(loanOrder.getFreeTimeOfInterest() / 24 * 60 * 60 * 1000));
+				map.put("${start}", TimeUtils.getStringDate(loanOrder.getDeliverTime()));
+				map.put("${end}", TimeUtils.getStringDate(loanOrder.getMaxLimitTime()));
+				String destPath = WordUtil.PATH + loanOrder.getId() + ".docx";
+		 		WordUtil.searchAndReplace(WordUtil.DEMO_PATH, destPath, map);
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

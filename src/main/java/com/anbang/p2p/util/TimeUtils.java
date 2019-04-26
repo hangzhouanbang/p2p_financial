@@ -17,10 +17,19 @@ public class TimeUtils {
         return sdf.format(date);
     }
 
+    /**
+     * 格式化日期字符串 yyyyMMddHHmmss
+     */
+    public static String getStringDate(long time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        return sdf.format(time);
+    }
+
     public static double repayTime (long maxTime, long nowTime) {
         Long compareTime = maxTime - nowTime;
         double midTime = Double.valueOf(compareTime.toString());
         double result = midTime / DAY_TIME;
         return result;
     }
+
 }

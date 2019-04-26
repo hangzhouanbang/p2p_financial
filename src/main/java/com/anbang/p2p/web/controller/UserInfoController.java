@@ -1,26 +1,29 @@
 package com.anbang.p2p.web.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.anbang.p2p.conf.OrgInfoConfig;
+import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import com.anbang.p2p.cqrs.q.dbo.*;
+import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.plan.bean.BaseLoan;
+import com.anbang.p2p.plan.bean.Notification;
 import com.anbang.p2p.plan.bean.OrgInfo;
 import com.anbang.p2p.plan.bean.UserBaseLoan;
 import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.plan.service.BaseRateService;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.TimeUtils;
+import com.anbang.p2p.web.vo.LoanOrderQueryVO;
+import com.highto.framework.web.page.ListPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anbang.p2p.cqrs.c.service.UserAuthService;
-import com.anbang.p2p.cqrs.q.dbo.UserAgentInfo;
-import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
-import com.anbang.p2p.cqrs.q.dbo.UserContacts;
-import com.anbang.p2p.cqrs.q.dbo.UserCreditInfo;
-import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.web.vo.CommonVO;
 
@@ -37,6 +40,87 @@ public class UserInfoController {
 
 	@Autowired
 	private BaseRateService baseRateService;
+
+	@Autowired
+	private OrderQueryService orderQueryService;
+
+
+	/**
+	 * 用户卡密
+	 */
+	@RequestMapping("/getOrder")
+	public CommonVO getOrder(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		LoanOrder loanOrder = orderQueryService.findLastOrderByUserId(userId);
+		loanOrder.setContractPath(null);
+		return CommonVOUtil.success(loanOrder, "success");
+	}
+
+	/**
+	 * 用户卡密list
+	 */
+	@RequestMapping("/listOrder")
+	public CommonVO listOrder(String token, int page, int size) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		LoanOrderQueryVO query = new LoanOrderQueryVO();
+		query.setUserId(userId);
+		ListPage listPage = orderQueryService.findLoanOrder(page, size, query);
+		return CommonVOUtil.success(listPage, "success");
+	}
+
+	/**
+	 * 查询提示
+	 */
+	@RequestMapping("/queryOrderTip")
+	public CommonVO queryOrderTip(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+		LoanOrder loanOrder = orderQueryService.findLastOrderByUserId(userId);
+		if (loanOrder == null) {
+			return CommonVOUtil.error("init");
+		}
+
+		if (OrderState.refund.equals(loanOrder.getState())) {
+			long maxLimitTime = loanOrder.getMaxLimitTime();
+			long nowTIme = System.currentTimeMillis();
+			double flag = TimeUtils.repayTime(maxLimitTime, nowTIme);
+			if (flag > 1 && flag < 2) {
+				return CommonVOUtil.success(Notification.getMap().get("repayDay").toString());
+			}
+			if (flag > 0 && flag < 1) {
+				return CommonVOUtil.success(Notification.getMap().get("repayFront").toString());
+			}
+		}
+//		if (OrderState.clean.equals(loanOrder.getState())) {
+//			return CommonVOUtil.success(Notification.getMap().get("repaySuccess").toString());
+//		}
+		if (OrderState.overdue.equals(loanOrder.getState())) {
+			double flag = TimeUtils.repayTime(System.currentTimeMillis(), loanOrder.getMaxLimitTime());
+			if (flag > 15) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond15").toString());
+			}
+			if (flag > 7) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond7").toString());
+			}
+			if (flag > 3) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond3").toString());
+			}
+			if (flag > 1) {
+				return CommonVOUtil.success(Notification.getMap().get("beyond1").toString());
+			}
+		}
+		return CommonVOUtil.error("init");
+	}
 
 	/**
 	 * 用户信息

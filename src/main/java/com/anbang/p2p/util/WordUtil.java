@@ -45,23 +45,23 @@ public class WordUtil {
             /**
              * 替换表格中的指定文字
              */
-//            Iterator<XWPFTable> itTable = document.getTablesIterator();
-//            while (itTable.hasNext()) {
-//                XWPFTable table = (XWPFTable) itTable.next();
-//                int count = table.getNumberOfRows();
-//                for (int i = 0; i < count; i++) {
-//                    XWPFTableRow row = table.getRow(i);
-//                    List<XWPFTableCell> cells = row.getTableCells();
-//                    for (XWPFTableCell cell : cells) {
-//                        for (Map.Entry<String, String> e : map.entrySet()) {
-//                            if (cell.getText().equals(e.getKey())) {
-//                                cell.removeParagraph(0);
-//                                cell.setText(e.getValue());
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            Iterator<XWPFTable> itTable = document.getTablesIterator();
+            while (itTable.hasNext()) {
+                XWPFTable table = (XWPFTable) itTable.next();
+                int count = table.getNumberOfRows();
+                for (int i = 0; i < count; i++) {
+                    XWPFTableRow row = table.getRow(i);
+                    List<XWPFTableCell> cells = row.getTableCells();
+                    for (XWPFTableCell cell : cells) {
+                        for (Map.Entry<String, String> e : map.entrySet()) {
+                            if (cell.getText().equals(e.getKey())) {
+                                cell.removeParagraph(0);
+                                cell.setText(e.getValue());
+                            }
+                        }
+                    }
+                }
+            }
             FileOutputStream outStream = null;
             outStream = new FileOutputStream(destPath);
             document.write(outStream);

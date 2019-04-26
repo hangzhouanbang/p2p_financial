@@ -3,6 +3,8 @@ package com.anbang.p2p.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.constants.ExpandType;
+import com.anbang.p2p.constants.PaymentType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderValueObject;
@@ -68,13 +70,19 @@ public class AgentNotifyController {
 
             OrderValueObject orderValueObject = null;
             try {
-                orderValueObject = orderCmdService.cleanOrder(refundInfo.getUserId(), amount, System.currentTimeMillis());
+
+                if (PaymentType.expand.equals(refundInfo.getPaymentType())) {  //客户延期
+                    orderValueObject = orderCmdService.addExpand(refundInfo.getUserId(), ExpandType.CLIENT);
+                    orderQueryService.updateLoanOrderExpand(orderValueObject);
+                } else { // 付款
+                    orderValueObject = orderCmdService.cleanOrder(refundInfo.getUserId(), amount, System.currentTimeMillis());
+                    orderQueryService.updateLoanOrder(orderValueObject);
+                }
             } catch (OrderNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalOperationException e) {
                 e.printStackTrace();
             }
-            orderQueryService.updateLoanOrder(orderValueObject);
             return "success";
         }
         RefundInfo refundInfo = refundInfoService.getById(out_order_no);

@@ -20,6 +20,9 @@ public class RefundInfo {
 
 	private String status;
 
+	private double expand_charge;	//延期手续费
+	private String paymentType;  // 付款类型:还款、延期
+
 	public RefundInfo() {
 	}
 
@@ -35,6 +38,7 @@ public class RefundInfo {
 		headimgurl = loanOrder.getHeadimgurl();
 		phone = loanOrder.getPhone();
 		realName = loanOrder.getRealName();
+		expand_charge = loanOrder.getExpand_charge();
 	}
 
 	public String getId() {
@@ -150,6 +154,19 @@ public class RefundInfo {
 		this.status = status;
 	}
 
+	public String getPaymentType() {
+		return paymentType;
+	}
 
+	public void setPaymentType(String paymentType) {
+		this.paymentType = paymentType;
+	}
 
+	public double getExpand_charge() {
+		return expand_charge;
+	}
+
+	public void setExpand_charge(double expand_charge) {
+		this.expand_charge = expand_charge;
+	}
 }

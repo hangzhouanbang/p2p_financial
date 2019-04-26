@@ -1,5 +1,6 @@
 package com.anbang.p2p.cqrs.c.service.impl;
 
+import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.cqrs.c.domain.order.*;
 import org.springframework.stereotype.Component;
 
@@ -80,6 +81,18 @@ public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdServi
 		return orderManager.changeOrderStateByAdmin(userId, orderState);
 	}
 
+	@Override
+	public OrderValueObject changeExpandFee(String userId, Double fee)
+			throws OrderNotFoundException {
+		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
+		return orderManager.changeExpandFee(userId, fee);
+	}
 
+	@Override
+	public OrderValueObject addExpand(String userId, ExpandType expandType)
+			throws OrderNotFoundException {
+		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
+		return orderManager.addExpand(userId, expandType);
+	}
 
 }

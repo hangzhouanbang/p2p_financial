@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.anbang.p2p.conf.OrgInfoConfig;
 import com.anbang.p2p.plan.bean.BaseLoan;
+import com.anbang.p2p.plan.bean.OrgInfo;
 import com.anbang.p2p.plan.bean.UserBaseLoan;
 import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.plan.service.BaseRateService;
@@ -244,5 +245,19 @@ public class UserInfoController {
 			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
 			return CommonVOUtil.success(data, "success");
 		}
+	}
+
+	/**
+	 * 查询玩家合同信息
+	 */
+	@RequestMapping("/getOrgInfo")
+	public CommonVO getOrgInfo(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
+		return CommonVOUtil.success(orgInfo, "success");
 	}
 }

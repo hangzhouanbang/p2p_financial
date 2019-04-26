@@ -295,6 +295,9 @@ public class OrderController {
 			double amount = loanOrder.getShouldRepayAmount();
 			data.put("amount", amount);
 			data.put("status", loanOrder.getState());
+			data.put("orderAmount", loanOrder.getAmount());
+			data.put("maxLimitTime", loanOrder.getMaxLimitTime());
+			data.put("overdueDay", loanOrder.getOverdueDay());
 			return CommonVOUtil.success(data,"success");
 		} catch (Exception e) {
 			vo.setSuccess(false);

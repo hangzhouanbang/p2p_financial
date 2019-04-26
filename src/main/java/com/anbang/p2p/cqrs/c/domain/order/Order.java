@@ -2,6 +2,7 @@ package com.anbang.p2p.cqrs.c.domain.order;
 
 import java.math.BigDecimal;
 
+import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 
 /**
@@ -32,14 +33,18 @@ public class Order {
 	private int expandTimes;	  // 延期次数
 
 
-	/**
-	 * 计算手续费：用户借款金额，实际到账金额是扣除手续费后的金额
-	 */
-//	public void calculateServiceCharge() {
-//		BigDecimal b_amount = new BigDecimal(Double.toString(amount));
-//		BigDecimal b_service_charge_rate = new BigDecimal(Double.toString(service_charge_rate));
-//		service_charge = b_amount.multiply(b_service_charge_rate).doubleValue();
-//	}
+	// 增加延期次数
+	public void addExpand(ExpandType expandType) {
+
+		if (ExpandType.ADMIN.equals(expandType)) {
+
+		}
+		if (ExpandType.CLIENT.equals(expandType)) {
+			expandTotal = expandTotal + expand_charge;
+		}
+		expandTimes ++;
+		maxLimitTime = maxLimitTime + freeTimeOfInterest;
+	}
 
 	/**
 	 * 计算实际到账金额:本金-手续费
@@ -58,41 +63,6 @@ public class Order {
 		maxLimitTime = freeTimeOfInterest + createTime;
 	}
 
-	/**
-	 * 计算应还款
-	 */
-//	public double calculateRefundAmount(long currentTime) throws IllegalOperationException {
-//		if (currentTime < deliverTime) {
-//			throw new IllegalOperationException();
-//		}
-//		// 如果需要精确计算，非要用String来够造BigDecimal不可
-//		BigDecimal b_amount = new BigDecimal(Double.toString(amount));
-//		BigDecimal b_rate = new BigDecimal(Double.toString(0));
-//		BigDecimal b_freeOfInterest = new BigDecimal(Long.toString(freeTimeOfInterest / 24 / 60 / 60 / 1000));
-//		if (currentTime > maxLimitTime) {
-//			// 逾期应还:到期应还金额+逾期天数X本金X逾期利率
-//			long limitDay = (maxLimitTime - deliverTime) / 1000 / 60 / 60 / 24;
-//			BigDecimal b_limitDay = new BigDecimal(Long.toString(limitDay));
-//			BigDecimal limit_num = b_limitDay.subtract(b_freeOfInterest);
-//			BigDecimal amount = b_amount.add(b_amount.multiply(b_rate.multiply(limit_num)));
-//
-//			long day = (currentTime - maxLimitTime) / 1000 / 60 / 60 / 24;
-//			BigDecimal b_day = new BigDecimal(Long.toString(day));
-//			BigDecimal b_overdue_rate = new BigDecimal(Double.toString(overdue_rate));
-//			return amount.add(b_amount.multiply(b_overdue_rate.multiply(b_day))).doubleValue();
-//		} else {
-//			// 到期应还:本金X相应借款天数利率X（借款天数-免息天数）+本金
-//			long day = (currentTime - deliverTime) / 1000 / 60 / 60 / 24;
-//			BigDecimal b_day = new BigDecimal(Long.toString(day));
-//			BigDecimal num = b_day.subtract(b_freeOfInterest);
-//
-//			// 小于免息时间，则还本金
-//			if (b_day.compareTo(b_freeOfInterest) == -1 ) {
-//				return b_amount.doubleValue();
-//			}
-//			return b_amount.add(b_amount.multiply(b_rate.multiply(num))).doubleValue();
-//		}
-//	}
 
 	public String getId() {
 		return id;

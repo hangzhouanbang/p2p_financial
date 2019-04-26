@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 
 /**
@@ -196,6 +197,33 @@ public class OrderManager {
 		}
 		Order order = userIdOrderMap.get(userId);
 		order.setState(orderState);
+		return new OrderValueObject(order);
+	}
+
+	/**
+	 * 管理员变更延期费
+	 */
+	public OrderValueObject changeExpandFee(String userId, double fee)
+			throws OrderNotFoundException {
+		if (!userIdOrderMap.containsKey(userId)) {
+			throw new OrderNotFoundException();
+		}
+		Order order = userIdOrderMap.get(userId);
+		double newExpandTotal = order.getExpandTotal() + fee;
+		order.setExpandTotal(newExpandTotal);
+		return new OrderValueObject(order);
+	}
+
+	/**
+	 * 管理员变更状态
+	 */
+	public OrderValueObject addExpand(String userId, ExpandType expandType)
+			throws OrderNotFoundException {
+		if (!userIdOrderMap.containsKey(userId)) {
+			throw new OrderNotFoundException();
+		}
+		Order order = userIdOrderMap.get(userId);
+		order.addExpand(expandType);
 		return new OrderValueObject(order);
 	}
 

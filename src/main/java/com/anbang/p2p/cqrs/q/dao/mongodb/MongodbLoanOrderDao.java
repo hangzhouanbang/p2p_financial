@@ -162,4 +162,12 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		update.set("shouldRepayAmount", shouldRepayAmount);
 		mongoTemplate.updateFirst(query, update, LoanOrder.class);
 	}
+
+	public void updateLoanOrderState(String id, OrderState orderState) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(id));
+		Update update = new Update();
+		update.set("state", orderState);
+		mongoTemplate.updateFirst(query, update, LoanOrder.class);
+	}
 }

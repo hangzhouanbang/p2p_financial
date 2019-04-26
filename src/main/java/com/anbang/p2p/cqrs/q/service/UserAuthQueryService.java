@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.plan.bean.MobileVerify;
+import com.anbang.p2p.plan.bean.OrgInfo;
 import com.anbang.p2p.plan.dao.MobileVerifyDao;
+import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,9 @@ public class UserAuthQueryService {
 
 	@Autowired
 	private MobileVerifyDao mobileVerifyDao;
+
+	@Autowired
+	private OrgInfoDao orgInfoDao;
 
 	/**
 	 * 创建用户并授权
@@ -166,5 +171,9 @@ public class UserAuthQueryService {
 
 	public void updateStateAndData(String id, String state, String report) {
 		mobileVerifyDao.updateStateAndData(id, state, report);
+	}
+
+	public OrgInfo getOrgInfo(String id) {
+		return orgInfoDao.getById(id);
 	}
 }

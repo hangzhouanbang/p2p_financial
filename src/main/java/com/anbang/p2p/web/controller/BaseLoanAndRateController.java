@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.anbang.p2p.plan.bean.OrgInfo;
+import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.util.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class BaseLoanAndRateController {
 
 	@Autowired
 	private BaseRateService baseRateService;
+
+	@Autowired
+	private OrgInfoDao orgInfoDao;
 
 	/**
 	 * 查询基础设置
@@ -119,5 +124,24 @@ public class BaseLoanAndRateController {
 			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
 			return CommonVOUtil.success(data, "success");
 		}
+	}
+
+	/**
+	 * 新增机构设置
+	 */
+	@RequestMapping("/saveOrgInfo")
+	public CommonVO saveOrgInfo(OrgInfo orgInfo) {
+		orgInfo.setId("001");
+		orgInfoDao.save(orgInfo);
+		return CommonVOUtil.success("success");
+	}
+
+	/**
+	 * 查询机构设置
+	 */
+	@RequestMapping("/getOrgInfo")
+	public CommonVO getOrgInfo() {
+		OrgInfo orgInfo = orgInfoDao.getById("001");
+		return CommonVOUtil.success(orgInfo, "success");
 	}
 }

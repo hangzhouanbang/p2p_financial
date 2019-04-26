@@ -1,5 +1,6 @@
 package com.anbang.p2p.cqrs.c.service;
 
+import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
@@ -34,5 +35,11 @@ public interface OrderCmdService {
 			throws OrderNotFoundException, IllegalOperationException;
 
 	OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+			throws OrderNotFoundException;
+
+	OrderValueObject changeExpandFee(String userId, Double fee)
+			throws OrderNotFoundException;
+
+	OrderValueObject addExpand(String userId, ExpandType expandType)
 			throws OrderNotFoundException;
 }

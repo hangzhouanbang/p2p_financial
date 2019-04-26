@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.zip.ZipOutputStream;
 
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.constants.ExpandType;
+import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
 import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
@@ -397,4 +399,33 @@ public class OrderManagerController {
 		return CommonVOUtil.systemException();
 	}
 
+	/**
+	 * 变更卡密状态
+	 */
+	@RequestMapping("/changeOrderStateByAdmin")
+	public CommonVO changeOrderStateByAdmin(String userId, OrderState orderState) {
+		try {
+			OrderValueObject object = orderCmdService.changeOrderStateByAdmin(userId, orderState);
+			orderQueryService.updateLoanOrderState(object.getId(), object.getState());
+			return CommonVOUtil.success("success");
+		} catch (OrderNotFoundException e) {
+			e.printStackTrace();
+			return CommonVOUtil.error("order error");
+		}
+	}
+
+	/**
+	 * 增加延期次数
+	 */
+	@RequestMapping("/addExpand")
+	public CommonVO addExpand(String userId) {
+		try {
+			OrderValueObject object = orderCmdService.addExpand(userId, ExpandType.ADMIN);
+			orderQueryService.updateLoanOrderExpand(object);
+			return CommonVOUtil.success("success");
+		} catch (OrderNotFoundException e) {
+			e.printStackTrace();
+			return CommonVOUtil.error("order error");
+		}
+	}
 }

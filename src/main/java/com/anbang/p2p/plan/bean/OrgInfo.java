@@ -1,13 +1,15 @@
 package com.anbang.p2p.plan.bean;
 
 /**
- * 管理员信息
+ * 机构信息
  */
 public class OrgInfo {
     private String id;
-    private String orgName;
-    private String phone;
-    private String servicePhone;
+    private String orgName;  // 机构名称
+    private String phone;    // 机构电话
+    private String servicePhone;    // 客服电话
+    private String serviceQQ;       // 客服qq
+    private String serviceWX;       // 客服微信
 
     public String getId() {
         return id;
@@ -39,5 +41,21 @@ public class OrgInfo {
 
     public void setServicePhone(String servicePhone) {
         this.servicePhone = servicePhone;
+    }
+
+    public String getServiceQQ() {
+        return serviceQQ;
+    }
+
+    public void setServiceQQ(String serviceQQ) {
+        this.serviceQQ = serviceQQ;
+    }
+
+    public String getServiceWX() {
+        return serviceWX;
+    }
+
+    public void setServiceWX(String serviceWX) {
+        this.serviceWX = serviceWX;
     }
 }

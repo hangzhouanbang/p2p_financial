@@ -83,6 +83,24 @@ public class LoanOrder {
 	}
 
 	/**
+	 * 判断当前订单状态
+	 */
+	public void checkState() {
+		if (OrderState.refund.equals(state) || OrderState.overdue.equals(state) || OrderState.collection.equals(state)) {
+			long nowTime = System.currentTimeMillis();
+			if (nowTime < maxLimitTime) {
+				state = OrderState.refund;
+				return;
+			}
+			if (nowTime > (maxLimitTime + overdue)) {
+				state = OrderState.collection;
+				return;
+			}
+			state = OrderState.overdue;
+		}
+	}
+
+	/**
 	 * 是否逾期
 	 */
 	public boolean isOverdue(long currentTime) {

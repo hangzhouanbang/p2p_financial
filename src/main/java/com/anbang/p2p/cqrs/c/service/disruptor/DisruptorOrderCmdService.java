@@ -1,5 +1,6 @@
 package com.anbang.p2p.cqrs.c.service.disruptor;
 
+import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -238,5 +239,44 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 			}
 		}
 	}
+	@Override
+	public OrderValueObject changeExpandFee(String userId, Double fee)
+			throws OrderNotFoundException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeExpandFee",
+				userId, fee);
+		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeExpandFee(cmd.getParameter(), cmd.getParameter());
+			return orderValueObject;
+		});
+		try {
+			return result.getResult();
+		} catch (Exception e) {
+			if (e instanceof OrderNotFoundException) {
+				throw (OrderNotFoundException) e;
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	@Override
+	public OrderValueObject addExpand(String userId, ExpandType expandType)
+			throws OrderNotFoundException {
+		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "addExpand",
+				userId, expandType);
+		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
+			OrderValueObject orderValueObject = orderCmdServiceImpl.addExpand(cmd.getParameter(), cmd.getParameter());
+			return orderValueObject;
+		});
+		try {
+			return result.getResult();
+		} catch (Exception e) {
+			if (e instanceof OrderNotFoundException) {
+				throw (OrderNotFoundException) e;
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 
 }

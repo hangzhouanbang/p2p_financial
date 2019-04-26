@@ -36,6 +36,26 @@ public class OrderQueryService {
 	@Autowired
 	private OrderContractDao orderContractDao;
 
+	public void updateLoanOrderExpand(OrderValueObject orderValueObject) {
+		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
+
+		loanOrder.setExpandTotal(orderValueObject.getExpandTotal());
+		loanOrder.setExpandTimes(orderValueObject.getExpandTimes());
+		loanOrder.setMaxLimitTime(orderValueObject.getMaxLimitTime());
+
+		// 判断现在的订单状态/应还金额
+		loanOrder.checkState();
+		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
+
+		loanOrderDao.save(loanOrder);
+		userDboDao.updateUserState(loanOrder.getUserId(), loanOrder.getState().name());
+	}
+
+
+	public void updateLoanOrderState(String id, OrderState orderState) {
+		loanOrderDao.updateLoanOrderState(id, orderState);
+	}
+
 	public void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount) {
 		loanOrderDao.updateLoanOrderAmount(id, overdueDay, interest, shouldRepayAmount);
 	}

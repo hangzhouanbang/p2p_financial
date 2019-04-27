@@ -19,10 +19,7 @@ import com.anbang.p2p.web.vo.CommonVO;
 import com.highto.framework.web.page.ListPage;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -114,7 +111,7 @@ public class ImportReocrdController {
     /**
      * excel 销账导入
      */
-    @RequestMapping("/repayImport")
+    @PostMapping("/repayImport")
     public CommonVO repayImport(@RequestParam(value="filename") MultipartFile file) {
         try {
 
@@ -131,12 +128,6 @@ public class ImportReocrdController {
             fileEntity.setInputStream(inputstream);
             fileEntity.setFileType(prefix);
             fileEntity.setFileName(fileName);
-
-//            List<FileEntity> list = FileUtils.getFilesFromRequest(request);
-//            if (list == null || list.size() == 0) {
-//                return CommonVOUtil.error("文件错误");
-//            }
-//            FileEntity fileEntity = list.get(0);
 
             Workbook workbook = ImprotExcelUtil.checkExcel(fileEntity);
             importRecordService.saveImprotMaterial(workbook, fileEntity.getFileName());

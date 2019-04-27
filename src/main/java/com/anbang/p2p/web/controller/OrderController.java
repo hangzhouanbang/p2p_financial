@@ -163,12 +163,18 @@ public class OrderController {
 			//获取风控，保存合同
 			riskAndContract(loanOrder);
 			userDboDao.updateCountAndState(userId, user.getOrderCount() + 1, null, OrderState.wait.name());
+
+			Map data = new HashMap();
+			data.put("realAmount", loanOrder.getRealAmount());
+			data.put("payAccount", loanOrder.getPayAccount());
+			data.put("realName", loanOrder.getRealName());
+			data.put("id", loanOrder.getId());
+			return CommonVOUtil.success(data, "success");
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());
 			return vo;
 		}
-		return vo;
 	}
 
 	@RequestMapping("/getRepayUrl")

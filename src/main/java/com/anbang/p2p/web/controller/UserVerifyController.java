@@ -9,6 +9,7 @@ import com.anbang.p2p.plan.bean.MobileVerify;
 import com.anbang.p2p.plan.bean.VerifyRecord;
 import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.*;
+import com.anbang.p2p.util.checkservice.MobileServiceUtil;
 import com.anbang.p2p.util.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ import com.anbang.p2p.cqrs.c.service.UserAuthService;
 import com.anbang.p2p.cqrs.q.dbo.UserBaseInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
-import com.anbang.p2p.plan.service.BaseVerifyService;
 import com.anbang.p2p.web.vo.CommonVO;
 
 @CrossOrigin

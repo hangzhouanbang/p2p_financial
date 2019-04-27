@@ -1,4 +1,4 @@
-package com.anbang.p2p.util;
+package com.anbang.p2p.util.checkservice;
 
 import com.anbang.p2p.exception.CheckAPIException;
 import com.anbang.p2p.util.common.AbstractCredit;
@@ -126,30 +126,6 @@ public class MobileServiceUtil extends AbstractCredit {
             throw new CheckAPIException(json);
         }
     }
-
-//    public String query_data(String key) throws Exception{
-//        //提交受理请求对象
-//        List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
-//        reqParam.add(new BasicNameValuePair("apiKey", apiKey));//API授权
-//
-//        reqParam.add(new BasicNameValuePair("token", key));
-//        reqParam.add(new BasicNameValuePair("sign", getSign(reqParam)));//请求参数签名
-//
-//        //提交受理请求
-//        String json = doProcess("/mobile_report/v1/task/data", reqParam);
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        JsonNode rootNode = objectMapper.readValue(json, JsonNode.class);
-//        String code = rootNode.get("code").textValue();
-//
-//        if("0009".equals(code)) {//写入成功
-//            String data = rootNode.get("data").textValue();
-//            return data;
-//        } else {
-//            System.out.println("查询失败");
-//            throw new CheckAPIException(json);
-//        }
-//    }
 
     /**
      * 获取业务类型

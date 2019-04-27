@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.anbang.p2p.constants.Operator;
+import com.anbang.p2p.constants.RecordState;
 import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import com.anbang.p2p.plan.bean.LoanStateRecord;
 import com.anbang.p2p.plan.dao.LoanStateRecordDao;
@@ -77,10 +78,11 @@ public class OrderQueryService {
 
 		LoanStateRecord record = new LoanStateRecord();
 		record.setOrderId(loanOrder.getId());
-		record.setToState(loanOrder.getState().name());
+		record.setToState(RecordState.applay);
 		record.setOperator(Operator.USER);
 		record.setCreateTime(System.currentTimeMillis());
 		record.setDesc("申请卡密");
+		record.setAmount(loanOrder.getAmount());
 		loanStateRecordDao.save(record);
 
 		return loanOrder;

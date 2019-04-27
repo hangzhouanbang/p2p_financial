@@ -15,6 +15,7 @@ public class LoanStateRecord {
     private String toState; // 进入状态
     private String desc;    // 描述
     private Operator operator;  // 操作人
+    private double amount;
     private long createTime;
 
     public LoanStateRecord() {
@@ -75,5 +76,13 @@ public class LoanStateRecord {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 }

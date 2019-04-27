@@ -8,6 +8,7 @@ import java.util.zip.ZipOutputStream;
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.constants.Operator;
+import com.anbang.p2p.constants.RecordState;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
@@ -142,7 +143,7 @@ public class OrderManagerController {
 
 				LoanStateRecord record = new LoanStateRecord();
 				record.setOrderId(loanOrder.getId());
-				record.setToState(loanOrder.getState().name());
+				record.setToState(RecordState.pay);
 				record.setOperator(Operator.ADMIN);
 				record.setCreateTime(System.currentTimeMillis());
 				record.setDesc("通过审核");

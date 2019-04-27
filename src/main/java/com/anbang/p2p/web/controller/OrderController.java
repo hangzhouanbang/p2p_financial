@@ -10,10 +10,7 @@ import java.util.concurrent.Executors;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.anbang.p2p.constants.CommonRecordState;
-import com.anbang.p2p.constants.Operator;
-import com.anbang.p2p.constants.PayType;
-import com.anbang.p2p.constants.PaymentType;
+import com.anbang.p2p.constants.*;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.q.dbo.*;
@@ -23,6 +20,7 @@ import com.anbang.p2p.plan.dao.LeaveWordDao;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.record.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -417,10 +415,10 @@ public class OrderController {
 
 				LoanStateRecord record = new LoanStateRecord();
 				record.setOrderId(loanOrder.getId());
-				record.setToState(loanOrder.getState().name());
+				record.setToState(RecordState.audit);
 				record.setOperator(Operator.SYS);
 				record.setCreateTime(System.currentTimeMillis());
-				record.setDesc("风控审核");
+				record.setDesc("转为审核");
 				orderQueryService.saveStateRecord(record);
 
 			} catch (Exception e) {

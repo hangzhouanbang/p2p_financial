@@ -7,6 +7,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.constants.ExpandType;
+import com.anbang.p2p.constants.Operator;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
 import com.anbang.p2p.cqrs.q.dbo.AgentPayRecord;
 import com.anbang.p2p.cqrs.q.dbo.OrderContract;
@@ -14,6 +15,7 @@ import com.anbang.p2p.cqrs.q.service.AgentPayRecordService;
 import com.anbang.p2p.cqrs.q.service.LoanOrderExportService;
 import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.plan.bean.ImportRecord;
+import com.anbang.p2p.plan.bean.LoanStateRecord;
 import com.anbang.p2p.plan.bean.RepayRecord;
 import com.anbang.p2p.plan.bean.RiskInfo;
 import com.anbang.p2p.plan.service.ImportRecordService;
@@ -137,6 +139,15 @@ public class OrderManagerController {
 			if (flag) {
 				OrderValueObject payResult = orderCmdService.changeOrderStateToRefund(order.getUserId(), System.currentTimeMillis());
 				orderQueryService.updateLoanOrder(payResult);
+
+				LoanStateRecord record = new LoanStateRecord();
+				record.setOrderId(loanOrder.getId());
+				record.setToState(loanOrder.getState().name());
+				record.setOperator(Operator.ADMIN);
+				record.setCreateTime(System.currentTimeMillis());
+				record.setDesc("通过审核");
+				orderQueryService.saveStateRecord(record);
+
 				agentPayRecordService.updataStatus(agentPayRecord.getId(), CommonRecordState.SUCCESS);
 				return CommonVOUtil.success("success");
 			} else {

@@ -2,6 +2,7 @@ package com.anbang.p2p.web.controller;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -10,16 +11,15 @@ import java.util.concurrent.Executors;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.constants.Operator;
 import com.anbang.p2p.constants.PayType;
 import com.anbang.p2p.constants.PaymentType;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
-import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import com.anbang.p2p.cqrs.q.dbo.*;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
 import com.anbang.p2p.plan.bean.*;
 import com.anbang.p2p.plan.dao.LeaveWordDao;
-import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -60,9 +60,6 @@ public class OrderController {
 	private BaseRateService baseRateService;
 
 	@Autowired
-	private UserDboDao userDboDao;
-
-	@Autowired
 	private RiskService riskService;
 
 	@Autowired
@@ -72,6 +69,63 @@ public class OrderController {
 	private LeaveWordDao leaveWordDao;
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
+
+	@RequestMapping("/checkAllVerify")
+	public CommonVO checkAllVerify(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		Map data = new HashMap();
+		UserDbo user = userAuthQueryService.findUserDboByUserId(userId);
+		data.put("phone", user.getPhone());
+		data.put("hasBaseInfo", true);
+		data.put("allVerify", true);
+
+		// 身份认证
+		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		if (baseInfo == null) {
+			data.put("hasBaseInfo", false);
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
+
+		// 紧急联系人
+		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
+		if (contacts == null) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
+
+		// 绑定银行卡
+		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
+		if (bankCardCount == 0) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
+
+		// 绑定支付宝
+		if (user == null || user.getAlipayInfo() == null) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
+
+//		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+//		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+//			data.put("allVerify", false);
+//			return CommonVOUtil.success(data, "success");
+//		}
+
+		//  合同认证
+		OrderContract contract = orderQueryService.findOrderContractById("001");
+		if (contract == null) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
+
+		return CommonVOUtil.success(data, "success");
+	}
 
 	/**
 	 * 申请卡密
@@ -111,8 +165,7 @@ public class OrderController {
 		}
 
 	    // TODO 绑定支付宝
-		UserDbo userDbo = userDboDao.findById(userId);
-		if (userDbo == null || userDbo.getAlipayInfo() == null) {
+		if (user == null || user.getAlipayInfo() == null) {
 			vo.setSuccess(false);
 			vo.setMsg("invalid alipay");
 			return vo;
@@ -151,7 +204,7 @@ public class OrderController {
 		try {
 			// 生成卡密
 			int dayNum = (int) freeTimeOfInterest  / 1000 / 60 / 60 / 24;	// 借款天数
-			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, PayType.alipay, userDbo.getAlipayInfo().getAccount(), amount,
+			OrderValueObject orderValueObject = orderCmdService.createOrder(userId, PayType.alipay, user.getAlipayInfo().getAccount(), amount,
 					service_charge, freeTimeOfInterest, overdue, overdue_rate, dayNum, contractId, expand_charge,
 					System.currentTimeMillis());
 
@@ -162,7 +215,7 @@ public class OrderController {
 
 			//获取风控，保存合同
 			riskAndContract(loanOrder);
-			userDboDao.updateCountAndState(userId, user.getOrderCount() + 1, null, OrderState.wait.name());
+			userAuthQueryService.updateCountAndState(userId, user.getOrderCount() + 1, null, OrderState.wait.name());
 
 			Map data = new HashMap();
 			data.put("realAmount", loanOrder.getRealAmount());
@@ -175,6 +228,17 @@ public class OrderController {
 			vo.setMsg(e.getClass().getName());
 			return vo;
 		}
+	}
+
+	@RequestMapping("/listStateRecord")
+	public CommonVO listStateRecord(String token, String orderId) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		List<LoanStateRecord> records = orderQueryService.listStateRecord(orderId);
+		return CommonVOUtil.success(records, "success");
 	}
 
 	@RequestMapping("/getRepayUrl")
@@ -350,6 +414,15 @@ public class OrderController {
 				OrderValueObject orderValueObject = orderCmdService
 						.changeOrderStateToCheck_by_admin(loanOrder.getUserId());
 				orderQueryService.updateLoanOrder(orderValueObject);
+
+				LoanStateRecord record = new LoanStateRecord();
+				record.setOrderId(loanOrder.getId());
+				record.setToState(loanOrder.getState().name());
+				record.setOperator(Operator.SYS);
+				record.setCreateTime(System.currentTimeMillis());
+				record.setDesc("风控审核");
+				orderQueryService.saveStateRecord(record);
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

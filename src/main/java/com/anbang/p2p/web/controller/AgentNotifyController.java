@@ -50,9 +50,6 @@ public class AgentNotifyController {
     private RiskService riskService;
 
     @Autowired
-    private MobileServiceUtil mobileServiceUtil;
-
-    @Autowired
     private UserAuthQueryService userAuthQueryService;
 
     @RequestMapping("/incomeNotify")
@@ -142,21 +139,21 @@ public class AgentNotifyController {
     }
 
 
-    @RequestMapping("/contactNotify")
-    public String contactNotify(String uid, String bizType, String code, String msg, String token){
-
-        if ("0000".equals(code)) {
-            try {
-                String json = mobileServiceUtil.query_report(token);
-                userAuthQueryService.updateStateAndData(uid, CommonRecordState.SUCCESS, json);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        System.out.println("运营商验证回调>>>>>>>>>>" + String.format("%s|%s|%s|%s|%s",uid,bizType,code,msg,token));
-        return "success";
-    }
+//    @RequestMapping("/contactNotify")
+//    public String contactNotify(String uid, String bizType, String code, String msg, String token){
+//
+//        if ("0000".equals(code)) {
+//            try {
+//                String json = mobileServiceUtil.query_report(token);
+//                userAuthQueryService.updateStateAndData(uid, CommonRecordState.SUCCESS, json);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        System.out.println("运营商验证回调>>>>>>>>>>" + String.format("%s|%s|%s|%s|%s",uid,bizType,code,msg,token));
+//        return "success";
+//    }
 
     /**
      * 新颜回调

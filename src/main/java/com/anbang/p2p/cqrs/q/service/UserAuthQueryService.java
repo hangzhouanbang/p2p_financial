@@ -98,6 +98,11 @@ public class UserAuthQueryService {
 		return userDboDao.findById(userId);
 	}
 
+	// 更新借款、逾期次数
+	public void updateCountAndState(String userId, Integer orderCount, Integer overdueCount, String state){
+		userDboDao.updateCountAndState(userId, orderCount, overdueCount, state);
+	}
+
 	public void updateNicknameAndHeadimgurlById(String userId, String nickname, String headimgurl) {
 		userDboDao.updateNicknameAndHeadimgurlById(userId, nickname, headimgurl);
 	}

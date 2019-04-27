@@ -4,6 +4,7 @@ import com.anbang.p2p.cqrs.q.dao.UserDboDao;
 import com.anbang.p2p.cqrs.q.dbo.AlipayInfo;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.common.StringUtils;
 import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +15,8 @@ import com.anbang.p2p.cqrs.c.service.UserAuthService;
 import com.anbang.p2p.cqrs.q.dbo.UserBankCardInfo;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
 import com.anbang.p2p.web.vo.CommonVO;
+
+import java.util.regex.Pattern;
 
 @CrossOrigin
 @RestController
@@ -38,7 +41,11 @@ public class BankCardController {
 		if (userId == null) {
 			return CommonVOUtil.invalidToken();
 		}
-		if (StringUtil.isBlank(info.getPhone()) || StringUtil.isBlank(info.getBankCardNo())) {
+		if (StringUtil.isBlank(info.getPhone()) || StringUtil.isBlank(info.getBankCardNo()) || StringUtils.isBlank(info.getUserName())) {
+			return CommonVOUtil.invalidParam();
+		}
+
+		if (!Pattern.matches("[0-9]{11}", info.getPhone()) || !StringUtils.isNumeric(info.getBankCardNo())) {// 检验手机格式
 			return CommonVOUtil.invalidParam();
 		}
 

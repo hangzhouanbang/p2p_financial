@@ -16,7 +16,7 @@ import java.util.List;
  * @author kx
  * @version v1.2.0
  */
-@Service
+//@Service
 public class MobileServiceUtil extends AbstractCredit {
 
     //业务参数

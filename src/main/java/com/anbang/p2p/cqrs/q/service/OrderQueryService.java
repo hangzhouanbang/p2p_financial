@@ -3,7 +3,10 @@ package com.anbang.p2p.cqrs.q.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.anbang.p2p.constants.Operator;
 import com.anbang.p2p.cqrs.q.dao.UserDboDao;
+import com.anbang.p2p.plan.bean.LoanStateRecord;
+import com.anbang.p2p.plan.dao.LoanStateRecordDao;
 import com.anbang.p2p.util.CalAmountUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,9 @@ public class OrderQueryService {
 
 	@Autowired
 	private OrderContractDao orderContractDao;
+
+	@Autowired
+	private LoanStateRecordDao loanStateRecordDao;
 
 	public void updateLoanOrderExpand(OrderValueObject orderValueObject) {
 		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
@@ -68,6 +74,15 @@ public class OrderQueryService {
 
 		loanOrder.setShouldRepayAmount(loanOrder.getAmount());
 		loanOrderDao.save(loanOrder);
+
+		LoanStateRecord record = new LoanStateRecord();
+		record.setOrderId(loanOrder.getId());
+		record.setToState(loanOrder.getState().name());
+		record.setOperator(Operator.USER);
+		record.setCreateTime(System.currentTimeMillis());
+		record.setDesc("申请卡密");
+		loanStateRecordDao.save(record);
+
 		return loanOrder;
 	}
 
@@ -165,5 +180,13 @@ public class OrderQueryService {
 
 	public void saveOrderContract(OrderContract contract) {
 		orderContractDao.save(contract);
+	}
+
+	public void saveStateRecord(LoanStateRecord loanStateRecord){
+		loanStateRecordDao.save(loanStateRecord);
+	}
+
+	public List<LoanStateRecord> listStateRecord(String orderId){
+		return loanStateRecordDao.list(orderId);
 	}
 }

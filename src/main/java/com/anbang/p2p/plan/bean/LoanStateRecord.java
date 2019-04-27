@@ -15,7 +15,19 @@ public class LoanStateRecord {
     private String toState; // 进入状态
     private String desc;    // 描述
     private Operator operator;  // 操作人
-    private String createTime;
+    private long createTime;
+
+    public LoanStateRecord() {
+    }
+
+    public LoanStateRecord(String id, String orderId, String toState, String desc, Operator operator, String createTime) {
+        this.id = id;
+        this.orderId = orderId;
+        this.toState = toState;
+        this.desc = desc;
+        this.operator = operator;
+        this.createTime = System.currentTimeMillis();
+    }
 
     public String getId() {
         return id;
@@ -49,11 +61,11 @@ public class LoanStateRecord {
         this.operator = operator;
     }
 
-    public String getCreateTime() {
+    public long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(long createTime) {
         this.createTime = createTime;
     }
 

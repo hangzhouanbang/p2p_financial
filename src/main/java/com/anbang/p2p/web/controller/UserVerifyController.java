@@ -35,9 +35,6 @@ public class UserVerifyController {
 	@Autowired
 	private VerifyRecordService verifyRecordService;
 
-	@Autowired
-	private MobileServiceUtil mobileServiceUtil;
-
 	/**
 	 * 云慧眼加密加签
 	 */

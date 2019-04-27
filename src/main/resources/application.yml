@@ -4,7 +4,7 @@ spring:
       uri: mongodb://localhost:27017/p2p_financial
 
 server:
-  port: 2020
+  port: 80
   
 filepath:
   snapshotFileBasePath: /data/app/p2p_financial/snapshot

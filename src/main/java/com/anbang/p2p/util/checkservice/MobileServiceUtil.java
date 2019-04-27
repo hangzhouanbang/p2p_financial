@@ -22,7 +22,7 @@ public class MobileServiceUtil extends AbstractCredit {
     //业务参数
     public static final String method = "api.mobile.get";//请求接口
     public static final String bizType = "mobile";//业务类型
-    public static final String callBackUrl = "http://47.91.219.7:2020/agentNotifyInfo/contactNotify";//回调地址
+    public static final String callBackUrl = "http://47.91.219.7/agentNotifyInfo/contactNotify";//回调地址
 
 //    public static final String username = "1832568545";//账号---需客户指定
 //    public static final String password = "123456";//密码---需客户指定

@@ -26,8 +26,8 @@ public class AgentIncome {
     private static final String query_path = "/pay/query";
     private static final String merchant = "1916232533";
 
-    private static final String notify_url = "http://47.91.219.7:2020/agentNotifyInfo/incomeNotify";
-    private static final String return_url = "http://47.91.219.7/p2p/#/paycallback";
+    private static final String notify_url = "http://47.91.219.7/agentNotifyInfo/incomeNotify";
+    private static final String return_url = "http://47.91.219.7/#/paycallback";
 //    private static final String return_url = "index.html";
 
     /**

@@ -118,12 +118,12 @@ public class OrderController {
 			return vo;
 		}
 
-		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
-		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
-			vo.setSuccess(false);
-			vo.setMsg("lack mobile verify");
-			return vo;
-		}
+//		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+//		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+//			vo.setSuccess(false);
+//			vo.setMsg("lack mobile verify");
+//			return vo;
+//		}
 
 //		// TODO 合同认证
 		OrderContract contract = orderQueryService.findOrderContractById(contractId);

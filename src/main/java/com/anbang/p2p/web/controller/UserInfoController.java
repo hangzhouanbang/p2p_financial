@@ -1,10 +1,8 @@
 package com.anbang.p2p.web.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.anbang.p2p.conf.OrgInfoConfig;
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.cqrs.q.dbo.*;
 import com.anbang.p2p.cqrs.q.service.OrderQueryService;
@@ -12,8 +10,9 @@ import com.anbang.p2p.plan.bean.BaseLoan;
 import com.anbang.p2p.plan.bean.Notification;
 import com.anbang.p2p.plan.bean.OrgInfo;
 import com.anbang.p2p.plan.bean.UserBaseLoan;
-import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.plan.service.BaseRateService;
+import com.anbang.p2p.util.AmountToUpper;
+import com.anbang.p2p.util.CalAmountUtil;
 import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.util.TimeUtils;
 import com.anbang.p2p.web.vo.LoanOrderQueryVO;
@@ -273,6 +272,8 @@ public class UserInfoController {
 			data.put("overdue", BaseLoan.overdue / 24 / 60 / 60 / 1000);
 			data.put("freeTimeOfInterest", BaseLoan.freeTimeOfInterest / 24 / 60 / 60 / 1000);
 			data.put("overdue_rate", BaseLoan.overdue_rate * 1000);
+			data.put("day_amount", CalAmountUtil.calDayAmount(BaseLoan.baseLimit, BaseLoan.overdue_rate));
+			data.put("repayTime", TimeUtils.getStringHr(System.currentTimeMillis() + BaseLoan.freeTimeOfInterest));
 			return CommonVOUtil.success(data, "success");
 		} else {
 			data.put("id", userId);
@@ -282,6 +283,8 @@ public class UserInfoController {
 			data.put("overdue", loan.getOverdue() / 24 / 60 / 60 / 1000);
 			data.put("freeTimeOfInterest", loan.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000);
 			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
+			data.put("day_amount", CalAmountUtil.calDayAmount(loan.getBaseLimit(), loan.getOverdue_rate()));
+			data.put("repayTime", TimeUtils.getStringHr(System.currentTimeMillis() + loan.getFreeTimeOfInterest()));
 			return CommonVOUtil.success(data, "success");
 		}
 	}
@@ -305,9 +308,11 @@ public class UserInfoController {
 		data.put("id_card", userDbo.getIDcard());
 		data.put("realName", userDbo.getRealName());
 
-		// TODO: 2019/4/25
-		data.put("org_name", OrgInfoConfig.org_name);
-		data.put("org_phone", OrgInfoConfig.org_phone);
+		OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
+		if (orgInfo != null) {
+			data.put("org_name", orgInfo.getOrgName());
+			data.put("org_phone", orgInfo.getPhone());
+		}
 
 		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
 		if (loan == null) {
@@ -318,6 +323,10 @@ public class UserInfoController {
 			data.put("overdue", BaseLoan.overdue / 24 / 60 / 60 / 1000);
 			data.put("freeTimeOfInterest", BaseLoan.freeTimeOfInterest / 24 / 60 / 60 / 1000);
 			data.put("overdue_rate", BaseLoan.overdue_rate * 1000);
+
+			data.put("capital", AmountToUpper.number2CNMontrayUnit(BaseLoan.baseLimit));
+			data.put("start", TimeUtils.getStringDate(System.currentTimeMillis()));
+			data.put("end", TimeUtils.getStringDate(System.currentTimeMillis() + BaseLoan.freeTimeOfInterest));
 			return CommonVOUtil.success(data, "success");
 		} else {
 			data.put("id", userId);
@@ -327,6 +336,10 @@ public class UserInfoController {
 			data.put("overdue", loan.getOverdue() / 24 / 60 / 60 / 1000);
 			data.put("freeTimeOfInterest", loan.getFreeTimeOfInterest() / 24 / 60 / 60 / 1000);
 			data.put("overdue_rate", loan.getOverdue_rate() * 1000);
+
+			data.put("capital", AmountToUpper.number2CNMontrayUnit(loan.getBaseLimit()));
+			data.put("start", TimeUtils.getStringDate(System.currentTimeMillis()));
+			data.put("end", TimeUtils.getStringDate(System.currentTimeMillis() + loan.getFreeTimeOfInterest()));
 			return CommonVOUtil.success(data, "success");
 		}
 	}

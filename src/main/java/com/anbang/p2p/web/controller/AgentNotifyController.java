@@ -157,4 +157,13 @@ public class AgentNotifyController {
         System.out.println("运营商验证回调>>>>>>>>>>" + String.format("%s|%s|%s|%s|%s",uid,bizType,code,msg,token));
         return "success";
     }
+
+    /**
+     * 新颜回调
+     */
+    @RequestMapping("/checkNotify")
+    public String checkNotify(String uid, String bizType, String code, String msg, String token){
+
+        return "success";
+    }
 }

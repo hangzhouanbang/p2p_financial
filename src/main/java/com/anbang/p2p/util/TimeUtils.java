@@ -25,6 +25,14 @@ public class TimeUtils {
         return sdf.format(time);
     }
 
+    /**
+     * 格式化日期字符串 yyyyMMddHHmmss
+     */
+    public static String getStringHr(long time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH时mm分");
+        return sdf.format(time);
+    }
+
     public static double repayTime (long maxTime, long nowTime) {
         Long compareTime = maxTime - nowTime;
         double midTime = Double.valueOf(compareTime.toString());

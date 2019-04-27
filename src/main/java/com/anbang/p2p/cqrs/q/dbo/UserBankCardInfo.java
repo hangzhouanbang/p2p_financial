@@ -6,6 +6,7 @@ package com.anbang.p2p.cqrs.q.dbo;
 public class UserBankCardInfo {
 	private String id;
 	private String userId;// 用户id
+	private String userName;
 	private String bankCardNo;// 银行卡号
 	private String phone;	// 银行卡预留手机号
 
@@ -39,5 +40,13 @@ public class UserBankCardInfo {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

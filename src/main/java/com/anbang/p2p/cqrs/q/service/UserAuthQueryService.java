@@ -5,8 +5,10 @@ import java.util.List;
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.plan.bean.MobileVerify;
 import com.anbang.p2p.plan.bean.OrgInfo;
+import com.anbang.p2p.plan.bean.ShoppingVerify;
 import com.anbang.p2p.plan.dao.MobileVerifyDao;
 import com.anbang.p2p.plan.dao.OrgInfoDao;
+import com.anbang.p2p.plan.dao.ShoppingVerifyDao;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,9 @@ public class UserAuthQueryService {
 
 	@Autowired
 	private OrgInfoDao orgInfoDao;
+
+	@Autowired
+	private ShoppingVerifyDao shoppingVerifyDao;
 
 	/**
 	 * 创建用户并授权
@@ -175,5 +180,9 @@ public class UserAuthQueryService {
 
 	public OrgInfo getOrgInfo(String id) {
 		return orgInfoDao.getById(id);
+	}
+
+	public ShoppingVerify getShoppingVerify(String id) {
+		return shoppingVerifyDao.getById(id);
 	}
 }

@@ -46,7 +46,12 @@ public class CalAmountUtil {
                 return;
             }
         }
+    }
 
-
+    public static String calDayAmount(Double baseLimit, Double rate){
+        BigDecimal base_b = new BigDecimal(baseLimit.toString());
+        BigDecimal rate_b = new BigDecimal(rate.toString());
+        BigDecimal dayAmount = base_b.multiply(rate_b).setScale(2, BigDecimal.ROUND_UP);
+        return dayAmount.toString();
     }
 }

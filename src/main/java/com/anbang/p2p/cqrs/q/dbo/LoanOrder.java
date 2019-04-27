@@ -81,7 +81,8 @@ public class LoanOrder {
 		this.expand_charge = orderValueObject.getExpand_charge();
 		this.expandTotal = orderValueObject.getExpandTotal();
 		this.expandTimes = orderValueObject.getExpandTimes();
-		this.contractPath = "http://47.91.219.7/p2p/docs/orders/" + id + ".docx";		//temp
+//		this.contractPath = "http://47.91.219.7/base/getWord/" + id + ".docx";		//temp
+		this.contractPath = "";		//temp
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package com.anbang.p2p.web.controller;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import com.anbang.p2p.plan.bean.OrgInfo;
 import com.anbang.p2p.plan.dao.OrgInfoDao;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.WordUtil;
 import com.anbang.p2p.util.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +19,8 @@ import com.anbang.p2p.plan.bean.BaseLoan;
 import com.anbang.p2p.plan.bean.UserBaseLoan;
 import com.anbang.p2p.plan.service.BaseRateService;
 import com.anbang.p2p.web.vo.CommonVO;
+
+import javax.servlet.http.HttpServletResponse;
 
 @CrossOrigin
 @RestController
@@ -143,5 +147,51 @@ public class BaseLoanAndRateController {
 	public CommonVO getOrgInfo() {
 		OrgInfo orgInfo = orgInfoDao.getById("001");
 		return CommonVOUtil.success(orgInfo, "success");
+	}
+
+	/**
+	 * 下载合同
+	 */
+	@RequestMapping("/getWord")
+	public String getWord(String id, HttpServletResponse response) {
+		String filePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/docs/orders";//被下载的文件在服务器中的路径,
+		String filename = id + ".docx";//被下载文件的名称
+
+
+		File file = new File(filePath + "/" + filename);
+		if(file.exists()) { //判断文件父目录是否存在
+			response.setContentType("application/force-download");
+			response.setHeader("Content-Disposition", "attachment;fileName=" + filename);
+
+			byte[] buffer = new byte[1024];
+			FileInputStream fis = null; //文件输入流
+			BufferedInputStream bis = null;
+
+			OutputStream os = null; //输出流
+			try {
+				os = response.getOutputStream();
+				fis = new FileInputStream(file);
+				bis = new BufferedInputStream(fis);
+				int i = bis.read(buffer);
+				while (i != -1) {
+					os.write(buffer);
+					i = bis.read(buffer);
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("----------file download" + filename);
+			try {
+				bis.close();
+				fis.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return "success";
 	}
 }

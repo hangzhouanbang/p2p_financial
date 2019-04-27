@@ -40,8 +40,8 @@ public class XinyanUtil {
     }
 
     public static void main(String[] args) {
-//        System.out.println(getCarrierUrl("001"));
-        System.out.println(getTaobaowebUrl("002"));
+//        System.out.println(getCarrierUrl("003"));
+        System.out.println(getTaobaowebUrl("004"));
 
     }
 }

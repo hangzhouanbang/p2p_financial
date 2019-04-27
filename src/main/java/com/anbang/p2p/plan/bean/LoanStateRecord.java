@@ -13,6 +13,7 @@ public class LoanStateRecord {
     @Indexed(unique = false)
     private String orderId;  // 卡密id
     private String toState; // 进入状态
+    private String desc;    // 描述
     private Operator operator;  // 操作人
     private String createTime;
 
@@ -54,5 +55,13 @@ public class LoanStateRecord {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

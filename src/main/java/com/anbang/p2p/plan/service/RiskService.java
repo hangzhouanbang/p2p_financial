@@ -36,7 +36,7 @@ public class RiskService {
     @Autowired
     private UserDboDao userDboDao;
 
-    static final String imgUrl = "http://47.91.219.7:2020/admin/getImg?imgName=";
+    static final String imgUrl = "http://47.91.219.7/admin/getImg?imgName=";
 
     /**
      * 订单查询

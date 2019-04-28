@@ -5,12 +5,9 @@ package com.anbang.p2p.plan.bean;
  */
 public class MobileVerify {
     private String id;
-    private String IDcard;// 身份证
-    private String realName;// 真实姓名
-    private String username;    // 手机号
-    private String password;    //服务码
-    private String state;
-    private String token;   //
+    private String state;   //认证状态
+    private String token;   //查询任务token
+    private String taskId;  //认证方任务id
     private String report;
     private long createTime;
 
@@ -20,38 +17,6 @@ public class MobileVerify {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getIDcard() {
-        return IDcard;
-    }
-
-    public void setIDcard(String IDcard) {
-        this.IDcard = IDcard;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getState() {
@@ -68,6 +33,14 @@ public class MobileVerify {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getReport() {

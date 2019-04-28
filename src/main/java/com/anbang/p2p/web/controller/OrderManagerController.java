@@ -179,6 +179,15 @@ public class OrderManagerController {
 		try {
 			OrderValueObject orderValueObject = orderCmdService.refuseOrder(order.getUserId());
 			orderQueryService.updateLoanOrder(orderValueObject);
+
+			LoanStateRecord record = new LoanStateRecord();
+			record.setOrderId(orderValueObject.getId());
+			record.setToState(RecordState.refuse);
+			record.setOperator(Operator.ADMIN);
+			record.setCreateTime(System.currentTimeMillis());
+			record.setDesc("管理员拒绝");
+			orderQueryService.saveStateRecord(record);
+
 		} catch (Exception e) {
 			vo.setSuccess(false);
 			vo.setMsg(e.getClass().getName());

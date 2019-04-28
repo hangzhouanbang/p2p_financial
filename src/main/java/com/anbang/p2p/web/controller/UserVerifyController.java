@@ -127,7 +127,7 @@ public class UserVerifyController {
 		}
 
 		String time = TimeUtils.getStringDate(new Date());
-		String taskId = userId + "/" + time;
+		String taskId = userId + "_" + time;
 		String url = XinyanUtil.getCarrierUrl(taskId);
 
 		return CommonVOUtil.success(url,"等待中");
@@ -144,7 +144,7 @@ public class UserVerifyController {
 		}
 
 		String time = TimeUtils.getStringDate(new Date());
-		String taskId = userId + "/" + time;
+		String taskId = userId + "_" + time;
 		String url = XinyanUtil.getTaobaowebUrl(taskId);
 
 		return CommonVOUtil.success(url,"等待中");

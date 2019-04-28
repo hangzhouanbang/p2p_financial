@@ -2,6 +2,7 @@ package com.anbang.p2p.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.anbang.p2p.conf.XinyanConfig;
 import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.constants.ExpandType;
 import com.anbang.p2p.constants.PaymentType;
@@ -13,11 +14,14 @@ import com.anbang.p2p.cqrs.q.dbo.RefundInfo;
 import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.cqrs.q.service.RefundInfoService;
 import com.anbang.p2p.cqrs.q.service.UserAuthQueryService;
+import com.anbang.p2p.plan.bean.MobileVerify;
+import com.anbang.p2p.plan.bean.ShoppingVerify;
 import com.anbang.p2p.plan.bean.VerifyRecord;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.plan.service.VerifyRecordService;
 import com.anbang.p2p.util.AgentIncome;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.MD5Utils;
 import com.anbang.p2p.util.checkservice.MobileServiceUtil;
 import com.anbang.p2p.web.vo.CommonVO;
 import org.apache.commons.lang3.StringUtils;
@@ -138,8 +142,49 @@ public class AgentNotifyController {
         return CommonVOUtil.success("waiting");
     }
 
+    /**
+     * 新颜回调
+     */
+    @RequestMapping("/checkNotify")
+    public String checkNotify(String msg, String token, String taskId, String apiUser, String apiEnc, String apiName, Boolean success){
+        if (!XinyanConfig.ApiUser.equals(apiUser)) {
+            return "";
+        }
 
-//    @RequestMapping("/contactNotify")
+        String signStr = apiUser + XinyanConfig.AccessKey + token;
+        String sign = MD5Utils.getMD5(signStr, "utf-8");
+        if (!sign.equals(apiEnc)) {
+            System.out.println("验签未通过的新颜回调-------->" + msg + token + apiName + taskId);
+            return "";
+        }
+
+        String userId = taskId.substring(0, taskId.indexOf("_"));
+        if ("carrier".equals(apiName)) {
+            MobileVerify mobileVerify = new MobileVerify();
+            mobileVerify.setId(userId);
+            mobileVerify.setState(CommonRecordState.SUCCESS);
+            mobileVerify.setToken(token);
+            mobileVerify.setTaskId(taskId);
+            mobileVerify.setCreateTime(System.currentTimeMillis());
+            return "success";
+        }
+        if ("taobaoweb".equals(apiName)) {
+            ShoppingVerify shoppingVerify = new ShoppingVerify();
+            shoppingVerify.setId(userId);
+            shoppingVerify.setState(CommonRecordState.SUCCESS);
+            shoppingVerify.setToken(token);
+            shoppingVerify.setTaskId(taskId);
+            shoppingVerify.setCreateTime(System.currentTimeMillis());
+            return "success";
+        }
+
+        System.out.println("未消费的新颜回调-------->" + msg + token + apiName + taskId);
+        return "";
+    }
+
+
+    // 立木征信
+    //    @RequestMapping("/contactNotify")
 //    public String contactNotify(String uid, String bizType, String code, String msg, String token){
 //
 //        if ("0000".equals(code)) {
@@ -154,13 +199,4 @@ public class AgentNotifyController {
 //        System.out.println("运营商验证回调>>>>>>>>>>" + String.format("%s|%s|%s|%s|%s",uid,bizType,code,msg,token));
 //        return "success";
 //    }
-
-    /**
-     * 新颜回调
-     */
-    @RequestMapping("/checkNotify")
-    public String checkNotify(String uid, String bizType, String code, String msg, String token){
-
-        return "success";
-    }
 }

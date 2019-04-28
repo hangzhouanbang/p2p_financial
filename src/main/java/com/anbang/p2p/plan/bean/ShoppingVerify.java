@@ -5,8 +5,9 @@ package com.anbang.p2p.plan.bean;
  */
 public class ShoppingVerify {
     private String id;
-    private String state;
-    private String token;   //
+    private String state;   //认证状态
+    private String token;   //查询任务token
+    private String taskId;  //认证方任务id
     private String report;
     private long createTime;
 
@@ -48,5 +49,13 @@ public class ShoppingVerify {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 }

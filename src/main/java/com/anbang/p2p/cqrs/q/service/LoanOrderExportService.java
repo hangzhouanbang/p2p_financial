@@ -38,9 +38,30 @@ public class LoanOrderExportService {
     @Autowired
     private UserContactsDao userContactsDao;
 
-//    @Autowired
-//    private OrderCmdService orderCmdService;
+    // 导出用户详情
+    public void exportUserInfo(String userId, ZipOutputStream zipOutputStream) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        // 用户身份证信息
+        UserBaseInfo baseInfo = userBaseInfoDao.findById(userId);
+        if (baseInfo != null) {
+            ExcelUtils.detailBaseInfo(workbook, baseInfo);
+        }
 
+        LoanOrderQueryVO queryVO = new LoanOrderQueryVO();
+        queryVO.setUserId(userId);
+        List<LoanOrder> orderList = mongodbLoanOrderDao.find(1, 500, queryVO);
+        ExcelUtils.userLoanList(workbook, orderList);
+
+        UserContacts contacts = userContactsDao.findById(userId);
+        if (contacts != null) {
+            ExcelUtils.detailContacts(workbook, contacts);
+            ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
+        }
+
+        ZipEntry entry = new ZipEntry(userId + ".xls");
+        zipOutputStream.putNextEntry(entry);
+        workbook.write(zipOutputStream);
+    }
 
     // 导出单页
     public void exportSimple(String[] ids, OutputStream output) throws IOException {

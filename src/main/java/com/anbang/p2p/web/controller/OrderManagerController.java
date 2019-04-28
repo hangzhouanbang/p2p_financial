@@ -310,6 +310,43 @@ public class OrderManagerController {
 	}
 
 	/**
+	 * 用户详情导出
+	 */
+	@RequestMapping("/collectionExport")
+	public CommonVO collectionExport(String userId, HttpServletResponse response) {
+		if (userId == null) {
+			return CommonVOUtil.invalidParam();
+		}
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date date = new Date();
+		OutputStream output = null;
+
+		String fileName = format.format(date) + "用户" + userId + ".zip";
+		response.setContentType("application/octet-stream ");
+		response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
+		response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
+		try {
+			response.setHeader("Content-Disposition",
+					"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
+			response.setCharacterEncoding("UTF-8");
+
+			output = response.getOutputStream();
+			ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+
+			// 业务数据封装
+			loanOrderExportService.exportUserInfo(userId, zipOutputStream);
+
+			// 关闭输出流
+			zipOutputStream.flush();
+			zipOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return CommonVOUtil.systemException();
+	}
+
+	/**
 	 * 催收导出
 	 * @param ids 卡密id list
 	 * @param exportType 导出类型 simple/detail

@@ -3,9 +3,13 @@ package com.anbang.p2p.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.cqrs.q.service.UserService;
+import com.anbang.p2p.plan.bean.MobileVerify;
+import com.anbang.p2p.plan.bean.ShoppingVerify;
 import com.anbang.p2p.util.CommonVOUtil;
+import com.anbang.p2p.util.XinyanUtil;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -93,5 +97,33 @@ public class UserManagerController {
 		vo.setData(data);
 		data.put("loanOrder", loanOrder);
 		return vo;
+	}
+
+	/**
+	 * 查询用户运营商信息
+	 */
+	@RequestMapping("/queryUserMobile")
+	public CommonVO queryUserMobile(String userId) {
+		MobileVerify verify = userAuthQueryService.getMobileVerify(userId);
+		if (verify == null || !CommonRecordState.SUCCESS.equals(verify.getState())) {
+			return CommonVOUtil.error("not_verify");
+		}
+
+		String url = XinyanUtil.getReportUrl(verify.getToken());
+		return CommonVOUtil.success(url, "success");
+	}
+
+	/**
+	 * 查询电商信息
+	 */
+	@RequestMapping("/queryUserShopping")
+	public CommonVO queryUserShopping(String userId) {
+		ShoppingVerify verify = userAuthQueryService.getShoppingVerify(userId);
+		if (verify == null || !CommonRecordState.SUCCESS.equals(verify.getState())) {
+			return CommonVOUtil.error("not_verify");
+		}
+
+		String url = XinyanUtil.getQueryUrl(verify.getToken());
+		return CommonVOUtil.success(url, "success");
 	}
 }

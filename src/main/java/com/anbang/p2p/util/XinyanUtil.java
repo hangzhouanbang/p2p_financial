@@ -12,6 +12,7 @@ public class XinyanUtil {
     static final String path = "https://qz.xinyan.com/h5/%s/%s/%s/%s/%s?jumpUrl=%s";
     static final String jumpUrl = "https://www.baidu.com/";
     static final String reportPath = "https://qz.xinyan.com/#/portraitCarrier?apiUser=%s&apiEnc=%s&token=%s";
+    static final String queryPath = "https://qz.xinyan.com/api/user/data?apiUser=%s&apiEnc=%s&token=%s";
 
 
 
@@ -41,7 +42,7 @@ public class XinyanUtil {
         return url;
     }
 
-    public static String getReport(String token) {
+    public static String getReportUrl(String token) {
         String apiUser = XinyanConfig.ApiUser;
         String apiKey = XinyanConfig.AccessKey;
 
@@ -52,11 +53,23 @@ public class XinyanUtil {
         return url;
     }
 
+    public static String getQueryUrl(String token) {
+        String apiUser = XinyanConfig.ApiUser;
+        String apiKey = XinyanConfig.AccessKey;
+
+        String signStr = apiUser + apiKey;
+        String apiEnc = MD5Utils.getMD5(signStr, "utf-8");
+
+        String url = String.format(queryPath, apiUser, apiEnc, token);
+        return url;
+    }
+
     public static void main(String[] args) {
 //        System.out.println(getCarrierUrl("003"));
 //        System.out.println(getTaobaowebUrl("004"));
 
 
-        System.out.println(getReport("123"));
+//        System.out.println(getReportUrl("123"));
+        System.out.println(getQueryUrl("123"));
     }
 }

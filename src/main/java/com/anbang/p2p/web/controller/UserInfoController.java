@@ -55,7 +55,9 @@ public class UserInfoController {
 		}
 
 		LoanOrder loanOrder = orderQueryService.findLastOrderByUserId(userId);
-		loanOrder.setContractPath(null);
+		if (loanOrder != null) {
+			loanOrder.setContractPath(null);
+		}
 		return CommonVOUtil.success(loanOrder, "success");
 	}
 

@@ -1,6 +1,10 @@
 package com.anbang.p2p.web.vo;
 
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
+import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoanOrderQueryVO {
 	private String userId;
@@ -14,6 +18,24 @@ public class LoanOrderQueryVO {
 	private Boolean export; //是否导出
 	private Long startTime; //逾期范围
 	private Long endTime; //逾期范围
+
+	private String createTimeSort;
+
+
+	public Sort getSort() {
+		List<Sort.Order> orderList = new ArrayList<>();
+		if ("ASC".equals(createTimeSort)) {
+			orderList.add(new Sort.Order(Sort.Direction.ASC, "createTime"));
+		} else if ("DESC".equals(createTimeSort)) {
+			orderList.add(new Sort.Order(Sort.Direction.DESC, "createTime"));
+		}
+		if (!orderList.isEmpty()) {
+			Sort sort = new Sort(orderList);
+			return sort;
+		}
+		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"));
+		return sort;
+	}
 
 	public String getUserId() {
 		return userId;
@@ -85,5 +107,13 @@ public class LoanOrderQueryVO {
 
 	public void setEndTime(Long endTime) {
 		this.endTime = endTime;
+	}
+
+	public String getCreateTimeSort() {
+		return createTimeSort;
+	}
+
+	public void setCreateTimeSort(String createTimeSort) {
+		this.createTimeSort = createTimeSort;
 	}
 }

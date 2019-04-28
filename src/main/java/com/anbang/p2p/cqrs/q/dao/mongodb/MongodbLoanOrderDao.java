@@ -107,6 +107,7 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 			query.addCriteria(criteria);
 		}
 
+		query.with(queryVO.getSort());
 		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, LoanOrder.class);

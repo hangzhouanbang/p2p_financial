@@ -4,8 +4,8 @@ package com.anbang.p2p.plan.bean;
  * 基本贷款
  */
 public class BaseLoan {
-	public static double baseLimit = 0.2;// 基本额度
-	public static double service_charge = 200;// 借款手续费
+	public static double baseLimit = 0.25;// 基本额度
+	public static double service_charge = 0.1;// 借款手续费
 	public static double expand_charge = 100;	//延期手续费
 	public static long overdue = 24L * 60 * 60 * 1000 * 7;// 逾期转催收时间
 	public static long freeTimeOfInterest = 24L * 60 * 60 * 1000 * 3;// 免息时间

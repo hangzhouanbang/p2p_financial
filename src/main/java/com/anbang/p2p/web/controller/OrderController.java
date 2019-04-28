@@ -115,6 +115,13 @@ public class OrderController {
 //			return CommonVOUtil.success(data, "success");
 //		}
 
+		// 电商认证
+//		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
+//		if (shoppingVerify == null || !CommonRecordState.SUCCESS.equals(shoppingVerify.getState())) {
+//			data.put("allVerify", false);
+//			return CommonVOUtil.success(data, "success");
+//		}
+
 		//  合同认证
 		OrderContract contract = orderQueryService.findOrderContractById("001");
 		if (contract == null) {
@@ -138,7 +145,7 @@ public class OrderController {
 			return vo;
 		}
 		UserDbo user = userAuthQueryService.findUserDboByUserId(userId);
-		// TODO 身份认证
+		// 身份认证
 		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
 		if (baseInfo == null) {
 			vo.setSuccess(false);
@@ -146,7 +153,7 @@ public class OrderController {
 			return vo;
 		}
 
-		// TODO 紧急联系人
+		// 紧急联系人
 		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
 		if (contacts == null) {
 			vo.setSuccess(false);
@@ -154,7 +161,7 @@ public class OrderController {
 			return vo;
 		}
 
-//		// TODO 绑定银行卡
+		// 绑定银行卡
 		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
 		if (bankCardCount == 0) {
 			vo.setSuccess(false);
@@ -162,13 +169,14 @@ public class OrderController {
 			return vo;
 		}
 
-	    // TODO 绑定支付宝
+	    // 绑定支付宝
 		if (user == null || user.getAlipayInfo() == null) {
 			vo.setSuccess(false);
 			vo.setMsg("invalid alipay");
 			return vo;
 		}
 
+//		// 运营商认证
 //		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
 //		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
 //			vo.setSuccess(false);
@@ -176,7 +184,15 @@ public class OrderController {
 //			return vo;
 //		}
 
-//		// TODO 合同认证
+//		// 电商认证
+//		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
+//		if (shoppingVerify == null || !CommonRecordState.SUCCESS.equals(shoppingVerify.getState())) {
+//			vo.setSuccess(false);
+//			vo.setMsg("lack shopping verify");
+//			return vo;
+//		}
+
+		// 合同认证
 		OrderContract contract = orderQueryService.findOrderContractById(contractId);
 		if (contract == null) {
 			vo.setSuccess(false);
@@ -442,7 +458,7 @@ public class OrderController {
 				map.put("${amount}", String.valueOf(loanOrder.getAmount()));
 				map.put("${capital}", AmountToUpper.number2CNMontrayUnit(loanOrder.getAmount()));
 				map.put("${rate}", String.valueOf(loanOrder.getOverdue_rate() * 100));
-				map.put("${day}", String.valueOf(loanOrder.getFreeTimeOfInterest() / 24 * 60 * 60 * 1000));
+				map.put("${day}", String.valueOf(loanOrder.getFreeTimeOfInterest() / (24 * 60 * 60 * 1000)));
 				map.put("${start}", TimeUtils.getStringDate(loanOrder.getDeliverTime()));
 				map.put("${end}", TimeUtils.getStringDate(loanOrder.getMaxLimitTime()));
 				String destPath = WordUtil.PATH + loanOrder.getId() + ".docx";

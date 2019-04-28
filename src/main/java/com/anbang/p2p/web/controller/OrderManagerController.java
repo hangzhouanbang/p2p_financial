@@ -312,8 +312,8 @@ public class OrderManagerController {
 	/**
 	 * 用户详情导出
 	 */
-	@RequestMapping("/collectionExport")
-	public CommonVO collectionExport(String userId, HttpServletResponse response) {
+	@RequestMapping("/exportUserInfo")
+	public CommonVO exportUserInfo(String userId, HttpServletResponse response) {
 		if (userId == null) {
 			return CommonVOUtil.invalidParam();
 		}

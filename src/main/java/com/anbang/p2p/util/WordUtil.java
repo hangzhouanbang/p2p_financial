@@ -10,8 +10,8 @@ import java.util.*;
  * @Description:
  */
 public class WordUtil {
-    public static final String DEMO_PATH = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/docs/demo.docx";
-    public static final String PATH = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/docs/orders/";
+    public static final String DEMO_PATH = "/data/files/docs/demo.docx";
+    public static final String PATH = "/data/files/docs/orders/";
 
     public static void searchAndReplace(String srcPath, String destPath, Map<String, String> map) {
         try {

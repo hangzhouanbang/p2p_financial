@@ -9,7 +9,7 @@ public class FileEntity {
     private InputStream inputStream;
     private String fileType;
     private String fileName;
-    private String filePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/excel";
+    private String filePath = "/data/files/excel";
 
 
     public InputStream getInputStream() {

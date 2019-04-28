@@ -36,7 +36,7 @@ public class AdminController {
 
     @RequestMapping("/getImg")
     public void getImg (String imgName, HttpServletResponse response) {
-        String filePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/imgs/";
+        String filePath = "/data/files/imgs/";
         String imgPath = filePath + imgName;
         File file = new File(imgPath);
         try {

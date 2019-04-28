@@ -23,7 +23,7 @@ public class VerifyConfig {
     // 手机号二要素 appkey
     public static final String PHONE_APP_KEY = "cf8046f434dc84614a81eda0a5f6ff9b";
 
-    public static final String IMG_PATH = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/imgs/";
+    public static final String IMG_PATH = "/data/files/imgs/";
 
 
 }

@@ -154,7 +154,7 @@ public class BaseLoanAndRateController {
 	 */
 	@RequestMapping("/getWord")
 	public String getWord(String id, HttpServletResponse response) {
-		String filePath = "/data/tomcat/apache-tomcat-9.0.10/webapps/p2p/docs/orders";//被下载的文件在服务器中的路径,
+		String filePath = "/data/files/docs/orders";//被下载的文件在服务器中的路径,
 		String filename = id + ".docx";//被下载文件的名称
 
 

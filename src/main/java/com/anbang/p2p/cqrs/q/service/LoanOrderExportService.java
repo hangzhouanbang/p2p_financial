@@ -119,7 +119,7 @@ public class LoanOrderExportService {
     }
 
     // 批量导出
-    public void exportDetailBatch(LoanOrderQueryVO queryVO, ZipOutputStream zipOutputStream) throws IOException {
+    public void exportDetailBatch(LoanOrderQueryVO queryVO, OutputStream output) throws IOException {
         List<LoanOrder> orderList = mongodbLoanOrderDao.find(1, 10000, queryVO);
         for (LoanOrder list : orderList) {
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -133,9 +133,8 @@ public class LoanOrderExportService {
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
-            ZipEntry entry = new ZipEntry(list.getRealName() + list.getIDcard() + ".xls");
-            zipOutputStream.putNextEntry(entry);
-            workbook.write(zipOutputStream);
+            workbook.write(output);
+            workbook.close();
         }
     }
 

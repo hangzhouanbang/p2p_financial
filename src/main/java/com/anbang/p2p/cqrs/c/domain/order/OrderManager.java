@@ -197,6 +197,10 @@ public class OrderManager {
 		}
 		Order order = userIdOrderMap.get(userId);
 		order.setState(orderState);
+
+		if (OrderState.clean.equals(orderState)) {
+			userIdOrderMap.remove(userId);
+		}
 		return new OrderValueObject(order);
 	}
 

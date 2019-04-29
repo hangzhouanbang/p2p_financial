@@ -320,26 +320,16 @@ public class OrderManagerController {
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date date = new Date();
-		OutputStream output = null;
+		String fileName = format.format(date) + "_userInfo_" + userId + ".xlsx";
+		response.reset();
+		response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+		response.setContentType("application/msexcel");
 
-		String fileName = format.format(date) + "用户" + userId + ".zip";
-		response.setContentType("application/octet-stream ");
-		response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
-		response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
 		try {
-			response.setHeader("Content-Disposition",
-					"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
-			response.setCharacterEncoding("UTF-8");
-
-			output = response.getOutputStream();
-			ZipOutputStream zipOutputStream = new ZipOutputStream(output);
-
+			OutputStream output = response.getOutputStream();
 			// 业务数据封装
-			loanOrderExportService.exportUserInfo(userId, zipOutputStream);
-
-			// 关闭输出流
-			zipOutputStream.flush();
-			zipOutputStream.close();
+			loanOrderExportService.exportUserInfo(userId, output);
+			output.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -360,7 +350,7 @@ public class OrderManagerController {
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date date = new Date();
-		OutputStream output = null;
+
 
 		if ("simple".equals(exportType)) {
 			String fileName = format.format(date) + exportType + "Order.xlsx";
@@ -369,7 +359,7 @@ public class OrderManagerController {
 			response.setContentType("application/msexcel");
 
 			try {
-				output = response.getOutputStream();
+				OutputStream output = response.getOutputStream();
 				loanOrderExportService.exportSimple(ids, output);
 				output.close();
 			} catch (IOException e) {
@@ -378,24 +368,16 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
-			String fileName = format.format(date) + "催收详情文件" + ".zip";
-			response.setContentType("application/octet-stream ");
-			response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
-			response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
+			String fileName = format.format(date) + "orderDetail" + ".zip";
+			response.reset();
+			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+			response.setContentType("application/msexcel");
+
 			try {
-				response.setHeader("Content-Disposition",
-						"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
-				response.setCharacterEncoding("UTF-8");
-
-				output = response.getOutputStream();
-				ZipOutputStream zipOutputStream = new ZipOutputStream(output);
-
+				OutputStream output = response.getOutputStream();
 				// 业务数据封装
-				loanOrderExportService.exportDetail(ids, zipOutputStream);
-
-				// 关闭输出流
-				zipOutputStream.flush();
-				zipOutputStream.close();
+				loanOrderExportService.exportDetail(ids, output);
+				output.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -432,17 +414,17 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
-			String fileName = format.format(date) + "催收批量文件" + ".zip";
-			response.setContentType("application/octet-stream ");
-			response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
-			response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
 			try {
+				output = response.getOutputStream();
+				ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+
+				String fileName = format.format(date) + "催收批量文件" + ".zip";
+				response.setContentType("application/octet-stream ");
+				response.setHeader("Connection", "close"); // 表示不能用浏览器直接打开
+				response.setHeader("Accept-Ranges", "bytes");// 告诉客户端允许断点续传多线程连接下载
 				response.setHeader("Content-Disposition",
 						"attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1"));
 				response.setCharacterEncoding("UTF-8");
-
-				output = response.getOutputStream();
-				ZipOutputStream zipOutputStream = new ZipOutputStream(output);
 
 				// 业务数据封装
 				loanOrderExportService.exportDetailBatch(queryVO, zipOutputStream);

@@ -39,7 +39,7 @@ public class LoanOrderExportService {
     private UserContactsDao userContactsDao;
 
     // 导出用户详情
-    public void exportUserInfo(String userId, ZipOutputStream zipOutputStream) throws IOException {
+    public void exportUserInfo(String userId, OutputStream output) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         // 用户身份证信息
         UserBaseInfo baseInfo = userBaseInfoDao.findById(userId);
@@ -58,9 +58,8 @@ public class LoanOrderExportService {
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
         }
 
-        ZipEntry entry = new ZipEntry(userId + ".xls");
-        zipOutputStream.putNextEntry(entry);
-        workbook.write(zipOutputStream);
+        workbook.write(output);
+        workbook.close();
     }
 
     // 导出单页
@@ -82,7 +81,7 @@ public class LoanOrderExportService {
     }
 
     // 导出单页详情
-    public void exportDetail(String[] ids, ZipOutputStream zipOutputStream) throws IOException {
+    public void exportDetail(String[] ids, OutputStream output) throws IOException {
         List<LoanOrder> orderList = mongodbLoanOrderDao.listByIds(ids);
         for (LoanOrder list : orderList) {
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -96,9 +95,8 @@ public class LoanOrderExportService {
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
-            ZipEntry entry = new ZipEntry(list.getRealName() + list.getIDcard() + ".xls");
-            zipOutputStream.putNextEntry(entry);
-            workbook.write(zipOutputStream);
+            workbook.write(output);
+            workbook.close();
         }
     }
 

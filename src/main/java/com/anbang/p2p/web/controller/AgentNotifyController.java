@@ -24,9 +24,11 @@ import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.util.MD5Utils;
 import com.anbang.p2p.util.checkservice.MobileServiceUtil;
 import com.anbang.p2p.web.vo.CommonVO;
+import com.anbang.p2p.web.vo.XinyanParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -145,41 +147,45 @@ public class AgentNotifyController {
     /**
      * 新颜回调
      */
-    @RequestMapping("/checkNotify")
-    public String checkNotify(String msg, String token, String taskId, String apiUser, String apiEnc, String apiName, Boolean success){
-        if (!XinyanConfig.ApiUser.equals(apiUser)) {
-            return "";
+    @RequestMapping(value = "/checkNotify", produces = "application/json;charset=UTF-8")
+    public String checkNotify(@RequestBody XinyanParam bean){
+        if (!XinyanConfig.ApiUser.equals(bean.getApiUser())) {
+            return "success";
         }
 
-        String signStr = apiUser + XinyanConfig.AccessKey + token;
+        String taskId = bean.getTaskId();
+
+        String signStr =bean.getApiUser() + XinyanConfig.AccessKey + bean.getToken();
         String sign = MD5Utils.getMD5(signStr, "utf-8");
-        if (!sign.equals(apiEnc)) {
-            System.out.println("验签未通过的新颜回调-------->" + msg + token + apiName + taskId);
-            return "";
+        if (!sign.equals(bean.getApiEnc())) {
+            System.out.println("验签未通过的新颜回调-------->" + JSON.toJSONString(bean));
+            return "success";
         }
 
         String userId = taskId.substring(0, taskId.indexOf("_"));
-        if ("carrier".equals(apiName)) {
+        if ("carrier".equals(bean.getApiName())) {
             MobileVerify mobileVerify = new MobileVerify();
             mobileVerify.setId(userId);
             mobileVerify.setState(CommonRecordState.SUCCESS);
-            mobileVerify.setToken(token);
+            mobileVerify.setToken(bean.getToken());
             mobileVerify.setTaskId(taskId);
             mobileVerify.setCreateTime(System.currentTimeMillis());
+            userAuthQueryService.saveMobileVerify(mobileVerify);
             return "success";
         }
-        if ("taobaoweb".equals(apiName)) {
+        if ("taobaoweb".equals(bean.getApiName())) {
             ShoppingVerify shoppingVerify = new ShoppingVerify();
             shoppingVerify.setId(userId);
             shoppingVerify.setState(CommonRecordState.SUCCESS);
-            shoppingVerify.setToken(token);
+            shoppingVerify.setToken(bean.getToken());
             shoppingVerify.setTaskId(taskId);
             shoppingVerify.setCreateTime(System.currentTimeMillis());
+            userAuthQueryService.saveShoppingVerify(shoppingVerify);
             return "success";
         }
 
-        System.out.println("未消费的新颜回调-------->" + msg + token + apiName + taskId);
-        return "";
+        System.out.println("验签未通过的新颜回调-------->" + JSON.toJSONString(bean));
+        return "success";
     }
 
 

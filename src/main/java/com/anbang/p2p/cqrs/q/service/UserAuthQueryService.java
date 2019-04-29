@@ -190,4 +190,8 @@ public class UserAuthQueryService {
 	public ShoppingVerify getShoppingVerify(String id) {
 		return shoppingVerifyDao.getById(id);
 	}
+
+	public void saveShoppingVerify(ShoppingVerify shoppingVerify) {
+		 shoppingVerifyDao.save(shoppingVerify);
+	}
 }

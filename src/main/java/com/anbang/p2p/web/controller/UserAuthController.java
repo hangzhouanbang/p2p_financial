@@ -54,6 +54,19 @@ public class UserAuthController {
 	/**
 	 * 获取验证码
 	 */
+	@RequestMapping("/check")
+	@ResponseBody
+	public CommonVO check(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+		return CommonVOUtil.success(token, "success");
+	}
+
+	/**
+	 * 获取验证码
+	 */
 	@RequestMapping("/getcode")
 	@ResponseBody
 	public CommonVO getVerifyCode(String phone) {

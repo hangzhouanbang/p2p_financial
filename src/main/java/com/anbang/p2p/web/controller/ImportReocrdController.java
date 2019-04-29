@@ -112,8 +112,11 @@ public class ImportReocrdController {
      * excel 销账导入
      */
     @PostMapping("/repayImport")
-    public CommonVO repayImport(@RequestParam(value="filename") MultipartFile file) {
+    @ResponseBody
+    public CommonVO repayImport(HttpServletRequest request) {
         try {
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            MultipartFile file = multipartRequest.getFile("filename");
 
             InputStream inputstream = file.getInputStream();
             if (!(inputstream.markSupported())) {

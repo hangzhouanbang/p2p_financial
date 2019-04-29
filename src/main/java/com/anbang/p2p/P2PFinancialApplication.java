@@ -86,17 +86,6 @@ public class P2PFinancialApplication {
 		return initProcessor;
 	}
 
-	/**
-	 * 配置文件上传大小
-	 */
-	@Bean
-	public MultipartConfigElement getMultiConfig() {
-		MultipartConfigFactory factory = new MultipartConfigFactory();
-		factory.setMaxFileSize("50MB");
-		factory.setMaxRequestSize("50MB");
-		return factory.createMultipartConfig();
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(P2PFinancialApplication.class, args);
 	}

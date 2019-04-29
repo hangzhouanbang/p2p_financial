@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.anbang.p2p.conf.OrgConfig;
 import com.anbang.p2p.constants.*;
 import com.anbang.p2p.cqrs.c.domain.IllegalOperationException;
 import com.anbang.p2p.cqrs.c.domain.order.OrderNotFoundException;
@@ -20,7 +21,6 @@ import com.anbang.p2p.plan.dao.LeaveWordDao;
 import com.anbang.p2p.plan.service.RiskService;
 import com.anbang.p2p.util.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.record.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -132,6 +132,59 @@ public class OrderController {
 		return CommonVOUtil.success(data, "success");
 	}
 
+	@RequestMapping("/checkVerifyInfo")
+	public CommonVO checkVerifyInfo(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		Map data = new HashMap();
+		UserDbo user = userAuthQueryService.findUserDboByUserId(userId);
+		data.put("baseInfo", true);
+		data.put("contacts", true);
+		data.put("bankCard", true);
+		data.put("alipayInfo", true);
+		data.put("mobileVerify", true);
+		data.put("shoppingVerify", true);
+
+		// 身份认证
+		UserBaseInfo baseInfo = userAuthQueryService.findUserBaseInfoByUserId(userId);
+		if (baseInfo == null) {
+			data.put("baseInfo", false);
+		}
+
+		// 紧急联系人
+		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
+		if (contacts == null) {
+			data.put("contacts", false);
+		}
+
+		// 绑定银行卡
+		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
+		if (bankCardCount == 0) {
+			data.put("bankCard", false);
+		}
+
+		// 绑定支付宝
+		if (user == null || user.getAlipayInfo() == null) {
+			data.put("alipayInfo", false);
+		}
+
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+			data.put("mobileVerify", false);
+		}
+
+		// 电商认证
+		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
+		if (shoppingVerify == null || !CommonRecordState.SUCCESS.equals(shoppingVerify.getState())) {
+			data.put("shoppingVerify", false);
+		}
+
+		return CommonVOUtil.success(data, "success");
+	}
+
 	/**
 	 * 申请卡密
 	 */
@@ -162,12 +215,12 @@ public class OrderController {
 		}
 
 		// 绑定银行卡
-		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
-		if (bankCardCount == 0) {
-			vo.setSuccess(false);
-			vo.setMsg("invalid cardId");
-			return vo;
-		}
+//		long bankCardCount = userAuthQueryService.getAmountByUserId(userId);
+//		if (bankCardCount == 0) {
+//			vo.setSuccess(false);
+//			vo.setMsg("invalid cardId");
+//			return vo;
+//		}
 
 	    // 绑定支付宝
 		if (user == null || user.getAlipayInfo() == null) {
@@ -176,13 +229,13 @@ public class OrderController {
 			return vo;
 		}
 
-//		// 运营商认证
-//		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
-//		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
-//			vo.setSuccess(false);
-//			vo.setMsg("lack mobile verify");
-//			return vo;
-//		}
+		// 运营商认证
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+			vo.setSuccess(false);
+			vo.setMsg("lack mobile verify");
+			return vo;
+		}
 
 //		// 电商认证
 //		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
@@ -449,11 +502,13 @@ public class OrderController {
 				map.put("${realName}", loanOrder.getRealName());
 				map.put("${card}", loanOrder.getIDcard());
 
-				OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
-				if (orgInfo != null) {
-					map.put("${org}", orgInfo.getOrgName());
-					map.put("${phone}", orgInfo.getPhone());
-				}
+//				OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
+//				if (orgInfo != null) {
+//					map.put("${org}", orgInfo.getOrgName());
+//					map.put("${phone}", orgInfo.getPhone());
+//				}
+				map.put("${org}", OrgConfig.org_name);
+				map.put("${phone}", OrgConfig.org_phone);
 
 				map.put("${amount}", String.valueOf(loanOrder.getAmount()));
 				map.put("${capital}", AmountToUpper.number2CNMontrayUnit(loanOrder.getAmount()));

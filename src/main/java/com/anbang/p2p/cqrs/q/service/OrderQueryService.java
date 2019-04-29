@@ -59,8 +59,8 @@ public class OrderQueryService {
 	}
 
 
-	public void updateLoanOrderState(String id, OrderState orderState) {
-		loanOrderDao.updateLoanOrderState(id, orderState);
+	public void updateLoanOrderState(String id, OrderState orderState, Double amount) {
+		loanOrderDao.updateLoanOrderState(id, orderState, amount);
 	}
 
 	public void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount) {
@@ -122,7 +122,7 @@ public class OrderQueryService {
 		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
 		loanOrder.setRealRefundAmount(orderValueObject.getRealRefundAmount());
 		loanOrder.setRefundTime(orderValueObject.getRefundTime());
-		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
+//		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
 
 		// TODO: 2019/4/23
 		loanOrder.setRepayType("催收销账");

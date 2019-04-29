@@ -26,5 +26,5 @@ public interface LoanOrderDao {
 
 	void updateLoanOrderAmount(String id, int overdueDay, double interest, double shouldRepayAmount);
 
-	void updateLoanOrderState(String id, OrderState orderState);
+	void updateLoanOrderState(String id, OrderState orderState, Double amount);
 }

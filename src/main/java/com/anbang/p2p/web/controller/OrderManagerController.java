@@ -220,7 +220,7 @@ public class OrderManagerController {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
 		query.setNowTime(System.currentTimeMillis());
 		query.setState(OrderState.refund);
-		int size = 2000;
+		int size = 1000;
 		long amount = orderQueryService.countAmount(query);
 		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
 		for (int page = 1; page <= pageCount; page++) {
@@ -247,7 +247,7 @@ public class OrderManagerController {
 	public void overdueTransferToCollection() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
 		query.setState(OrderState.overdue);
-		int size = 2000;
+		int size = 1000;
 		long amount = orderQueryService.countAmount(query);
 		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
 		for (int page = 1; page <= pageCount; page++) {
@@ -280,7 +280,7 @@ public class OrderManagerController {
 	public void collectionCal() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
 		query.setState(OrderState.collection);
-		int size = 2000;
+		int size = 1000;
 		long amount = orderQueryService.countAmount(query);
 		long pageCount = amount % size > 0 ? amount / size + 1 : amount / size;
 		for (int page = 1; page <= pageCount; page++) {
@@ -461,10 +461,14 @@ public class OrderManagerController {
 	 * 变更卡密状态
 	 */
 	@RequestMapping("/changeOrderStateByAdmin")
-	public CommonVO changeOrderStateByAdmin(String userId, OrderState orderState) {
+	public CommonVO changeOrderStateByAdmin(String userId, OrderState orderState, Double amount) {
 		try {
+			if (amount == null || amount <= 0) {
+				return CommonVOUtil.success("amount error");
+			}
+
 			OrderValueObject object = orderCmdService.changeOrderStateByAdmin(userId, orderState);
-			orderQueryService.updateLoanOrderState(object.getId(), object.getState());
+			orderQueryService.updateLoanOrderState(object.getId(), object.getState(), amount);
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {
 			e.printStackTrace();
@@ -479,6 +483,25 @@ public class OrderManagerController {
 	public CommonVO addExpand(String userId) {
 		try {
 			OrderValueObject object = orderCmdService.addExpand(userId, ExpandType.ADMIN);
+			orderQueryService.updateLoanOrderExpand(object);
+			return CommonVOUtil.success("success");
+		} catch (OrderNotFoundException e) {
+			e.printStackTrace();
+			return CommonVOUtil.error("order error");
+		}
+	}
+
+	/**
+	 * 补缴延期费
+	 */
+	@RequestMapping("/addExpandFee")
+	public CommonVO addExpandFee(String userId, Double amount) {
+		try {
+			if (amount == null || amount <= 0) {
+				return CommonVOUtil.success("success");
+			}
+
+			OrderValueObject object = orderCmdService.changeExpandFee(userId, amount);
 			orderQueryService.updateLoanOrderExpand(object);
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {

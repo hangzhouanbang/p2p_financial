@@ -154,44 +154,48 @@ public class BaseLoanAndRateController {
 	 */
 	@RequestMapping("/getWord")
 	public String getWord(String id, HttpServletResponse response) {
-		String filePath = "/data/files/docs/orders";//被下载的文件在服务器中的路径,
-		String filename = id + ".docx";//被下载文件的名称
 
-
-		File file = new File(filePath + "/" + filename);
-		if(file.exists()) { //判断文件父目录是否存在
-			response.setContentType("application/force-download");
-			response.setHeader("Content-Disposition", "attachment;fileName=" + filename);
-
-			byte[] buffer = new byte[1024];
-			FileInputStream fis = null; //文件输入流
-			BufferedInputStream bis = null;
-
-			OutputStream os = null; //输出流
-			try {
-				os = response.getOutputStream();
-				fis = new FileInputStream(file);
-				bis = new BufferedInputStream(fis);
-				int i = bis.read(buffer);
-				while (i != -1) {
-					os.write(buffer);
-					i = bis.read(buffer);
+		String fileName = id + ".docx";//被下载文件的名称// 设置文件名，根据业务需要替换成要下载的文件名
+		if (fileName != null) {
+			//设置文件路径
+			String realPath = "/data/files/docs/orders/";
+			File file = new File(realPath , fileName);
+			if (file.exists()) {
+				response.setContentType("application/force-download");// 设置强制下载不打开
+				response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
+				byte[] buffer = new byte[1024];
+				FileInputStream fis = null;
+				BufferedInputStream bis = null;
+				try {
+					fis = new FileInputStream(file);
+					bis = new BufferedInputStream(fis);
+					OutputStream os = response.getOutputStream();
+					int i = bis.read(buffer);
+					while (i != -1) {
+						os.write(buffer, 0, i);
+						i = bis.read(buffer);
+					}
+					System.out.println("success");
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (bis != null) {
+						try {
+							bis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if (fis != null) {
+						try {
+							fis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
 				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-			System.out.println("----------file download" + filename);
-			try {
-				bis.close();
-				fis.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
 		}
-		return "success";
+		return null;
 	}
 }

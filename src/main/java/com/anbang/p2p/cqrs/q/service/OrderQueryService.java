@@ -116,11 +116,11 @@ public class OrderQueryService {
 		return loanOrder;
 	}
 
-	public LoanOrder updateLoanOrderByImport(OrderValueObject orderValueObject) {
+	public LoanOrder updateLoanOrderByImport(OrderValueObject orderValueObject, double repayAmount) {
 		LoanOrder loanOrder = loanOrderDao.findById(orderValueObject.getId());
 		loanOrder.setState(orderValueObject.getState());
 		loanOrder.setDeliverTime(orderValueObject.getDeliverTime());
-		loanOrder.setRealRefundAmount(orderValueObject.getRealRefundAmount());
+		loanOrder.setRealRefundAmount(repayAmount);
 		loanOrder.setRefundTime(orderValueObject.getRefundTime());
 //		CalAmountUtil.shouldRepayAmount(loanOrder, System.currentTimeMillis());
 

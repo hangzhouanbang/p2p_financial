@@ -8,7 +8,7 @@ public class RepayRecord {
     private String userId;
     private String realName;
     private double amount;
-    private double repayAmount;
+    private double repayAmount;  //销账金额
 
 
     public String getId() {

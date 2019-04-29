@@ -95,7 +95,7 @@ public class ImportReocrdController {
         for (RepayRecord list : importRecord.getRepayRecords()) {
             try {
                 OrderValueObject order = orderCmdService.changeOrderStateClean(list.getUserId());
-                orderQueryService.updateLoanOrderByImport(order);
+                orderQueryService.updateLoanOrderByImport(order, list.getRepayAmount());
             } catch (OrderNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalOperationException e) {

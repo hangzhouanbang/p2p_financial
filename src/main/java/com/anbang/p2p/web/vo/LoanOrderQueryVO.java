@@ -19,6 +19,9 @@ public class LoanOrderQueryVO {
 	private Long startTime; //逾期范围
 	private Long endTime; //逾期范围
 
+	private Integer startDay; //逾期天数
+	private Integer endDay; //逾期天数
+
 	private String createTimeSort;
 
 
@@ -115,5 +118,21 @@ public class LoanOrderQueryVO {
 
 	public void setCreateTimeSort(String createTimeSort) {
 		this.createTimeSort = createTimeSort;
+	}
+
+	public Integer getStartDay() {
+		return startDay;
+	}
+
+	public void setStartDay(Integer startDay) {
+		this.startDay = startDay;
+	}
+
+	public Integer getEndDay() {
+		return endDay;
+	}
+
+	public void setEndDay(Integer endDay) {
+		this.endDay = endDay;
 	}
 }

@@ -202,37 +202,37 @@ public class UserAuthController {
 	/**
 	 * 验证手机验证码
 	 */
-	@RequestMapping("/test")
-	@ResponseBody
-	public CommonVO verifyPhone(String phone) {
-		CommonVO vo = new CommonVO();
-
-		try {
-			AuthorizationDbo authDbo = userAuthQueryService.findAuthorizationDbo("p2p.app.phone", phone);
-			if (authDbo != null) {// 已经手机注册
-				String token = userAuthService.thirdAuth("p2p.app.phone", phone);
-				Map data = new HashMap<>();
-				vo.setData(data);
-				data.put("token", token);
-				return vo;
-			} else {
-				// 新用户手机注册
-				CreateUserResult createResult = userAuthCmdService.createUserAndAddThirdAuth("p2p.app.phone", phone,
-						System.currentTimeMillis());
-				userAuthQueryService.createUserAndAddThirdAuth(createResult.getUserId(), createResult.getPublisher(),
-						createResult.getUuid(), "","");
-				String token = userAuthService.thirdAuth(createResult.getPublisher(), createResult.getUuid());
-				Map data = new HashMap<>();
-				vo.setData(data);
-				data.put("token", token);
-				return vo;
-			}
-		} catch (Exception e) {
-			vo.setSuccess(false);
-			vo.setMsg(e.getClass().getName());
-			return vo;
-		}
-	}
+//	@RequestMapping("/test")
+//	@ResponseBody
+//	public CommonVO verifyPhone(String phone) {
+//		CommonVO vo = new CommonVO();
+//
+//		try {
+//			AuthorizationDbo authDbo = userAuthQueryService.findAuthorizationDbo("p2p.app.phone", phone);
+//			if (authDbo != null) {// 已经手机注册
+//				String token = userAuthService.thirdAuth("p2p.app.phone", phone);
+//				Map data = new HashMap<>();
+//				vo.setData(data);
+//				data.put("token", token);
+//				return vo;
+//			} else {
+//				// 新用户手机注册
+//				CreateUserResult createResult = userAuthCmdService.createUserAndAddThirdAuth("p2p.app.phone", phone,
+//						System.currentTimeMillis());
+//				userAuthQueryService.createUserAndAddThirdAuth(createResult.getUserId(), createResult.getPublisher(),
+//						createResult.getUuid(), "","");
+//				String token = userAuthService.thirdAuth(createResult.getPublisher(), createResult.getUuid());
+//				Map data = new HashMap<>();
+//				vo.setData(data);
+//				data.put("token", token);
+//				return vo;
+//			}
+//		} catch (Exception e) {
+//			vo.setSuccess(false);
+//			vo.setMsg(e.getClass().getName());
+//			return vo;
+//		}
+//	}
 
 
 	/**

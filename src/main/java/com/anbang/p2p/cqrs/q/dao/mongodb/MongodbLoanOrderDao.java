@@ -57,13 +57,23 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		if (queryVO.getExport() != null) {
 			query.addCriteria(Criteria.where("export").is(queryVO.getExport()));
 		}
-		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
-			Criteria criteria = Criteria.where("overdueTime");
-			if (queryVO.getStartTime() != null) {
-				criteria = criteria.gte(queryVO.getStartTime());
+//		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
+//			Criteria criteria = Criteria.where("overdueTime");
+//			if (queryVO.getStartTime() != null) {
+//				criteria = criteria.gte(queryVO.getStartTime());
+//			}
+//			if (queryVO.getEndTime() != null) {
+//				criteria = criteria.lte(queryVO.getEndTime());
+//			}
+//			query.addCriteria(criteria);
+//		}
+		if (queryVO.getStartDay() != null || queryVO.getEndDay() != null) {
+			Criteria criteria = Criteria.where("overdueDay");
+			if (queryVO.getStartDay() != null) {
+				criteria = criteria.gte(queryVO.getStartDay());
 			}
-			if (queryVO.getEndTime() != null) {
-				criteria = criteria.lte(queryVO.getEndTime());
+			if (queryVO.getEndDay() != null) {
+				criteria = criteria.lte(queryVO.getEndDay());
 			}
 			query.addCriteria(criteria);
 		}
@@ -96,13 +106,23 @@ public class MongodbLoanOrderDao implements LoanOrderDao {
 		if (queryVO.getExport() != null) {
 			query.addCriteria(Criteria.where("export").is(queryVO.getExport()));
 		}
-		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
-			Criteria criteria = Criteria.where("overdueTime");
-			if (queryVO.getStartTime() != null) {
-				criteria = criteria.gte(queryVO.getStartTime());
+//		if (queryVO.getStartTime() != null || queryVO.getEndTime() != null) {
+//			Criteria criteria = Criteria.where("overdueTime");
+//			if (queryVO.getStartTime() != null) {
+//				criteria = criteria.gte(queryVO.getStartTime());
+//			}
+//			if (queryVO.getEndTime() != null) {
+//				criteria = criteria.lte(queryVO.getEndTime());
+//			}
+//			query.addCriteria(criteria);
+//		}
+		if (queryVO.getStartDay() != null || queryVO.getEndDay() != null) {
+			Criteria criteria = Criteria.where("overdueDay");
+			if (queryVO.getStartDay() != null) {
+				criteria = criteria.gte(queryVO.getStartDay());
 			}
-			if (queryVO.getEndTime() != null) {
-				criteria = criteria.lte(queryVO.getEndTime());
+			if (queryVO.getEndDay() != null) {
+				criteria = criteria.lte(queryVO.getEndDay());
 			}
 			query.addCriteria(criteria);
 		}

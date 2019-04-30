@@ -10,7 +10,7 @@ import java.util.Date;
 public class XinyanUtil {
 //    static final String path = "https://qz.xinyan.com/h5?apiUser=%s&timeMark=%s&apiEnc=%s&apiName=%s&taskId=%s&jumpUrl=%s";
     static final String path = "https://qz.xinyan.com/h5/%s/%s/%s/%s/%s?jumpUrl=%s";
-    static final String jumpUrl = "https://www.baidu.com/";
+    static final String jumpUrl = "http://47.91.219.7/p2p/#/yunyingshang";
     static final String reportPath = "https://qz.xinyan.com/#/portraitCarrier?apiUser=%s&apiEnc=%s&token=%s";
     static final String queryPath = "https://qz.xinyan.com/api/user/data?apiUser=%s&apiEnc=%s&token=%s";
 

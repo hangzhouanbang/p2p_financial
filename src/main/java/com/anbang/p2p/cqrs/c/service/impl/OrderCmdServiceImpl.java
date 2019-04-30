@@ -75,24 +75,24 @@ public class OrderCmdServiceImpl extends CmdServiceBase implements OrderCmdServi
 	}
 
 	@Override
-	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+	public OrderValueObject changeOrderStateByAdmin(String id, String userId, OrderState orderState)
 			throws OrderNotFoundException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.changeOrderStateByAdmin(userId, orderState);
+		return orderManager.changeOrderStateByAdmin(id, userId, orderState);
 	}
 
 	@Override
-	public OrderValueObject changeExpandFee(String userId, Double fee)
+	public OrderValueObject changeExpandFee(String id, String userId, Double fee)
 			throws OrderNotFoundException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.changeExpandFee(userId, fee);
+		return orderManager.changeExpandFee(id, userId, fee);
 	}
 
 	@Override
-	public OrderValueObject addExpand(String userId, ExpandType expandType)
+	public OrderValueObject addExpand(String id, String userId, ExpandType expandType)
 			throws OrderNotFoundException {
 		OrderManager orderManager = singletonEntityRepository.getEntity(OrderManager.class);
-		return orderManager.addExpand(userId, expandType);
+		return orderManager.addExpand(id, userId, expandType);
 	}
 
 }

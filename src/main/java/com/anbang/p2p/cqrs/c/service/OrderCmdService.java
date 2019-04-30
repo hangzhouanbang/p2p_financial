@@ -34,12 +34,12 @@ public interface OrderCmdService {
 	OrderValueObject changeOrderStateClean(String userId)
 			throws OrderNotFoundException, IllegalOperationException;
 
-	OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+	OrderValueObject changeOrderStateByAdmin(String id, String userId, OrderState orderState)
 			throws OrderNotFoundException;
 
-	OrderValueObject changeExpandFee(String userId, Double fee)
+	OrderValueObject changeExpandFee(String id, String userId, Double fee)
 			throws OrderNotFoundException;
 
-	OrderValueObject addExpand(String userId, ExpandType expandType)
+	OrderValueObject addExpand(String id, String userId, ExpandType expandType)
 			throws OrderNotFoundException;
 }

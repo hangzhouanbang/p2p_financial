@@ -430,13 +430,13 @@ public class OrderManagerController {
 	 * 变更卡密状态
 	 */
 	@RequestMapping("/changeOrderStateByAdmin")
-	public CommonVO changeOrderStateByAdmin(String userId, OrderState orderState, Double amount) {
+	public CommonVO changeOrderStateByAdmin(String id, String userId, OrderState orderState, Double amount) {
 		try {
 			if (amount == null || amount <= 0) {
 				return CommonVOUtil.success("amount error");
 			}
 
-			OrderValueObject object = orderCmdService.changeOrderStateByAdmin(userId, orderState);
+			OrderValueObject object = orderCmdService.changeOrderStateByAdmin(id, userId, orderState);
 			orderQueryService.updateLoanOrderState(object.getId(), object.getState(), amount);
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {
@@ -449,9 +449,9 @@ public class OrderManagerController {
 	 * 增加延期次数
 	 */
 	@RequestMapping("/addExpand")
-	public CommonVO addExpand(String userId) {
+	public CommonVO addExpand(String id, String userId) {
 		try {
-			OrderValueObject object = orderCmdService.addExpand(userId, ExpandType.ADMIN);
+			OrderValueObject object = orderCmdService.addExpand(id, userId, ExpandType.ADMIN);
 			orderQueryService.updateLoanOrderExpand(object);
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {
@@ -464,13 +464,13 @@ public class OrderManagerController {
 	 * 补缴延期费
 	 */
 	@RequestMapping("/addExpandFee")
-	public CommonVO addExpandFee(String userId, Double amount) {
+	public CommonVO addExpandFee(String id, String userId, Double amount) {
 		try {
 			if (amount == null || amount <= 0) {
 				return CommonVOUtil.success("success");
 			}
 
-			OrderValueObject object = orderCmdService.changeExpandFee(userId, amount);
+			OrderValueObject object = orderCmdService.changeExpandFee(id, userId, amount);
 			orderQueryService.updateLoanOrderExpand(object);
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {

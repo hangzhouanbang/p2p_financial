@@ -74,7 +74,7 @@ public class AgentNotifyController {
             try {
 
                 if (PaymentType.expand.equals(refundInfo.getPaymentType())) {  //客户延期
-                    orderValueObject = orderCmdService.addExpand(refundInfo.getUserId(), ExpandType.CLIENT);
+                    orderValueObject = orderCmdService.addExpand(refundInfo.getLoanOrderId(), refundInfo.getUserId(), ExpandType.CLIENT);
                     orderQueryService.updateLoanOrderExpand(orderValueObject);
                 } else { // 付款
                     orderValueObject = orderCmdService.cleanOrder(refundInfo.getUserId(), amount, System.currentTimeMillis());

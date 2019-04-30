@@ -221,12 +221,12 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 	}
 
 	@Override
-	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+	public OrderValueObject changeOrderStateByAdmin(String id, String userId, OrderState orderState)
 			throws OrderNotFoundException {
 		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeOrderStateByAdmin",
-				userId, orderState);
+				id, userId, orderState);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
-			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateByAdmin(cmd.getParameter(), cmd.getParameter());
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeOrderStateByAdmin(cmd.getParameter(), cmd.getParameter(), cmd.getParameter());
 			return orderValueObject;
 		});
 		try {
@@ -240,12 +240,12 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 		}
 	}
 	@Override
-	public OrderValueObject changeExpandFee(String userId, Double fee)
+	public OrderValueObject changeExpandFee(String id, String userId, Double fee)
 			throws OrderNotFoundException {
 		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "changeExpandFee",
-				userId, fee);
+				id, userId, fee);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
-			OrderValueObject orderValueObject = orderCmdServiceImpl.changeExpandFee(cmd.getParameter(), cmd.getParameter());
+			OrderValueObject orderValueObject = orderCmdServiceImpl.changeExpandFee(cmd.getParameter(), cmd.getParameter(), cmd.getParameter());
 			return orderValueObject;
 		});
 		try {
@@ -259,12 +259,12 @@ public class DisruptorOrderCmdService extends DisruptorCmdServiceBase implements
 		}
 	}
 	@Override
-	public OrderValueObject addExpand(String userId, ExpandType expandType)
+	public OrderValueObject addExpand(String id, String userId, ExpandType expandType)
 			throws OrderNotFoundException {
 		CommonCommand cmd = new CommonCommand(OrderCmdServiceImpl.class.getName(), "addExpand",
-				userId, expandType);
+				id, userId, expandType);
 		DeferredResult<OrderValueObject> result = publishEvent(disruptorFactory.getCoreCmdDisruptor(), cmd, () -> {
-			OrderValueObject orderValueObject = orderCmdServiceImpl.addExpand(cmd.getParameter(), cmd.getParameter());
+			OrderValueObject orderValueObject = orderCmdServiceImpl.addExpand(cmd.getParameter(), cmd.getParameter(), cmd.getParameter());
 			return orderValueObject;
 		});
 		try {

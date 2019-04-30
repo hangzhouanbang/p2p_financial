@@ -190,15 +190,19 @@ public class OrderManager {
 	/**
 	 * 管理员变更状态
 	 */
-	public OrderValueObject changeOrderStateByAdmin(String userId, OrderState orderState)
+	public OrderValueObject changeOrderStateByAdmin(String id, String userId, OrderState orderState)
 			throws OrderNotFoundException {
 		if (!userIdOrderMap.containsKey(userId)) {
 			throw new OrderNotFoundException();
 		}
 		Order order = userIdOrderMap.get(userId);
-		order.setState(orderState);
 
-		if (OrderState.clean.equals(orderState)) {
+		if (!order.getId().equals(id)) {
+			throw new OrderNotFoundException();
+		}
+
+		order.setState(orderState);
+		if (OrderState.clean.equals(orderState) || OrderState.refuse.equals(orderState)) {
 			userIdOrderMap.remove(userId);
 		}
 		return new OrderValueObject(order);
@@ -207,12 +211,16 @@ public class OrderManager {
 	/**
 	 * 管理员变更延期费
 	 */
-	public OrderValueObject changeExpandFee(String userId, double fee)
+	public OrderValueObject changeExpandFee(String id, String userId, double fee)
 			throws OrderNotFoundException {
 		if (!userIdOrderMap.containsKey(userId)) {
 			throw new OrderNotFoundException();
 		}
 		Order order = userIdOrderMap.get(userId);
+		if (!order.getId().equals(id)) {
+			throw new OrderNotFoundException();
+		}
+
 		double newExpandTotal = order.getExpandTotal() + fee;
 		order.setExpandTotal(newExpandTotal);
 		return new OrderValueObject(order);
@@ -221,12 +229,16 @@ public class OrderManager {
 	/**
 	 * 管理员变更状态
 	 */
-	public OrderValueObject addExpand(String userId, ExpandType expandType)
+	public OrderValueObject addExpand(String id, String userId, ExpandType expandType)
 			throws OrderNotFoundException {
 		if (!userIdOrderMap.containsKey(userId)) {
 			throw new OrderNotFoundException();
 		}
 		Order order = userIdOrderMap.get(userId);
+		if (!order.getId().equals(id)) {
+			throw new OrderNotFoundException();
+		}
+
 		order.addExpand(expandType);
 		return new OrderValueObject(order);
 	}

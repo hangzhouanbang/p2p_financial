@@ -311,11 +311,13 @@ public class UserInfoController {
 		data.put("id_card", userDbo.getIDcard());
 		data.put("realName", userDbo.getRealName());
 
-		OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
-		if (orgInfo != null) {
-			data.put("org_name", orgInfo.getOrgName());
-			data.put("org_phone", orgInfo.getPhone());
-		}
+//		OrgInfo orgInfo = userAuthQueryService.getOrgInfo("001");
+//		if (orgInfo != null) {
+//			data.put("org_name", orgInfo.getOrgName());
+//			data.put("org_phone", orgInfo.getPhone());
+//		}
+		data.put("org_name", "快鹿小贷");
+		data.put("org_phone", "000000");
 
 		UserBaseLoan loan = baseRateService.findUserBaseLoanByUserId(userId);
 		if (loan == null) {

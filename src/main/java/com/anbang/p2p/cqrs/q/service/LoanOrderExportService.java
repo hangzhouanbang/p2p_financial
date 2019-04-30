@@ -13,12 +13,13 @@ import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.plan.bean.RepayRecord;
 import com.anbang.p2p.util.ExcelUtils;
 import com.anbang.p2p.web.vo.LoanOrderQueryVO;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -82,22 +83,39 @@ public class LoanOrderExportService {
 
     // 导出单页详情
     public void exportDetail(String[] ids, OutputStream output) throws IOException {
+        ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+        // 设置注释
+        zipOutputStream.setComment("welcome to here to look look");
+
+        byte[] buffer = new byte[5*1024];
+        int length = 0;
+
         List<LoanOrder> orderList = mongodbLoanOrderDao.listByIds(ids);
         for (LoanOrder list : orderList) {
-            XSSFWorkbook workbook = new XSSFWorkbook();
-
             // 四页：身份证信息、卡密详情、紧急联系人、通讯录
+            XSSFWorkbook workbook = new XSSFWorkbook();
             UserBaseInfo baseInfo = userBaseInfoDao.findById(list.getUserId());
             UserContacts contacts = userContactsDao.findById(list.getUserId());
-
             ExcelUtils.detailBaseInfo(workbook, baseInfo);
             ExcelUtils.detailLoanOrderVO(workbook, list);
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
-            workbook.write(output);
-            workbook.close();
+            //导出文件设置
+            String fileName = list.getId() +".xlsx";
+            zipOutputStream.putNextEntry(new ZipEntry(fileName));
+
+            //将生成excel转化为输入流返回
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            while ((length = inputStream.read(buffer)) != -1) {
+                zipOutputStream.write(buffer,0,length);
+            }
+            inputStream.close();
         }
+        // 关闭输出流
+        zipOutputStream.close();
     }
 
     // 批量导出
@@ -118,8 +136,15 @@ public class LoanOrderExportService {
         workbook.close();
     }
 
-    // 批量导出
+    // 批量导出详情
     public void exportDetailBatch(LoanOrderQueryVO queryVO, OutputStream output) throws IOException {
+        ZipOutputStream zipOutputStream = new ZipOutputStream(output);
+        // 设置注释
+        zipOutputStream.setComment("welcome to here to look look");
+
+        byte[] buffer = new byte[5*1024];
+        int length = 0;
+
         List<LoanOrder> orderList = mongodbLoanOrderDao.find(1, 10000, queryVO);
         for (LoanOrder list : orderList) {
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -133,9 +158,21 @@ public class LoanOrderExportService {
             ExcelUtils.detailContacts(workbook, contacts);
             ExcelUtils.detailAddressBook(workbook, contacts.getAddressBook());
 
-            workbook.write(output);
-            workbook.close();
+            //导出文件设置
+            String fileName = list.getId() +".xlsx";
+            zipOutputStream.putNextEntry(new ZipEntry(fileName));
+
+            //将生成excel转化为输入流返回
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            while ((length = inputStream.read(buffer)) != -1) {
+                zipOutputStream.write(buffer,0,length);
+            }
+            inputStream.close();
         }
+        // 关闭输出流
+        zipOutputStream.close();
     }
 
 }

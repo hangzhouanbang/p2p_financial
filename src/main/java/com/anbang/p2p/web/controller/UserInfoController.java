@@ -101,10 +101,11 @@ public class UserInfoController {
 			if (flag > 0 && flag < 1) {
 				return CommonVOUtil.success(Notification.getMap().get("repayFront").toString());
 			}
+			return CommonVOUtil.success(Notification.getMap().get("applySuccess").toString());
 		}
-//		if (OrderState.clean.equals(loanOrder.getState())) {
-//			return CommonVOUtil.success(Notification.getMap().get("repaySuccess").toString());
-//		}
+		if (OrderState.clean.equals(loanOrder.getState())) {
+			return CommonVOUtil.success(Notification.getMap().get("repaySuccess").toString());
+		}
 		if (OrderState.overdue.equals(loanOrder.getState())) {
 			double flag = TimeUtils.repayTime(System.currentTimeMillis(), loanOrder.getMaxLimitTime());
 			if (flag > 15) {

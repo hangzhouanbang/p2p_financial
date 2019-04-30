@@ -109,18 +109,18 @@ public class OrderController {
 			return CommonVOUtil.success(data, "success");
 		}
 
-//		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
-//		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
-//			data.put("allVerify", false);
-//			return CommonVOUtil.success(data, "success");
-//		}
+		MobileVerify mobileVerify = userAuthQueryService.getMobileVerify(userId);
+		if (mobileVerify == null || !CommonRecordState.SUCCESS.equals(mobileVerify.getState())) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
 
 		// 电商认证
-//		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
-//		if (shoppingVerify == null || !CommonRecordState.SUCCESS.equals(shoppingVerify.getState())) {
-//			data.put("allVerify", false);
-//			return CommonVOUtil.success(data, "success");
-//		}
+		ShoppingVerify shoppingVerify = userAuthQueryService.getShoppingVerify(userId);
+		if (shoppingVerify == null || !CommonRecordState.SUCCESS.equals(shoppingVerify.getState())) {
+			data.put("allVerify", false);
+			return CommonVOUtil.success(data, "success");
+		}
 
 		//  合同认证
 		OrderContract contract = orderQueryService.findOrderContractById("001");

@@ -368,16 +368,13 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
-			String fileName = format.format(date) + "orderDetail" + ".zip";
-			response.reset();
-			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
-			response.setContentType("application/msexcel");
+			response.setHeader("Content-Type","application/octect-stream");
+			response.setHeader("Content-Disposition","attachment;filename=order.zip");
 
 			try {
 				OutputStream output = response.getOutputStream();
 				// 业务数据封装
 				loanOrderExportService.exportDetail(ids, output);
-				output.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -414,18 +411,14 @@ public class OrderManagerController {
 			return CommonVOUtil.success("success");
 		}
 		if ("detail".equals(exportType)) {
-			String fileName = format.format(date) + exportType + "Order.xlsx";
-			response.reset();
-			response.setHeader("Content-disposition", "attachment; filename=" + fileName);
-			response.setContentType("application/msexcel");
+			response.setHeader("Content-Type","application/octect-stream");
+			response.setHeader("Content-Disposition","attachment;filename=orderDetail.zip");
 			try {
 
 				OutputStream output = response.getOutputStream();
 				// 业务数据封装
 				loanOrderExportService.exportDetailBatch(queryVO, output);
 
-				// 关闭输出流
-				output.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

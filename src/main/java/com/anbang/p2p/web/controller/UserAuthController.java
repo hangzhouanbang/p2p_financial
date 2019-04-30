@@ -91,22 +91,17 @@ public class UserAuthController {
 		String code = "";
 		String requestId = "";
 		String bizId = "";
-		if (map.containsKey("Message")) {
-			message = (String) map.get("Message");
+		if (map.containsKey("order_id")) {
+			message = (String) map.get("order_id");
 		}
-		if (map.containsKey("Code")) {
-			code = (String) map.get("Code");
+		if (map.containsKey("return_code")) {
+			code = (String) map.get("return_code");
 		}
-		if (message.equals("OK") && code.equals("OK")) {
-			if (map.containsKey("RequestId")) {
-				requestId = (String) map.get("RequestId");
-			}
-			if (map.containsKey("BizId")) {
-				bizId = (String) map.get("BizId");
-			}
+		if (code.equals("00000")) {
+
 		} else {
 			vo.setSuccess(false);
-			vo.setMsg(message);
+			vo.setMsg("error");
 		}
 		UserVerifyPhoneInfo userVerifyPhoneInfo = new UserVerifyPhoneInfo();
 		userVerifyPhoneInfo.setId(phone);
@@ -176,21 +171,22 @@ public class UserAuthController {
 	}
 
 	private String getCode(String phone, String param) {
-		String host = "https://feginesms.market.alicloudapi.com";
-		String path = "/codeNotice";
+		String host = "http://dingxin.market.alicloudapi.com";
+		String path = "/dx/sendSms";
 		String appcode = AliyunConfig.APPCODE;
 		Map<String, String> headers = new HashMap<String, String>();
-		// 最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
+		//最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
 		headers.put("Authorization", "APPCODE " + appcode);
 		Map<String, String> querys = new HashMap<String, String>();
+		querys.put("mobile", phone);
+		querys.put("param", "code:" + param);
+		querys.put("tpl_id", "TP1711063");
 
-		querys.put("param", param);
-		querys.put("phone", phone);
-		querys.put("sign", "1");
-		querys.put("skin", "1");
 		String result = "";
 		try {
-			HttpResponse response = HttpUtil.doGet(host, path, headers, querys);
+			HttpResponse response = HttpUtil.doPost(host, path, headers, querys, "");
+			System.out.println(response.toString());
+			//获取response的body
 			result = EntityUtils.toString(response.getEntity());
 		} catch (Exception e) {
 			e.printStackTrace();

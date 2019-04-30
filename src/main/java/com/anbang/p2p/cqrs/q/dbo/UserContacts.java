@@ -21,7 +21,7 @@ public class UserContacts {
 	public static boolean isBlank(UserContacts contacts) {
 		if (StringUtils.isAnyBlank(contacts.getDirectContactsPhone(), contacts.getDirectContactsName(),
 				contacts.getDireactRelation(), contacts.getCommonContactsPhone(), contacts.getCommonContactsName(),
-				contacts.getCommonRelation(), contacts.getAddressBook())) {
+				contacts.getCommonRelation())) {
 			return true;
 		}
 		return false;

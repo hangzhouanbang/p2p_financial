@@ -5,6 +5,7 @@ spring:
 
 server:
   port: 2020
+  max-http-header-size: 10000000
   
 filepath:
   snapshotFileBasePath: /data/app/p2p_financial/snapshot

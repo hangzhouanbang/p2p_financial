@@ -79,7 +79,7 @@ public class UserVerifyController {
 	 * 紧急联系人
 	 */
 	@RequestMapping("/contacts")
-	public CommonVO contacts(String token, UserContacts userContacts, String addressList) {
+	public CommonVO contacts(String token, UserContacts userContacts) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
 			return CommonVOUtil.error("invalid token");

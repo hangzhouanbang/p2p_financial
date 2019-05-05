@@ -5,6 +5,7 @@ import java.util.List;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -74,7 +75,7 @@ public class MongodbUserDboDao implements UserDboDao {
 		if (StringUtils.isNotBlank(userQuery.getState())) {
 			query.addCriteria(Criteria.where("state").is(userQuery.getState()));
 		}
-
+		query.with(new Sort(Sort.Direction.DESC, "createTime"));
 		query.skip((page - 1) * size);
 		query.limit(size);
 		return mongoTemplate.find(query, UserDbo.class);

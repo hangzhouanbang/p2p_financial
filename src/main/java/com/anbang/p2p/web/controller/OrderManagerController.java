@@ -391,6 +391,7 @@ public class OrderManagerController {
 	 */
 	@RequestMapping("/collectionExportBatch")
 	public CommonVO collectionExportBatch(LoanOrderQueryVO queryVO, String exportType, HttpServletResponse response) {
+		queryVO.setState(OrderState.collection);
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date date = new Date();

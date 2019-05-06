@@ -137,7 +137,7 @@ public class BaseLoanAndRateController {
 	public CommonVO saveOrgInfo(OrgInfo orgInfo) {
 		orgInfo.setId("001");
 		orgInfoDao.save(orgInfo);
-		return CommonVOUtil.success("success");
+		return CommonVOUtil.success(orgInfo,"success");
 	}
 
 	/**

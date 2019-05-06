@@ -12,6 +12,7 @@ public class UserBaseInfo {
 	private String faceImgUrl;// 人脸图片
 	private String IDcardImgUrl_front;// 身份证正面
 	private String IDcardImgUrl_reverse;// 身份证反面
+	private long createTime;
 
 	/**
 	 * 是否完成实名认证
@@ -79,4 +80,11 @@ public class UserBaseInfo {
 		IDcardImgUrl_reverse = iDcardImgUrl_reverse;
 	}
 
+	public long getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(long createTime) {
+		this.createTime = createTime;
+	}
 }

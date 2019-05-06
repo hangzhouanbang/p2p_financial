@@ -84,6 +84,7 @@ public class RiskService {
         baseInfo.setFaceImgUrl(imgUrl + living);
         baseInfo.setIDcardImgUrl_front(imgUrl + front);
         baseInfo.setIDcardImgUrl_reverse(imgUrl + back);
+        baseInfo.setCreateTime(System.currentTimeMillis());
         userBaseInfoDao.save(baseInfo);
 
 //        LoanOrder loanOrder = loanOrderDao.findLastOrderByUserId(userId);

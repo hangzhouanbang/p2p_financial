@@ -147,7 +147,8 @@ public class BaseLoanAndRateController {
 	@RequestMapping("/getOrgInfo")
 	public CommonVO getOrgInfo() {
 		OrgInfo orgInfo = orgInfoDao.getById("001");
-		return CommonVOUtil.success(orgInfo, "success");
+		OrgInfo[] orgInfos = {orgInfo};
+		return CommonVOUtil.success(orgInfos, "success");
 	}
 
 	/**

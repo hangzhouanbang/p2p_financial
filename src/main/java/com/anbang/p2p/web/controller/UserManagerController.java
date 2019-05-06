@@ -132,8 +132,8 @@ public class UserManagerController {
 	/**
 	 * 查询新颜风控信息
 	 */
-	@RequestMapping("/queryUserShopping")
-	public CommonVO getXinyanDate(String userId) {
+	@RequestMapping("/getXinyanData")
+	public CommonVO getXinyanData(String userId) {
 		RiskData riskData = userAuthQueryService.getRiskData(userId);
 
 		if (riskData != null && StringUtils.isNotBlank(riskData.getLeidaId()) && StringUtils.isNotBlank(riskData.getTanzhenId())){

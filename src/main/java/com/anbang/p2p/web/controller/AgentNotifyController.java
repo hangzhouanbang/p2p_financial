@@ -107,6 +107,8 @@ public class AgentNotifyController {
      */
     @RequestMapping("/verifyCallback")
     public String verifyCallback(String partner_order_id, String result_auth, String result_status, String errorcode, String message) {
+        System.out.println(String.format("有盾身份证识别回调：%s|%s|%s|%s|%s", partner_order_id, result_auth, result_status, errorcode,message));
+
         if (StringUtils.isBlank(partner_order_id)) {
             return "error";
         }

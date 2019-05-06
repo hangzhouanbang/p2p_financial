@@ -5,9 +5,11 @@ import java.util.List;
 import com.anbang.p2p.cqrs.c.domain.order.OrderState;
 import com.anbang.p2p.plan.bean.MobileVerify;
 import com.anbang.p2p.plan.bean.OrgInfo;
+import com.anbang.p2p.plan.bean.RiskData;
 import com.anbang.p2p.plan.bean.ShoppingVerify;
 import com.anbang.p2p.plan.dao.MobileVerifyDao;
 import com.anbang.p2p.plan.dao.OrgInfoDao;
+import com.anbang.p2p.plan.dao.RiskDataDao;
 import com.anbang.p2p.plan.dao.ShoppingVerifyDao;
 import com.anbang.p2p.web.vo.UserQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,9 @@ public class UserAuthQueryService {
 
 	@Autowired
 	private ShoppingVerifyDao shoppingVerifyDao;
+
+	@Autowired
+	private RiskDataDao riskDataDao;
 
 	/**
 	 * 创建用户并授权
@@ -193,5 +198,13 @@ public class UserAuthQueryService {
 
 	public void saveShoppingVerify(ShoppingVerify shoppingVerify) {
 		 shoppingVerifyDao.save(shoppingVerify);
+	}
+
+	public void saveRiskData(RiskData riskData) {
+		riskDataDao.save(riskData);
+	}
+
+	public RiskData getRiskData(String id) {
+		return riskDataDao.getById(id);
 	}
 }

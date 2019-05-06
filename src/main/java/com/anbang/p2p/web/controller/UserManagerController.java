@@ -7,10 +7,12 @@ import com.anbang.p2p.constants.CommonRecordState;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.plan.bean.MobileVerify;
+import com.anbang.p2p.plan.bean.RiskData;
 import com.anbang.p2p.plan.bean.ShoppingVerify;
 import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.util.XinyanUtil;
 import com.anbang.p2p.web.vo.UserQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -125,5 +127,43 @@ public class UserManagerController {
 
 		String url = XinyanUtil.getQueryUrl(verify.getToken());
 		return CommonVOUtil.success(url, "success");
+	}
+
+	/**
+	 * 查询新颜风控信息
+	 */
+	@RequestMapping("/queryUserShopping")
+	public CommonVO getXinyanDate(String userId) {
+		RiskData riskData = userAuthQueryService.getRiskData(userId);
+
+		if (riskData != null && StringUtils.isNotBlank(riskData.getLeidaId()) && StringUtils.isNotBlank(riskData.getTanzhenId())){
+			return CommonVOUtil.success(riskData,"success");
+		}
+
+		if (riskData == null) {
+			riskData = new RiskData();
+		}
+
+		UserDbo userDbo = userAuthQueryService.findUserDboByUserId(userId);
+		if (StringUtils.isBlank(userDbo.getIDcard())){
+			return CommonVOUtil.error("no_verify");
+		}
+
+		if (StringUtils.isBlank(riskData.getLeidaJson())) {
+			String leidaId = userId + "_" + System.currentTimeMillis();
+			String leidaJson = XinyanUtil.getLeida(leidaId, userDbo.getIDcard(), userDbo.getRealName(), userDbo.getPhone());
+			riskData.setLeidaId(leidaId);
+			riskData.setLeidaJson(leidaJson);
+		}
+
+		if (StringUtils.isBlank(riskData.getTanzhenJson())) {
+			String tanzhenId = userId + "_" + System.currentTimeMillis();
+			String tanzhengJson = XinyanUtil.getTanzhengA(tanzhenId, userDbo.getIDcard(), userDbo.getRealName(), userDbo.getPhone());
+			riskData.setTanzhenId(tanzhenId);
+			riskData.setTanzhenJson(tanzhengJson);
+		}
+
+		userAuthQueryService.saveRiskData(riskData);
+		return CommonVOUtil.success(riskData,"success");
 	}
 }

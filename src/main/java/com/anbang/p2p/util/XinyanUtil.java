@@ -79,7 +79,7 @@ public class XinyanUtil {
     /**
      * 全景雷达
      */
-    public static void getLeida(String trans_id, String id_no, String id_name,String phone_no) {
+    public static String getLeida(String trans_id, String id_no, String id_name,String phone_no) {
         /** 1、 商户号 **/
         String member_id = XinyanConfig.ApiUser;
         /** 2、终端号 **/
@@ -148,15 +148,20 @@ public class XinyanUtil {
             throw new RuntimeException("返回数据为空");
         }
 
-        System.out.println(">>>>>>>>>>>>>>>");
-        System.out.println(PostString);
-
+        JSONObject object = JSON.parseObject(PostString);
+        boolean success = object.getBoolean("success");
+        if (false == success) {
+            System.out.println("新颜全景雷达查询异常---->" + object.getString("errorCode") + object.getString("errorMsg") );
+            System.out.println(String.format("%s|%s|%s|%s", trans_id, id_no, id_name, phone_no));
+            return "";
+        }
+        return object.getString("data");
     }
 
     /**
      * 新颜探针A
      */
-    public static void probeA(String trans_id, String id_no, String id_name,String phone_no) {
+    public static String getTanzhengA(String trans_id, String id_no, String id_name,String phone_no) {
         /** 1、 商户号 **/
         String member_id = XinyanConfig.ApiUser;
         /** 2、终端号 **/
@@ -225,9 +230,14 @@ public class XinyanUtil {
             throw new RuntimeException("返回数据为空");
         }
 
-        System.out.println(">>>>>>>>>>>>>>>");
-        System.out.println(PostString);
-
+        JSONObject object = JSON.parseObject(PostString);
+        boolean success = object.getBoolean("success");
+        if (false == success) {
+            System.out.println("新颜探针A查询异常---->" + object.getString("errorCode") + object.getString("errorMsg") );
+            System.out.println(String.format("%s|%s|%s|%s", trans_id, id_no, id_name, phone_no));
+            return "";
+        }
+        return object.getString("data");
     }
 
 
@@ -241,6 +251,7 @@ public class XinyanUtil {
 
 
 //        getLeida("00001", "411422199408165414", "黄晨光", "15738510522");
-        probeA("00005", "411422199408165414", "黄晨光", "15738510522");
+        String json = getTanzhengA("00011", "411422199408165414", "黄晨光", "15738510522");
+        System.out.println(json);
     }
 }

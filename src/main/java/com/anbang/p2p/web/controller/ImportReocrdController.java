@@ -102,6 +102,9 @@ public class ImportReocrdController {
             }
         }
 
+        importRecord.setImportState(ImportState.finish);
+        importRecordService.save(importRecord);
+
         return CommonVOUtil.success("success");
     }
 

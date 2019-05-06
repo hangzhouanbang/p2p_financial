@@ -111,7 +111,7 @@ public class ImportReocrdController {
     /**
      * excel 销账导入
      */
-    @RequestMapping("/repayImport")
+    @PostMapping("/repayImport")
     public CommonVO repayImport(@RequestParam("file") MultipartFile file) {
         try {
 //            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;

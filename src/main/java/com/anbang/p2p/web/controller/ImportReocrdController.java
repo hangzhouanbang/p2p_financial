@@ -116,7 +116,7 @@ public class ImportReocrdController {
     public CommonVO repayImport(HttpServletRequest request) {
         try {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            MultipartFile file = multipartRequest.getFile("filename");
+            MultipartFile file = multipartRequest.getFile("template1");
 
             InputStream inputstream = file.getInputStream();
             if (!(inputstream.markSupported())) {
@@ -140,6 +140,4 @@ public class ImportReocrdController {
         }
         return CommonVOUtil.error("上传错误，请检查文件格式是否正确");
     }
-
-
 }

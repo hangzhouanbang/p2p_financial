@@ -123,7 +123,8 @@ public class XinyanUtil {
         base64str=base64str.replaceAll("\r\n", "");//重要 避免出现换行空格符
 
         /** rsa加密 **/
-        String pfxpath = "D:/xinyan/keyfile_pri.pfx";// 商户私钥
+//        String pfxpath = "D:/xinyan/keyfile_pri.pfx";// 商户私钥
+        String pfxpath = "/data/xinyan/keyfile_pri.pfx";// 商户私钥
 
         File pfxfile = new File(pfxpath);
         if (!pfxfile.exists()) {
@@ -205,7 +206,8 @@ public class XinyanUtil {
         base64str=base64str.replaceAll("\r\n", "");//重要 避免出现换行空格符
 
         /** rsa加密 **/
-        String pfxpath = "D:/xinyan/keyfile_pri.pfx";// 商户私钥
+//        String pfxpath = "D:/xinyan/keyfile_pri.pfx";// 商户私钥
+        String pfxpath = "/data/xinyan/keyfile_pri.pfx";// 商户私钥
 
         File pfxfile = new File(pfxpath);
         if (!pfxfile.exists()) {

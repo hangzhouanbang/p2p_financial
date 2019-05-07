@@ -10,6 +10,7 @@ import com.anbang.p2p.cqrs.q.service.OrderQueryService;
 import com.anbang.p2p.plan.bean.ImportRecord;
 import com.anbang.p2p.plan.bean.ImportState;
 import com.anbang.p2p.plan.bean.RepayRecord;
+import com.anbang.p2p.plan.bean.RepayRecordState;
 import com.anbang.p2p.plan.service.ImportRecordService;
 import com.anbang.p2p.util.CommonVOUtil;
 import com.anbang.p2p.util.FileUtils;
@@ -91,18 +92,24 @@ public class ImportReocrdController {
             return CommonVOUtil.error("state error");
         }
 
+        ImportState importState = ImportState.finish;
+
         for (RepayRecord list : importRecord.getRepayRecords()) {
             try {
                 OrderValueObject order = orderCmdService.changeOrderStateClean(list.getUserId());
                 orderQueryService.updateLoanOrderByImport(order, list.getRepayAmount());
+                list.setState(RepayRecordState.finish);
+                continue;
             } catch (OrderNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalOperationException e) {
                 e.printStackTrace();
             }
+            list.setState(RepayRecordState.error);
+            importState = ImportState.error;
         }
 
-        importRecord.setImportState(ImportState.finish);
+        importRecord.setImportState(importState);
         importRecordService.save(importRecord);
 
         return CommonVOUtil.success("success");

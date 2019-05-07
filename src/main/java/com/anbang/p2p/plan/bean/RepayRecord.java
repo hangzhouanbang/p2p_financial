@@ -9,6 +9,7 @@ public class RepayRecord {
     private String realName;
     private double amount;
     private double repayAmount;  //销账金额
+    private RepayRecordState state;
 
 
     public String getId() {
@@ -49,5 +50,13 @@ public class RepayRecord {
 
     public void setRepayAmount(double repayAmount) {
         this.repayAmount = repayAmount;
+    }
+
+    public RepayRecordState getState() {
+        return state;
+    }
+
+    public void setState(RepayRecordState state) {
+        this.state = state;
     }
 }

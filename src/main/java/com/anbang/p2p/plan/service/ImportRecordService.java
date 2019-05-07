@@ -3,6 +3,7 @@ package com.anbang.p2p.plan.service;
 import com.anbang.p2p.plan.bean.ImportRecord;
 import com.anbang.p2p.plan.bean.ImportState;
 import com.anbang.p2p.plan.bean.RepayRecord;
+import com.anbang.p2p.plan.bean.RepayRecordState;
 import com.anbang.p2p.plan.dao.ImportRecordDao;
 import com.anbang.p2p.util.ImprotExcelUtil;
 import com.google.gson.reflect.TypeToken;
@@ -54,7 +55,10 @@ public class ImportRecordService {
         List<RepayRecord> list = ImprotExcelUtil.listFromJson(ImprotExcelUtil.objFromJson(listMap),new TypeToken<List<RepayRecord>>(){}.getType());
         ImportRecord importRecord = new ImportRecord();
         importRecord.setName(fileName);
+
+        list.forEach(p -> p.setState(RepayRecordState.wait));
         importRecord.setRepayRecords(list);
+
         importRecord.setImportState(ImportState.wait);
         importRecord.setCauseBy("");
         importRecord.setCreateTime(System.currentTimeMillis());

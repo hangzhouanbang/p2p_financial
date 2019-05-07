@@ -512,9 +512,9 @@ public class OrderController {
 
 				map.put("${amount}", String.valueOf(loanOrder.getAmount()));
 				map.put("${capital}", AmountToUpper.number2CNMontrayUnit(loanOrder.getAmount()));
-				map.put("${rate}", String.valueOf(loanOrder.getOverdue_rate() * 100));
+				map.put("${rate}", String.format("%.2f", loanOrder.getOverdue_rate() * 100));
 				map.put("${day}", String.valueOf(loanOrder.getFreeTimeOfInterest() / (24 * 60 * 60 * 1000)));
-				map.put("${start}", TimeUtils.getStringDate(loanOrder.getDeliverTime()));
+				map.put("${start}", TimeUtils.getStringDate(loanOrder.getCreateTime()));
 				map.put("${end}", TimeUtils.getStringDate(loanOrder.getMaxLimitTime()));
 				String destPath = WordUtil.PATH + loanOrder.getId() + ".docx";
 		 		WordUtil.searchAndReplace(WordUtil.DEMO_PATH, destPath, map);

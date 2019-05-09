@@ -364,11 +364,6 @@ public class OrderController {
 			vo.setMsg("OrderNotFoundException");
 			return vo;
 		}
-		if (!loanOrder.getState().equals(OrderState.refund)) {
-			vo.setSuccess(false);
-			vo.setMsg("IllegalOperationException");
-			return vo;
-		}
 		if (System.currentTimeMillis() < loanOrder.getDeliverTime()) {
 			vo.setSuccess(false);
 			vo.setMsg("IllegalOperationException");

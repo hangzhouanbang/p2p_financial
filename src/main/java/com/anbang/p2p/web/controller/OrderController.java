@@ -399,6 +399,33 @@ public class OrderController {
 		}
 	}
 
+	/**
+	 * 获取延期信息
+	 */
+	@RequestMapping("/getExpandInfo")
+	public CommonVO getExpandUrl(String token) {
+		String userId = userAuthService.getUserIdBySessionId(token);
+		if (userId == null) {
+			return CommonVOUtil.invalidToken();
+		}
+
+		LoanOrder order = orderQueryService.findLastOrderByUserId(userId);
+		if (order == null) {
+			return CommonVOUtil.error("OrderNotFoundException");
+		}
+
+		if (order.getState().equals(OrderState.clean)) {
+			return CommonVOUtil.error("OrderStateException");
+		}
+
+		Map data = new HashMap();
+		data.put("amount", order.getAmount());
+		data.put("expand_charge", order.getExpand_charge());
+		data.put("repayTime", order.getMaxLimitTime() + order.getFreeTimeOfInterest());
+		return CommonVOUtil.systemException();
+
+	}
+
 	@RequestMapping("/getExpandUrl")
 	public CommonVO getExpandUrl(String token, String payType) {
 		String userId = userAuthService.getUserIdBySessionId(token);

@@ -214,7 +214,7 @@ public class OrderManagerController {
 	/**
 	 * 待还款转逾期
 	 */
-	@Scheduled(cron = "0 20 0 * * ?") // 每天凌晨20
+	@Scheduled(cron = "0 1 0 * * ?") // 每天凌晨20
 	@RequestMapping("/refund_to_overdue")
 	public void refundTransferToOverdue() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
@@ -242,7 +242,7 @@ public class OrderManagerController {
 	/**
 	 * 逾期转催收
 	 */
-	@Scheduled(cron = "0 30 0 * * ?") // 每天凌晨30
+	@Scheduled(cron = "0 10 0 * * ?") // 每天凌晨30
 	@RequestMapping("/overdue_to_collection")
 	public void overdueTransferToCollection() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();
@@ -275,7 +275,7 @@ public class OrderManagerController {
 	/**
 	 * 催收更新应还款
 	 */
-	@Scheduled(cron = "0 40 0 * * ?") // 每天凌晨40
+	@Scheduled(cron = "0 20 0 * * ?") // 每天凌晨40
 	@RequestMapping("/collection_cal")
 	public void collectionCal() {
 		LoanOrderQueryVO query = new LoanOrderQueryVO();

@@ -129,7 +129,8 @@ public class OrderManager {
 			throw new OrderNotFoundException();
 		}
 		Order order = userIdOrderMap.get(userId);
-		if (!order.getState().equals(OrderState.refund)) {
+		if (!order.getState().equals(OrderState.refund) && !order.getState().equals(OrderState.overdue) &&
+				!order.getState().equals(OrderState.collection)) {
 			throw new IllegalOperationException();
 		}
 		order.setRealRefundAmount(amount);

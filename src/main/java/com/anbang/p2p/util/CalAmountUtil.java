@@ -12,6 +12,9 @@ import java.util.Map;
  * @Description: 计算利息等
  */
 public class CalAmountUtil {
+    private static final long DAY_MESC = 24 * 60 * 60 * 1000;
+    private static final long TIME_ZONE_MESC  = 8 * 60 * 60 * 1000;
+
     public static void shouldRepayAmount(LoanOrder order, long currentTime) {
         if (currentTime < order.getDeliverTime()) {
             return;
@@ -26,7 +29,7 @@ public class CalAmountUtil {
                 BigDecimal b_amount = new BigDecimal(Double.toString(order.getAmount()));
 
                 // 逾期时间
-                long day = (currentTime - order.getMaxLimitTime()) / 1000 / 60 / 60 / 24;
+                long day = (currentTime + TIME_ZONE_MESC) / DAY_MESC - (order.getMaxLimitTime() + TIME_ZONE_MESC) / DAY_MESC;
                 BigDecimal b_day = new BigDecimal(Long.toString(day));
 
                 // 逾期利率

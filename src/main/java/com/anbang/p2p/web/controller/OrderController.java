@@ -399,7 +399,7 @@ public class OrderController {
 	 * 获取延期信息
 	 */
 	@RequestMapping("/getExpandInfo")
-	public CommonVO getExpandUrl(String token) {
+	public CommonVO getExpandInfo(String token) {
 		String userId = userAuthService.getUserIdBySessionId(token);
 		if (userId == null) {
 			return CommonVOUtil.invalidToken();

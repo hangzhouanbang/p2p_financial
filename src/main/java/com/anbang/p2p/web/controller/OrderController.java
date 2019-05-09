@@ -422,7 +422,7 @@ public class OrderController {
 		data.put("amount", order.getAmount());
 		data.put("expand_charge", order.getExpand_charge());
 		data.put("repayTime", order.getMaxLimitTime() + order.getFreeTimeOfInterest());
-		return CommonVOUtil.systemException();
+		return CommonVOUtil.success(data, "success");
 
 	}
 

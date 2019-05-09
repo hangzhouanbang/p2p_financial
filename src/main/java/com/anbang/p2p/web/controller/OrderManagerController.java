@@ -439,6 +439,8 @@ public class OrderManagerController {
 
 			OrderValueObject object = orderCmdService.changeOrderStateByAdmin(id, userId, orderState);
 			orderQueryService.updateLoanOrderState(object.getId(), object.getState(), amount);
+
+			userService.updateUserState(object.getUserId(), object.getState().name());
 			return CommonVOUtil.success("success");
 		} catch (OrderNotFoundException e) {
 			e.printStackTrace();

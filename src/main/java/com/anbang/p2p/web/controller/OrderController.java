@@ -267,6 +267,7 @@ public class OrderController {
 			freeTimeOfInterest = loan.getFreeTimeOfInterest();
 			overdue = loan.getOverdue();
 			overdue_rate = loan.getOverdue_rate();
+			expand_charge = loan.getExpand_charge();
 		}
 		try {
 			// 生成卡密

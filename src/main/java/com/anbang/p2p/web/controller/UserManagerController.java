@@ -163,6 +163,7 @@ public class UserManagerController {
 			riskData.setTanzhenJson(tanzhengJson);
 		}
 
+		riskData.setId(userId);
 		userAuthQueryService.saveRiskData(riskData);
 		return CommonVOUtil.success(riskData,"success");
 	}

@@ -164,6 +164,7 @@ public class UserManagerController {
 		}
 
 		riskData.setId(userId);
+		riskData.setCreateTime(System.currentTimeMillis());
 		userAuthQueryService.saveRiskData(riskData);
 		return CommonVOUtil.success(riskData,"success");
 	}

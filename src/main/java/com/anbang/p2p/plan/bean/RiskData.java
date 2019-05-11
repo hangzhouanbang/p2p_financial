@@ -9,6 +9,7 @@ public class RiskData {
     private String leidaJson;  // 新颜全景雷达
     private String tanzhenId;    // 探针trans_id
     private String tanzhenJson;  // 新颜探针A
+    private long createTime;
 
     public String getId() {
         return id;
@@ -48,5 +49,13 @@ public class RiskData {
 
     public void setTanzhenId(String tanzhenId) {
         this.tanzhenId = tanzhenId;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
     }
 }

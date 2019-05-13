@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.anbang.p2p.constants.CommonRecordState;
+import com.anbang.p2p.cqrs.q.dbo.UserContacts;
 import com.anbang.p2p.cqrs.q.dbo.UserDbo;
 import com.anbang.p2p.cqrs.q.service.UserService;
 import com.anbang.p2p.plan.bean.MobileVerify;
@@ -167,5 +168,14 @@ public class UserManagerController {
 		riskData.setCreateTime(System.currentTimeMillis());
 		userAuthQueryService.saveRiskData(riskData);
 		return CommonVOUtil.success(riskData,"success");
+	}
+
+	/**
+	 * 查询用户联系人
+	 */
+	@RequestMapping("/queryContracts")
+	public CommonVO queryContracts(String userId) {
+		UserContacts contacts = userAuthQueryService.findUserContactsByUserId(userId);
+		return CommonVOUtil.success(contacts, "success");
 	}
 }

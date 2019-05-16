@@ -48,7 +48,6 @@ public class FileUtil {
 	 * 注意 若cmd文件很大 。大小超过int最大值时 会有问题
 	 *
 	 * @param fileBasePath
-	 * @param prefix
 	 * @throws IOException
 	 */
 	public List<Command> read(String fileBasePath) throws Throwable {

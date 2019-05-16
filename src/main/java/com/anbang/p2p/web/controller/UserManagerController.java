@@ -137,7 +137,7 @@ public class UserManagerController {
 	public CommonVO getXinyanData(String userId) {
 		RiskData riskData = userAuthQueryService.getRiskData(userId);
 
-		if (riskData != null && StringUtils.isNotBlank(riskData.getLeidaId()) && StringUtils.isNotBlank(riskData.getTanzhenId())){
+		if (riskData != null && StringUtils.isNotBlank(riskData.getLeidaId()) && StringUtils.isNotBlank(riskData.getDaihouJson())){
 			return CommonVOUtil.success(riskData,"success");
 		}
 
@@ -157,11 +157,18 @@ public class UserManagerController {
 			riskData.setLeidaJson(leidaJson);
 		}
 
-		if (StringUtils.isBlank(riskData.getTanzhenJson())) {
+//		if (StringUtils.isBlank(riskData.getTanzhenJson())) {
+//			String tanzhenId = userId + "_" + System.currentTimeMillis();
+//			String tanzhengJson = XinyanUtil.getTanzhengA(tanzhenId, userDbo.getIDcard(), userDbo.getRealName(), userDbo.getPhone());
+//			riskData.setTanzhenId(tanzhenId);
+//			riskData.setTanzhenJson(tanzhengJson);
+//		}
+
+		if (StringUtils.isBlank(riskData.getDaihouJson())) {
 			String tanzhenId = userId + "_" + System.currentTimeMillis();
-			String tanzhengJson = XinyanUtil.getTanzhengA(tanzhenId, userDbo.getIDcard(), userDbo.getRealName(), userDbo.getPhone());
-			riskData.setTanzhenId(tanzhenId);
-			riskData.setTanzhenJson(tanzhengJson);
+			String tanzhengJson = XinyanUtil.daiHou(tanzhenId, userDbo.getIDcard(), userDbo.getRealName());
+			riskData.setDaihouId(tanzhenId);
+			riskData.setDaihouJson(tanzhengJson);
 		}
 
 		riskData.setId(userId);

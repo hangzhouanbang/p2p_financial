@@ -9,6 +9,9 @@ public class RiskData {
     private String leidaJson;  // 新颜全景雷达
     private String tanzhenId;    // 探针trans_id
     private String tanzhenJson;  // 新颜探针A
+    private String daihouId;    //贷后trans_id
+    private String daihouJson;  //贷后雷达数据
+
     private long createTime;
 
     public String getId() {
@@ -57,5 +60,21 @@ public class RiskData {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public String getDaihouId() {
+        return daihouId;
+    }
+
+    public void setDaihouId(String daihouId) {
+        this.daihouId = daihouId;
+    }
+
+    public String getDaihouJson() {
+        return daihouJson;
+    }
+
+    public void setDaihouJson(String daihouJson) {
+        this.daihouJson = daihouJson;
     }
 }

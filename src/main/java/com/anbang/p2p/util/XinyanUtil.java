@@ -242,6 +242,89 @@ public class XinyanUtil {
         return object.getString("data");
     }
 
+    /**
+     * 贷后雷达
+     */
+    public static String daiHou(String trans_id, String id_no, String id_name) {
+        /** 1、 商户号 **/
+        String member_id = XinyanConfig.ApiUser;
+        /** 2、终端号 **/
+        String terminal_id = XinyanConfig.keyNo;
+        /** 3、请求地址 **/
+        String url = "https://api.xinyan.com/product/rating/v3/assets";
+        Map<String, String> headers = new HashMap<>();
+        String PostString = null;
+
+        String versions = "1.3.0";
+
+        id_no = MD5Utils.encode(id_no.trim());
+        id_name = MD5Utils.encode(id_name.trim());
+
+        String trade_date = TimeUtils.getStringDate(new Date());// 订单日期
+
+        String XmlOrJson = "";
+        /** 组装参数 **/
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("member_id", member_id);
+        jsonObject.put("terminal_id", terminal_id);
+        jsonObject.put("trade_date", trade_date);
+        jsonObject.put("trans_id", trans_id);
+        jsonObject.put("versions", versions);
+        jsonObject.put("encrypt_type", "MD5");// MD5：标准32位小写(推荐) SHA256：标准64位
+
+        jsonObject.put("id_no", id_no);
+        jsonObject.put("id_name", id_name);
+
+        XmlOrJson = JSON.toJSONString(jsonObject);
+
+        /** base64 编码 **/
+        String base64str = null;
+        try {
+            base64str = SecurityUtil.Base64Encode(XmlOrJson);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        base64str=base64str.replaceAll("\r\n", "");//重要 避免出现换行空格符
+
+        /** rsa加密 **/
+        String pfxpath = "D:/xinyan/keyfile_pri.pfx";// 商户私钥
+//        String pfxpath = "/data/xinyan/keyfile_pri.pfx";// 商户私钥
+
+        File pfxfile = new File(pfxpath);
+        if (!pfxfile.exists()) {
+            System.out.println("私钥文件不存在");
+            throw new RuntimeException("私钥文件不存在！");
+        }
+        String pfxpwd = "123456";// 私钥密码
+
+        String data_content = RsaCodingUtil.encryptByPriPfxFile(base64str, pfxpath, pfxpwd);// 加密数据
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("member_id", member_id);
+        params.put("terminal_id", terminal_id);
+        params.put("data_type", "json");
+        params.put("data_content", data_content);
+
+        PostString = HttpUtils.doPostByForm(url, headers, params);
+
+        System.out.println(PostString);
+
+
+        /** ================处理返回结果============= **/
+        if (PostString.isEmpty()) {// 判断参数是否为空
+            throw new RuntimeException("返回数据为空");
+        }
+
+        JSONObject object = JSON.parseObject(PostString);
+        boolean success = object.getBoolean("success");
+        if (false == success) {
+            System.out.println("新颜贷后雷达查询异常---->" + object.getString("errorCode") + object.getString("errorMsg") );
+            System.out.println(String.format("%s|%s|%s", trans_id, id_no, id_name));
+            return "";
+        }
+        return object.getString("data");
+    }
+
 
     public static void main(String[] args) {
 //        System.out.println(getCarrierUrl("003"));
@@ -253,7 +336,8 @@ public class XinyanUtil {
 
 
 //        getLeida("00001", "411422199408165414", "黄晨光", "15738510522");
-        String json = getTanzhengA("00011", "411422199408165414", "黄晨光", "15738510522");
+//        String json = getTanzhengA("00012", "411422199408165414", "黄晨光", "15738510522");
+        String json = daiHou("00013", "411422199408165414", "黄晨光");
         System.out.println(json);
     }
 }
